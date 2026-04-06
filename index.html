@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>メモ帳トップページ</title>
+<title>出勤・退勤LINE送信用ツール</title>
 <style>
 body{
   margin:0;
@@ -351,7 +351,7 @@ async function copyWithFallback(text){
   if(!ok) throw new Error("copy failed");
 }
 
-/* 出勤用 */
+/* 出勤LINE用 */
 const SH_STORAGE_KEY = "top_shukkin_memo_v1";
 const shBaseIds = ["sh_name", "sh_locationSelect", "sh_locationManual", "sh_extraText"];
 const shAreaOptions = ["", "(四)", "(鈴)", "(桑)", "(三)", "(員)"];
@@ -497,7 +497,7 @@ function shClearAll(){
   shSetStatus("クリアしました。");
 }
 
-/* 退勤用 */
+/* 退勤LINE用 */
 const NP_STORAGE_KEY = "top_nippo_memo_v1";
 const npIds = ["np_name","np_area","np_minutes","np_cases","np_home","np_miai","np_referral","np_appointment","np_contract","np_introContract","np_other","np_leave","np_form"];
 
