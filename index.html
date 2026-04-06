@@ -1,0 +1,593 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>メモ帳トップページ</title>
+<style>
+body{
+  margin:0;
+  font-family:"Yu Gothic","Hiragino Kaku Gothic ProN",sans-serif;
+  background:#f5f7fb;
+  color:#1f2937;
+}
+.topbar{
+  max-width:1200px;
+  margin:20px auto 0;
+  padding:0 12px;
+}
+.shell{
+  max-width:1200px;
+  margin:12px auto 24px;
+  padding:12px;
+}
+.header-card,.page-card{
+  background:#fff;
+  border-radius:18px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+.header-card{
+  padding:22px;
+}
+h1{
+  margin:0 0 8px;
+  font-size:26px;
+}
+.sub{
+  margin:0;
+  color:#6b7280;
+  font-size:14px;
+  line-height:1.7;
+}
+.menu{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-top:18px;
+}
+.menu button{
+  border:none;
+  border-radius:14px;
+  padding:18px;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.btn-shukkin{background:#2a424c;color:#fff;}
+.btn-nippo{background:#fee846;color:#2a424c;}
+.page-card{
+  margin-top:18px;
+  padding:18px;
+}
+.page{
+  display:none;
+}
+.page.active{
+  display:block;
+}
+.page-title{
+  margin:0 0 14px;
+  font-size:22px;
+}
+.back-row{
+  margin-bottom:14px;
+}
+.back-btn{
+  border:none;
+  background:#e5e7eb;
+  color:#111827;
+  border-radius:12px;
+  padding:10px 14px;
+  font-size:14px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.wrap{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+.card{
+  background:#fff;
+  padding:20px;
+  border-radius:16px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+.output{
+  white-space:pre-wrap;
+  background:#f9fafb;
+  padding:15px;
+  border-radius:12px;
+  min-height:320px;
+  border:1px solid #ccc;
+  font-size:15px;
+  line-height:1.9;
+}
+.status{
+  margin-top:12px;
+  min-height:20px;
+  font-size:13px;
+  font-weight:bold;
+  color:#2a424c;
+}
+.buttons{
+  display:grid;
+  gap:12px;
+  margin-top:15px;
+}
+button.action{
+  width:100%;
+  padding:16px;
+  font-size:18px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+}
+.primary{background:#2a424c;color:#fff;}
+.secondary{background:#fee846;color:#2a424c;}
+.line{background:#06c755;color:#fff;}
+.ghost{background:#ddd;color:#111;}
+.note{
+  margin-top:8px;
+  font-size:12px;
+  color:#6b7280;
+  line-height:1.6;
+}
+@media(max-width:900px){
+  .menu{grid-template-columns:1fr;}
+  .wrap{grid-template-columns:1fr;}
+}
+
+/* 出勤メモ帳 */
+.sh-row{ margin-bottom:14px; }
+.sh-label{
+  display:block;
+  font-size:14px;
+  font-weight:bold;
+  margin-bottom:6px;
+}
+.sh-input, .sh-select, .sh-textarea{
+  width:100%;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+  box-sizing:border-box;
+}
+.sh-textarea{ min-height:88px; resize:vertical; }
+.sh-inline-group{
+  display:grid;
+  grid-template-columns:110px 1fr auto;
+  gap:10px;
+  align-items:center;
+  margin-bottom:10px;
+}
+.sh-inline-group .small{
+  width:auto;
+  min-width:72px;
+  padding:10px 12px;
+  font-size:14px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold;
+  background:#eef2f7;
+  color:#1f2937;
+}
+@media(max-width:800px){
+  .sh-inline-group{grid-template-columns:1fr;}
+  .sh-inline-group .small{width:100%;}
+}
+
+/* 営業日報 */
+.np-grid{
+  display:grid;
+  grid-template-columns:140px 1fr;
+  gap:10px;
+  align-items:center;
+}
+.np-label{
+  font-size:14px;
+  font-weight:bold;
+}
+.np-input,.np-textarea{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+  box-sizing:border-box;
+}
+.np-textarea{
+  min-height:90px;
+  resize:vertical;
+}
+@media(max-width:800px){
+  .np-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="header-card">
+    <h1>メモ帳トップページ</h1>
+    <p class="sub">この1つのHTMLから、出勤メモ帳と営業日報メモを切り替えて使えます。入力内容はそれぞれ自動保存されます。</p>
+
+    <div class="menu" id="homeMenu">
+      <button class="btn-shukkin" type="button" onclick="showPage('shukkinPage')">出勤メモ帳を開く</button>
+      <button class="btn-nippo" type="button" onclick="showPage('nippoPage')">営業日報メモを開く</button>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+  <div class="page-card page" id="shukkinPage">
+    <div class="back-row">
+      <button class="back-btn" type="button" onclick="showHome()">← トップに戻る</button>
+    </div>
+    <h2 class="page-title">出勤メモ帳</h2>
+
+    <div class="wrap">
+      <div class="card">
+        <div class="sh-row">
+          <label class="sh-label" for="sh_name">名前</label>
+          <input class="sh-input" id="sh_name" type="text" placeholder="名前を入力">
+        </div>
+
+        <div class="sh-row">
+          <label class="sh-label">スタート地点（複数追加できます）</label>
+          <div id="sh_startPoints"></div>
+          <button class="small" type="button" onclick="shAddStartPoint()">＋ 追加</button>
+          <div class="note">例： (四)○○・(鈴)△△ のように横並びの「・」区切りで出力されます。</div>
+        </div>
+
+        <div class="sh-row">
+          <label class="sh-label" for="sh_locationSelect">打刻場所</label>
+          <div class="sh-inline-group">
+            <select class="sh-select" id="sh_locationSelect">
+              <option value=""></option>
+              <option value="店舗">店舗</option>
+              <option value="本社">本社</option>
+              <option value="manual">手動入力</option>
+            </select>
+            <input class="sh-input" id="sh_locationManual" type="text" placeholder="手動入力する場合はこちら">
+            <div></div>
+          </div>
+        </div>
+
+        <div class="sh-row">
+          <label class="sh-label" for="sh_extraText">追加の自由入力（未入力なら非表示）</label>
+          <textarea class="sh-textarea" id="sh_extraText" placeholder="必要なときだけ入力してください"></textarea>
+        </div>
+
+        <div class="buttons">
+          <button class="action primary" type="button" onclick="shGenerate()">出力</button>
+          <button class="action secondary" type="button" onclick="shCopyText()">コピー</button>
+          <button class="action ghost" type="button" onclick="shClearAll()">クリア</button>
+        </div>
+
+        <div id="sh_status" class="status"></div>
+      </div>
+
+      <div class="card">
+        <div id="sh_out" class="output">ここに出力されます。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-card page" id="nippoPage">
+    <div class="back-row">
+      <button class="back-btn" type="button" onclick="showHome()">← トップに戻る</button>
+    </div>
+    <h2 class="page-title">営業日報メモ</h2>
+
+    <div class="wrap">
+      <div class="card">
+        <div class="np-grid">
+          <label class="np-label" for="np_name">名前</label><input class="np-input" id="np_name">
+          <label class="np-label" for="np_area">エリア</label><input class="np-input" id="np_area">
+          <label class="np-label" for="np_minutes">分数</label><input class="np-input" id="np_minutes">
+          <label class="np-label" for="np_cases">件数</label><input class="np-input" id="np_cases">
+          <label class="np-label" for="np_home">在宅</label><input class="np-input" id="np_home">
+          <label class="np-label" for="np_miai">目合</label><input class="np-input" id="np_miai">
+          <label class="np-label" for="np_referral">紹介依頼</label><input class="np-input" id="np_referral">
+          <label class="np-label" for="np_appointment">アポ</label><input class="np-input" id="np_appointment">
+          <label class="np-label" for="np_contract">成約</label><input class="np-input" id="np_contract">
+          <label class="np-label" for="np_introContract">紹介成約</label><input class="np-input" id="np_introContract">
+          <label class="np-label" for="np_other">その他</label><textarea class="np-textarea" id="np_other"></textarea>
+          <label class="np-label" for="np_leave">退勤時刻</label><input class="np-input" id="np_leave">
+          <label class="np-label" for="np_form">申込用紙</label><input class="np-input" id="np_form">
+        </div>
+
+        <div class="buttons">
+          <button class="action primary" type="button" onclick="npGenerate()">出力</button>
+          <button class="action secondary" type="button" onclick="npCopyText()">コピー</button>
+          <button class="action line" type="button" onclick="npSendLine()">LINE</button>
+          <button class="action ghost" type="button" onclick="npClearAll()">クリア</button>
+        </div>
+
+        <div id="np_status" class="status"></div>
+      </div>
+
+      <div class="card">
+        <div id="np_out" class="output">ここに出力されます。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* トップ切り替え */
+function showPage(pageId){
+  document.getElementById("homeMenu").style.display = "none";
+  document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
+  document.getElementById(pageId).classList.add("active");
+}
+function showHome(){
+  document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
+  document.getElementById("homeMenu").style.display = "grid";
+}
+
+/* 共通コピー */
+async function copyWithFallback(text){
+  if (navigator.clipboard && window.isSecureContext){
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const temp = document.createElement("textarea");
+  temp.value = text;
+  temp.setAttribute("readonly", "");
+  temp.style.position = "fixed";
+  temp.style.top = "-9999px";
+  temp.style.left = "-9999px";
+  document.body.appendChild(temp);
+  temp.focus();
+  temp.select();
+  temp.setSelectionRange(0, temp.value.length);
+  const ok = document.execCommand("copy");
+  document.body.removeChild(temp);
+  if(!ok) throw new Error("copy failed");
+}
+
+/* 出勤メモ帳 */
+const SH_STORAGE_KEY = "top_shukkin_memo_v1";
+const shBaseIds = ["sh_name", "sh_locationSelect", "sh_locationManual", "sh_extraText"];
+const shAreaOptions = ["", "(四)", "(鈴)", "(桑)", "(三)", "(員)"];
+
+function shById(id){ return document.getElementById(id); }
+function shSetStatus(msg){ shById("sh_status").textContent = msg; }
+
+function shCreateSelect(selectedValue=""){
+  const select = document.createElement("select");
+  select.className = "sh-select sh-start-code";
+  shAreaOptions.forEach(opt => {
+    const option = document.createElement("option");
+    option.value = opt;
+    option.textContent = opt;
+    if (opt === selectedValue) option.selected = true;
+    select.appendChild(option);
+  });
+  return select;
+}
+
+function shCreateStartPointRow(code="", text=""){
+  const row = document.createElement("div");
+  row.className = "sh-inline-group sh-start-point-row";
+
+  const select = shCreateSelect(code);
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "sh-input sh-start-text";
+  input.placeholder = "続けて自由入力";
+  input.value = text;
+
+  const removeBtn = document.createElement("button");
+  removeBtn.type = "button";
+  removeBtn.className = "small";
+  removeBtn.textContent = "削除";
+  removeBtn.onclick = () => {
+    row.remove();
+    if (document.querySelectorAll(".sh-start-point-row").length === 0) {
+      shAddStartPoint();
+    }
+    shSave();
+    shGeneratePreviewOnly();
+  };
+
+  select.addEventListener("change", () => { shSave(); shGeneratePreviewOnly(); });
+  input.addEventListener("input", () => { shSave(); shGeneratePreviewOnly(); });
+
+  row.appendChild(select);
+  row.appendChild(input);
+  row.appendChild(removeBtn);
+  return row;
+}
+
+function shAddStartPoint(code="", text=""){
+  shById("sh_startPoints").appendChild(shCreateStartPointRow(code, text));
+  shSave();
+}
+
+function shGetStartPointsText(){
+  const rows = Array.from(document.querySelectorAll(".sh-start-point-row"));
+  const parts = rows.map(row => {
+    const code = row.querySelector(".sh-start-code").value.trim();
+    const text = row.querySelector(".sh-start-text").value.trim();
+    return (code + text).trim();
+  }).filter(Boolean);
+  return parts.length ? parts.join("・") : " ";
+}
+
+function shGetLocationText(){
+  const selected = shById("sh_locationSelect").value;
+  const manual = shById("sh_locationManual").value.trim();
+  if (selected === "manual") return manual || " ";
+  if (manual !== "") return manual;
+  return selected || " ";
+}
+
+function shBuild(){
+  const extra = shById("sh_extraText").value.trim();
+  let text = `おはようございます。
+${shById("sh_name").value.trim() || " "}
+${shGetStartPointsText()}よりスタートいたします。
+${shGetLocationText()}打刻済みです。`;
+  if (extra !== "") text += `\n${extra}`;
+  return text;
+}
+
+function shGenerate(){
+  shById("sh_out").textContent = shBuild();
+  shSave();
+  shSetStatus("出力しました。");
+}
+function shGeneratePreviewOnly(){
+  shById("sh_out").textContent = shBuild();
+}
+async function shCopyText(){
+  const text = shBuild();
+  shById("sh_out").textContent = text;
+  try{
+    await copyWithFallback(text);
+    shSave();
+    shSetStatus("コピーしました。");
+  }catch(e){
+    shSetStatus("コピーできませんでした。出力結果を長押ししてコピーしてください。");
+  }
+}
+function shSave(){
+  const data = {};
+  shBaseIds.forEach(id => data[id] = shById(id).value);
+  data.startPoints = Array.from(document.querySelectorAll(".sh-start-point-row")).map(row => ({
+    code: row.querySelector(".sh-start-code").value,
+    text: row.querySelector(".sh-start-text").value
+  }));
+  localStorage.setItem(SH_STORAGE_KEY, JSON.stringify(data));
+}
+function shLoad(){
+  const raw = localStorage.getItem(SH_STORAGE_KEY);
+  if (!raw) {
+    shAddStartPoint();
+    return;
+  }
+  try{
+    const data = JSON.parse(raw);
+    shBaseIds.forEach(id => {
+      if (typeof data[id] === "string") shById(id).value = data[id];
+    });
+    shById("sh_startPoints").innerHTML = "";
+    if (Array.isArray(data.startPoints) && data.startPoints.length) {
+      data.startPoints.forEach(item => shAddStartPoint(item.code || "", item.text || ""));
+    } else {
+      shAddStartPoint();
+    }
+  }catch(e){
+    shById("sh_startPoints").innerHTML = "";
+    shAddStartPoint();
+  }
+}
+function shClearAll(){
+  shBaseIds.forEach(id => shById(id).value = "");
+  shById("sh_startPoints").innerHTML = "";
+  shAddStartPoint();
+  shById("sh_out").textContent = "ここに出力されます。";
+  localStorage.removeItem(SH_STORAGE_KEY);
+  shSetStatus("クリアしました。");
+}
+
+/* 営業日報メモ */
+const NP_STORAGE_KEY = "top_nippo_memo_v1";
+const npIds = ["np_name","np_area","np_minutes","np_cases","np_home","np_miai","np_referral","np_appointment","np_contract","np_introContract","np_other","np_leave","np_form"];
+
+function npById(id){ return document.getElementById(id); }
+function npSetStatus(msg){ npById("np_status").textContent = msg; }
+function npNowTime(){
+  const d = new Date();
+  return String(d.getHours()).padStart(2,'0') + ":" + String(d.getMinutes()).padStart(2,'0');
+}
+function npV(id){
+  const val = npById(id).value.trim();
+  return val === "" ? " " : val;
+}
+function npBuild(){
+  return `お疲れ様です。
+${npV("np_name")}
+エリア：${npV("np_area")}
+分数：${npV("np_minutes")}
+件数：${npV("np_cases")}
+在宅：${npV("np_home")}
+目合：${npV("np_miai")}
+紹介依頼：${npV("np_referral")}
+アポ：${npV("np_appointment")}
+成約：${npV("np_contract")}（紹介成約：${npV("np_introContract")}）
+その他：${npV("np_other")}
+退勤時刻：${npV("np_leave")}
+申込用紙：${npV("np_form")}
+
+以上で業務終了いたします。`;
+}
+function npGenerate(){
+  npById("np_out").textContent = npBuild();
+  npSave();
+  npSetStatus("出力しました。");
+}
+async function npCopyText(){
+  const text = npBuild();
+  npById("np_out").textContent = text;
+  try{
+    await copyWithFallback(text);
+    npSave();
+    npSetStatus("コピーしました。");
+  }catch(e){
+    npSetStatus("コピーできませんでした。出力結果を長押ししてコピーしてください。");
+  }
+}
+function npSendLine(){
+  const text = npBuild();
+  npById("np_out").textContent = text;
+  npSave();
+  location.href = "https://line.me/R/msg/text/?" + encodeURIComponent(text);
+}
+function npSave(){
+  const data = {};
+  npIds.forEach(id => data[id] = npById(id).value);
+  localStorage.setItem(NP_STORAGE_KEY, JSON.stringify(data));
+}
+function npLoad(){
+  const data = JSON.parse(localStorage.getItem(NP_STORAGE_KEY) || "{}");
+  npIds.forEach(id => {
+    if (typeof data[id] === "string") npById(id).value = data[id];
+  });
+}
+function npClearAll(){
+  npIds.forEach(id => npById(id).value = "");
+  npById("np_out").textContent = "ここに出力されます。";
+  localStorage.removeItem(NP_STORAGE_KEY);
+  npById("np_leave").value = npNowTime();
+  npSetStatus("クリアしました。");
+}
+
+/* 初期化 */
+window.addEventListener("DOMContentLoaded", () => {
+  shLoad();
+  shBaseIds.forEach(id => {
+    shById(id).addEventListener("input", () => { shSave(); shGeneratePreviewOnly(); });
+    shById(id).addEventListener("change", () => { shSave(); shGeneratePreviewOnly(); });
+  });
+  shGeneratePreviewOnly();
+
+  npLoad();
+  if(!npById("np_leave").value){
+    npById("np_leave").value = npNowTime();
+  }
+  npIds.forEach(id => {
+    npById(id).addEventListener("input", npSave);
+    npById(id).addEventListener("change", npSave);
+  });
+});
+</script>
+
+</body>
+</html>

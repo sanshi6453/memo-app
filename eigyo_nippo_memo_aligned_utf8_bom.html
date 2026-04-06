@@ -1,0 +1,219 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>営業日報メモ</title>
+<style>
+body{
+  margin:0;
+  font-family:"Yu Gothic","Hiragino Kaku Gothic ProN",sans-serif;
+  background:#f5f7fb;
+}
+
+.wrap{
+  max-width:1100px;
+  margin:20px auto;
+  padding:10px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+.card{
+  background:#fff;
+  padding:20px;
+  border-radius:16px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:140px 1fr;
+  gap:10px;
+  align-items:center;
+}
+
+label{
+  font-size:14px;
+  font-weight:bold;
+}
+
+input,textarea{
+  width:100%;              /* ←ボタンと右端揃え */
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+  box-sizing:border-box;
+}
+
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
+
+.buttons{
+  display:grid;
+  gap:12px;
+  margin-top:15px;
+}
+
+button{
+  width:100%;              /* ←基準 */
+  padding:16px;
+  font-size:18px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.primary{background:#2a424c;color:#fff;}
+.secondary{background:#fee846;color:#2a424c;}
+.line{background:#06c755;color:#fff;}
+.ghost{background:#ddd;color:#111;}
+
+.output{
+  white-space:pre-wrap;
+  background:#f9fafb;
+  padding:15px;
+  border-radius:12px;
+  min-height:450px;
+  border:1px solid #ccc;
+}
+
+.status{
+  margin-top:12px;
+  min-height:20px;
+  font-size:13px;
+  font-weight:bold;
+  color:#2a424c;
+}
+
+@media(max-width:800px){
+  .wrap{grid-template-columns:1fr;}
+  .grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="card">
+    <div class="grid">
+      <label>名前</label><input id="name">
+      <label>エリア</label><input id="area">
+      <label>分数</label><input id="minutes">
+      <label>件数</label><input id="cases">
+      <label>在宅</label><input id="home">
+      <label>目合</label><input id="miai">
+      <label>紹介依頼</label><input id="referral">
+      <label>アポ</label><input id="appointment">
+      <label>成約</label><input id="contract">
+      <label>紹介成約</label><input id="introContract">
+      <label>その他</label><textarea id="other"></textarea>
+      <label>退勤時刻</label><input id="leave">
+      <label>申込用紙</label><input id="form">
+    </div>
+
+    <div class="buttons">
+      <button class="primary" onclick="generate()">出力</button>
+      <button class="secondary" onclick="copyText()">コピー</button>
+      <button class="line" onclick="sendLine()">LINE</button>
+      <button class="ghost" onclick="clearAll()">クリア</button>
+    </div>
+
+    <div id="status" class="status"></div>
+  </div>
+
+  <div class="card">
+    <div id="out" class="output">ここに出力されます。</div>
+  </div>
+</div>
+
+<script>
+const ids=["name","area","minutes","cases","home","miai","referral","appointment","contract","introContract","other","leave","form"];
+const KEY="memo_fix_width";
+
+function nowTime(){
+ const d=new Date();
+ return String(d.getHours()).padStart(2,'0')+":"+String(d.getMinutes()).padStart(2,'0');
+}
+
+function v(id){
+ const val=document.getElementById(id).value.trim();
+ return val===""?" ":val;
+}
+
+function build(){
+return `お疲れ様です。
+${v("name")}
+エリア：${v("area")}
+分数：${v("minutes")}
+件数：${v("cases")}
+在宅：${v("home")}
+目合：${v("miai")}
+紹介依頼：${v("referral")}
+アポ：${v("appointment")}
+成約：${v("contract")}（紹介成約：${v("introContract")}）
+その他：${v("other")}
+退勤時刻：${v("leave")}
+申込用紙：${v("form")}
+
+以上で業務終了いたします。`;
+}
+
+function generate(){
+ document.getElementById("out").textContent=build();
+ save();
+}
+
+async function copyText(){
+ const t=build();
+ try{
+   await navigator.clipboard.writeText(t);
+ }catch{
+   const temp=document.createElement("textarea");
+   temp.value=t;
+   document.body.appendChild(temp);
+   temp.select();
+   document.execCommand("copy");
+   document.body.removeChild(temp);
+ }
+}
+
+function sendLine(){
+ const t=build();
+ location.href="https://line.me/R/msg/text/?"+encodeURIComponent(t);
+}
+
+function save(){
+ const data={};
+ ids.forEach(id=>data[id]=document.getElementById(id).value);
+ localStorage.setItem(KEY,JSON.stringify(data));
+}
+
+function load(){
+ const data=JSON.parse(localStorage.getItem(KEY)||"{}");
+ ids.forEach(id=>{
+   if(data[id]) document.getElementById(id).value=data[id];
+ });
+}
+
+function clearAll(){
+ ids.forEach(id=>document.getElementById(id).value="");
+ document.getElementById("out").textContent="ここに出力されます。";
+ localStorage.removeItem(KEY);
+}
+
+window.onload=()=>{
+ load();
+ if(!document.getElementById("leave").value){
+   document.getElementById("leave").value=nowTime();
+ }
+}
+</script>
+
+</body>
+</html>
