@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
 <title>出勤・退勤LINE送信用ツール</title>
 <style>
 body{
   margin:0;
-  font-family:"Zen Maru Gothic",sans-serif;
+  font-family: 'Zen Maru Gothic', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
   background:#f5f7fb;
   color:#1f2937;
 }
@@ -30,8 +31,30 @@ body{
   padding:22px;
 }
 h1{
-  margin:0 0 8px;
   font-size:26px;
+  font-weight:bold;
+  color:#2a424c;
+  letter-spacing:1px;
+}
+button{
+  font-family: 'Zen Maru Gothic', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  border:none;
+  border-radius:16px;
+  padding:16px;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+  transition: all 0.2s ease;
+}
+
+/* 押した時 */
+button:active{
+  transform: scale(0.96);
+}
+
+/* ホバー（PC用） */
+button:hover{
+  opacity:0.9;
 }
 .sub{
   margin:0;
