@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿<!DOCTYPE html>
+﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -339,7 +339,11 @@ button.action{
           <label class="np-label" for="np_introContract">紹介成約</label><input class="np-input" id="np_introContract">
           <label class="np-label" for="np_other">その他</label><textarea class="np-textarea" id="np_other"></textarea>
           <label class="np-label" for="np_leave">退勤時刻</label><input class="np-input" id="np_leave">
-          <label class="np-label" for="np_form">申込用紙</label><input class="np-input" id="np_form">
+          <label class="np-label" for="np_form">申込用紙</label><select class="np-input" id="np_form">
+<option value=""></option>
+<option value="生桑">生桑</option>
+<option value="本社">本社</option>
+</select>
         </div>
 
         <div class="buttons">
@@ -631,7 +635,7 @@ ${npV("np_name")}
 目合：${npV("np_miai")}
 紹介依頼：${npV("np_referral")}
 アポ：${npAppointmentFormat()}
-成約：${npV("np_contract")}(紹介成約：${npV("np_introContract")})
+成約：${npV("np_contract")}（紹介成約：${npV("np_introContract")}）
 その他：${npV("np_other")}
 退勤時刻：${npV("np_leave")}
 申込用紙：${npV("np_form")}
