@@ -230,6 +230,23 @@ button.action{
 @media(max-width:800px){
   .np-grid{grid-template-columns:1fr;}
 }
+
+.np-label-top{
+  align-self:start;
+  padding-top:8px;
+}
+.np-area-row{
+  margin:8px 0;
+}
+.np-area-row .np-input,
+.np-area-row select{
+  margin-top:4px;
+  margin-bottom:4px;
+}
+.np-add-btn{
+  margin-top:-2px;
+}
+
 </style>
 </head>
 <body>
@@ -311,10 +328,7 @@ button.action{
       <div class="card">
         <div class="np-grid">
           <label class="np-label" for="np_name">名前</label><input class="np-input" id="np_name">
-          <label class="np-label">エリア</label>
-<div id="np_areas"></div>
-<button class="small" type="button" onclick="npAddArea()">＋ 追加</button>
-<div class="note">例：(四)○○・(鈴)△△</div>
+          <label class="np-label np-label-top">エリア</label><div id="np_areas"></div><button class="small np-add-btn" type="button" onclick="npAddArea()">＋ 追加</button><div class="note">例：(四)○○・(鈴)△△</div>
           <label class="np-label" for="np_minutes">分数</label><input class="np-input" id="np_minutes">
           <label class="np-label" for="np_cases">件数</label><input class="np-input" id="np_cases">
           <label class="np-label" for="np_home">在宅</label><input class="np-input" id="np_home">
@@ -381,7 +395,7 @@ async function copyWithFallback(text){
 /* 出勤LINE用 */
 const SH_STORAGE_KEY = "top_shukkin_memo_v1";
 const shBaseIds = ["sh_name", "sh_locationSelect", "sh_locationManual", "sh_extraText"];
-const shAreaOptions = ["", "(四)", "(鈴)", "(桑)", "(三)", "(員)"];
+const shAreaOptions = ["", "(四)", "(鈴)", "(桑)", "(三)", "(い)"];
 
 function shById(id){ return document.getElementById(id); }
 function shSetStatus(msg){ shById("sh_status").textContent = msg; }
@@ -526,7 +540,7 @@ function shClearAll(){
 
 /* 退勤LINE用 */
 const NP_STORAGE_KEY = "top_nippo_memo_v1";
-const npIds = ["np_name","np_area","np_minutes","np_cases","np_home","np_miai","np_referral","np_appointment","np_contract","np_introContract","np_other","np_leave","np_form"];
+const npIds = ["np_name","np_minutes","np_cases","np_home","np_miai","np_referral","np_appointment","np_contract","np_introContract","np_other","np_leave","np_form"];
 
 function npById(id){ return document.getElementById(id); }
 function npSetStatus(msg){ npById("np_status").textContent = msg; }
@@ -539,7 +553,7 @@ function npV(id){
   return val === "" ? " " : val;
 }
 
-const npAreaOptions = ["", "(四)", "(鈴)", "(桑)", "(三)", "(員)"];
+const npAreaOptions = ["", "(四)", "(鈴)", "(桑)", "(三)", "(い)"];
 
 function npCreateSelect(val=""){
   const select = document.createElement("select");
@@ -642,6 +656,10 @@ function npSendLine(){
 function npSave(){
   const data = {};
   npIds.forEach(id => data[id] = npById(id).value);
+  data.areas = Array.from(document.querySelectorAll(".np-area-row")).map(row => ({
+    code: row.querySelector("select").value,
+    text: row.querySelector("input").value
+  }));
   localStorage.setItem(NP_STORAGE_KEY, JSON.stringify(data));
 }
 function npLoad(){
@@ -649,9 +667,23 @@ function npLoad(){
   npIds.forEach(id => {
     if (typeof data[id] === "string") npById(id).value = data[id];
   });
+  const areasBox = document.getElementById("np_areas");
+  if (areasBox){
+    areasBox.innerHTML = "";
+    if (Array.isArray(data.areas) && data.areas.length){
+      data.areas.forEach(item => npAddArea(item.code || "", item.text || ""));
+    } else {
+      npAddArea();
+    }
+  }
 }
 function npClearAll(){
   npIds.forEach(id => npById(id).value = "");
+  const areasBox = document.getElementById("np_areas");
+  if (areasBox){
+    areasBox.innerHTML = "";
+    npAddArea();
+  }
   npById("np_out").textContent = "ここに出力されます。";
   localStorage.removeItem(NP_STORAGE_KEY);
   npById("np_leave").value = npNowTime();
@@ -668,7 +700,9 @@ window.addEventListener("DOMContentLoaded", () => {
   shGeneratePreviewOnly();
 
   npLoad();
-  npAddArea();
+  if (document.getElementById("np_areas") && document.querySelectorAll(".np-area-row").length === 0) {
+    npAddArea();
+  }
   if(!npById("np_leave").value){
     npById("np_leave").value = npNowTime();
   }
