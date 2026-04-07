@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -311,7 +311,10 @@ button.action{
       <div class="card">
         <div class="np-grid">
           <label class="np-label" for="np_name">名前</label><input class="np-input" id="np_name">
-          <label class="np-label" for="np_area">エリア</label><input class="np-input" id="np_area">
+          <label class="np-label">エリア</label>
+<div id="np_areas"></div>
+<button class="small" type="button" onclick="npAddArea()">＋ 追加</button>
+<div class="note">例：(四)○○・(鈴)△△</div>
           <label class="np-label" for="np_minutes">分数</label><input class="np-input" id="np_minutes">
           <label class="np-label" for="np_cases">件数</label><input class="np-input" id="np_cases">
           <label class="np-label" for="np_home">在宅</label><input class="np-input" id="np_home">
@@ -535,10 +538,72 @@ function npV(id){
   const val = npById(id).value.trim();
   return val === "" ? " " : val;
 }
+
+const npAreaOptions = ["", "(四)", "(鈴)", "(桑)", "(三)", "(員)"];
+
+function npCreateSelect(val=""){
+  const select = document.createElement("select");
+  select.className = "np-input";
+  npAreaOptions.forEach(opt=>{
+    const o = document.createElement("option");
+    o.value = opt;
+    o.textContent = opt;
+    if(opt===val) o.selected = true;
+    select.appendChild(o);
+  });
+  return select;
+}
+
+function npCreateRow(code="", text=""){
+  const row = document.createElement("div");
+  row.className = "inline-group np-area-row";
+
+  const select = npCreateSelect(code);
+
+  const input = document.createElement("input");
+  input.className = "np-input";
+  input.value = text;
+  input.placeholder = "続けて入力";
+
+  const btn = document.createElement("button");
+  btn.textContent = "削除";
+  btn.className = "small";
+  btn.onclick = ()=>{
+    row.remove();
+    if(document.querySelectorAll(".np-area-row").length===0){
+      npAddArea();
+    }
+    npSave();
+  };
+
+  select.onchange = ()=>npSave();
+  input.oninput = ()=>npSave();
+
+  row.append(select,input,btn);
+  return row;
+}
+
+function npAddArea(code="", text=""){
+  document.getElementById("np_areas")
+    .appendChild(npCreateRow(code,text));
+  npSave();
+}
+
+function npGetAreas(){
+  return [...document.querySelectorAll(".np-area-row")]
+    .map(r=>{
+      const c=r.querySelector("select").value;
+      const t=r.querySelector("input").value;
+      return (c+t).trim();
+    })
+    .filter(Boolean)
+    .join("・") || " ";
+}
+
 function npBuild(){
   return `お疲れ様です。
 ${npV("np_name")}
-エリア：${npV("np_area")}
+エリア：${npGetAreas()}
 分数：${npV("np_minutes")}
 件数：${npV("np_cases")}
 在宅：${npV("np_home")}
@@ -603,6 +668,7 @@ window.addEventListener("DOMContentLoaded", () => {
   shGeneratePreviewOnly();
 
   npLoad();
+  npAddArea();
   if(!npById("np_leave").value){
     npById("np_leave").value = npNowTime();
   }

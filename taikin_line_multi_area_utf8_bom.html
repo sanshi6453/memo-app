@@ -1,0 +1,422 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>退勤LINE用</title>
+<style>
+body{
+  margin:0;
+  font-family:"Yu Gothic","Hiragino Kaku Gothic ProN",sans-serif;
+  background:#f5f7fb;
+  color:#1f2937;
+}
+.wrap{
+  max-width:1100px;
+  margin:20px auto;
+  padding:10px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+.card{
+  background:#fff;
+  padding:20px;
+  border-radius:16px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+h1{
+  margin:0 0 16px;
+  font-size:24px;
+}
+.row{
+  margin-bottom:14px;
+}
+label{
+  display:block;
+  font-size:14px;
+  font-weight:bold;
+  margin-bottom:6px;
+}
+input, select, textarea{
+  width:100%;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+  box-sizing:border-box;
+}
+textarea{
+  min-height:88px;
+  resize:vertical;
+}
+.inline-group{
+  display:grid;
+  grid-template-columns:110px 1fr auto;
+  gap:10px;
+  align-items:center;
+  margin-bottom:10px;
+}
+.inline-group button{
+  width:auto;
+  min-width:72px;
+  padding:10px 12px;
+  font-size:14px;
+}
+.buttons{
+  display:grid;
+  gap:12px;
+  margin-top:16px;
+}
+button{
+  width:100%;
+  padding:16px;
+  font-size:18px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+}
+.primary{background:#2a424c;color:#fff;}
+.secondary{background:#fee846;color:#2a424c;}
+.line{background:#06c755;color:#fff;}
+.ghost{background:#ddd;color:#111;}
+.small{background:#eef2f7;color:#1f2937;}
+.output{
+  white-space:pre-wrap;
+  background:#f9fafb;
+  padding:15px;
+  border-radius:12px;
+  min-height:450px;
+  border:1px solid #ccc;
+  font-size:15px;
+  line-height:1.9;
+}
+.status{
+  margin-top:12px;
+  min-height:20px;
+  font-size:13px;
+  font-weight:bold;
+  color:#2a424c;
+}
+.note{
+  margin-top:8px;
+  font-size:12px;
+  color:#6b7280;
+  line-height:1.6;
+}
+@media(max-width:800px){
+  .wrap{grid-template-columns:1fr;}
+  .inline-group{grid-template-columns:1fr;}
+  .inline-group button{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="card">
+    <h1>退勤LINE用</h1>
+
+    <div class="row">
+      <label for="name">名前</label>
+      <input id="name" type="text" placeholder="名前を入力">
+    </div>
+
+    <div class="row">
+      <label>エリア（複数追加できます）</label>
+      <div id="areas"></div>
+      <button class="small" type="button" onclick="addArea()">＋ 追加</button>
+      <div class="note">例： (四)○○・(鈴)△△ のように横並びの「・」区切りで出力されます。</div>
+    </div>
+
+    <div class="row">
+      <label for="minutes">分数</label>
+      <input id="minutes" type="text">
+    </div>
+
+    <div class="row">
+      <label for="cases">件数</label>
+      <input id="cases" type="text">
+    </div>
+
+    <div class="row">
+      <label for="home">在宅</label>
+      <input id="home" type="text">
+    </div>
+
+    <div class="row">
+      <label for="miai">目合</label>
+      <input id="miai" type="text">
+    </div>
+
+    <div class="row">
+      <label for="referral">紹介依頼</label>
+      <input id="referral" type="text">
+    </div>
+
+    <div class="row">
+      <label for="appointment">アポ</label>
+      <input id="appointment" type="text">
+    </div>
+
+    <div class="row">
+      <label for="contract">成約</label>
+      <input id="contract" type="text">
+    </div>
+
+    <div class="row">
+      <label for="introContract">紹介成約</label>
+      <input id="introContract" type="text">
+    </div>
+
+    <div class="row">
+      <label for="other">その他</label>
+      <textarea id="other"></textarea>
+    </div>
+
+    <div class="row">
+      <label for="leave">退勤時刻</label>
+      <input id="leave" type="text">
+    </div>
+
+    <div class="row">
+      <label for="form">申込用紙</label>
+      <input id="form" type="text">
+    </div>
+
+    <div class="buttons">
+      <button class="primary" type="button" onclick="generate()">出力</button>
+      <button class="secondary" type="button" onclick="copyText()">コピー</button>
+      <button class="line" type="button" onclick="sendLine()">LINE</button>
+      <button class="ghost" type="button" onclick="clearAll()">クリア</button>
+    </div>
+
+    <div id="status" class="status"></div>
+  </div>
+
+  <div class="card">
+    <div id="out" class="output">ここに出力されます。</div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = "taikin_line_multi_area_v1";
+const baseIds = ["name","minutes","cases","home","miai","referral","appointment","contract","introContract","other","leave","form"];
+const areaOptions = ["", "(四)", "(鈴)", "(桑)", "(三)", "(員)"];
+
+function byId(id){
+  return document.getElementById(id);
+}
+
+function setStatus(msg){
+  byId("status").textContent = msg;
+}
+
+function nowTime(){
+  const d = new Date();
+  return String(d.getHours()).padStart(2,'0') + ":" + String(d.getMinutes()).padStart(2,'0');
+}
+
+function createSelect(selectedValue=""){
+  const select = document.createElement("select");
+  select.className = "area-code";
+  areaOptions.forEach(opt => {
+    const option = document.createElement("option");
+    option.value = opt;
+    option.textContent = opt;
+    if (opt === selectedValue) option.selected = true;
+    select.appendChild(option);
+  });
+  return select;
+}
+
+function createAreaRow(code="", text=""){
+  const row = document.createElement("div");
+  row.className = "inline-group area-row";
+
+  const select = createSelect(code);
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "area-text";
+  input.placeholder = "続けて自由入力";
+  input.value = text;
+
+  const removeBtn = document.createElement("button");
+  removeBtn.type = "button";
+  removeBtn.className = "small";
+  removeBtn.textContent = "削除";
+  removeBtn.onclick = () => {
+    row.remove();
+    if (document.querySelectorAll(".area-row").length === 0) {
+      addArea();
+    }
+    save();
+    previewOnly();
+  };
+
+  select.addEventListener("change", () => { save(); previewOnly(); });
+  input.addEventListener("input", () => { save(); previewOnly(); });
+
+  row.appendChild(select);
+  row.appendChild(input);
+  row.appendChild(removeBtn);
+  return row;
+}
+
+function addArea(code="", text=""){
+  byId("areas").appendChild(createAreaRow(code, text));
+  save();
+}
+
+function getAreasText(){
+  const rows = Array.from(document.querySelectorAll(".area-row"));
+  const parts = rows.map(row => {
+    const code = row.querySelector(".area-code").value.trim();
+    const text = row.querySelector(".area-text").value.trim();
+    return (code + text).trim();
+  }).filter(Boolean);
+  return parts.length ? parts.join("・") : " ";
+}
+
+function v(id){
+  const val = byId(id).value.trim();
+  return val === "" ? " " : val;
+}
+
+function build(){
+  return `お疲れ様です。
+${v("name")}
+エリア：${getAreasText()}
+分数：${v("minutes")}
+件数：${v("cases")}
+在宅：${v("home")}
+目合：${v("miai")}
+紹介依頼：${v("referral")}
+アポ：${v("appointment")}
+成約：${v("contract")}（紹介成約：${v("introContract")}）
+その他：${v("other")}
+退勤時刻：${v("leave")}
+申込用紙：${v("form")}
+
+以上で業務終了いたします。`;
+}
+
+function generate(){
+  byId("out").textContent = build();
+  save();
+  setStatus("出力しました。");
+}
+
+function previewOnly(){
+  byId("out").textContent = build();
+}
+
+async function copyText(){
+  const text = build();
+  byId("out").textContent = text;
+  try{
+    if (navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+    } else {
+      fallbackCopy(text);
+    }
+    save();
+    setStatus("コピーしました。");
+  }catch(e){
+    try{
+      fallbackCopy(text);
+      save();
+      setStatus("コピーしました。");
+    }catch(e2){
+      setStatus("コピーできませんでした。出力結果を長押ししてコピーしてください。");
+    }
+  }
+}
+
+function fallbackCopy(text){
+  const temp = document.createElement("textarea");
+  temp.value = text;
+  temp.setAttribute("readonly", "");
+  temp.style.position = "fixed";
+  temp.style.top = "-9999px";
+  temp.style.left = "-9999px";
+  document.body.appendChild(temp);
+  temp.focus();
+  temp.select();
+  temp.setSelectionRange(0, temp.value.length);
+  const ok = document.execCommand("copy");
+  document.body.removeChild(temp);
+  if(!ok) throw new Error("copy failed");
+}
+
+function sendLine(){
+  const text = build();
+  byId("out").textContent = text;
+  save();
+  location.href = "https://line.me/R/msg/text/?" + encodeURIComponent(text);
+}
+
+function save(){
+  const data = {};
+  baseIds.forEach(id => data[id] = byId(id).value);
+  data.areas = Array.from(document.querySelectorAll(".area-row")).map(row => ({
+    code: row.querySelector(".area-code").value,
+    text: row.querySelector(".area-text").value
+  }));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function load(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) {
+    addArea();
+    return;
+  }
+  try{
+    const data = JSON.parse(raw);
+    baseIds.forEach(id => {
+      if (typeof data[id] === "string") byId(id).value = data[id];
+    });
+
+    byId("areas").innerHTML = "";
+    if (Array.isArray(data.areas) && data.areas.length) {
+      data.areas.forEach(item => addArea(item.code || "", item.text || ""));
+    } else {
+      addArea();
+    }
+  }catch(e){
+    byId("areas").innerHTML = "";
+    addArea();
+  }
+}
+
+function clearAll(){
+  baseIds.forEach(id => byId(id).value = "");
+  byId("areas").innerHTML = "";
+  addArea();
+  byId("out").textContent = "ここに出力されます。";
+  localStorage.removeItem(STORAGE_KEY);
+  byId("leave").value = nowTime();
+  setStatus("クリアしました。");
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  load();
+
+  baseIds.forEach(id => {
+    byId(id).addEventListener("input", () => { save(); previewOnly(); });
+    byId(id).addEventListener("change", () => { save(); previewOnly(); });
+  });
+
+  if(!byId("leave").value){
+    byId("leave").value = nowTime();
+  }
+
+  previewOnly();
+});
+</script>
+
+</body>
+</html>
