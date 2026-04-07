@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -614,6 +614,13 @@ function npGetAreas(){
     .join("・") || " ";
 }
 
+
+function npAppointmentFormat(){
+  const val = npById("np_appointment").value.trim();
+  if(val==="") return "0 ( / )";
+  return val;
+}
+
 function npBuild(){
   return `お疲れ様です。
 ${npV("np_name")}
@@ -623,7 +630,7 @@ ${npV("np_name")}
 在宅：${npV("np_home")}
 目合：${npV("np_miai")}
 紹介依頼：${npV("np_referral")}
-アポ：${npV("np_appointment")}
+アポ：${npAppointmentFormat()}
 成約：${npV("np_contract")}（紹介成約：${npV("np_introContract")}）
 その他：${npV("np_other")}
 退勤時刻：${npV("np_leave")}
@@ -705,6 +712,9 @@ window.addEventListener("DOMContentLoaded", () => {
   }
   if(!npById("np_leave").value){
     npById("np_leave").value = npNowTime();
+  }
+  if(!npById("np_appointment").value){
+    npById("np_appointment").value = "0 ( / )";
   }
   npIds.forEach(id => {
     npById(id).addEventListener("input", npSave);
