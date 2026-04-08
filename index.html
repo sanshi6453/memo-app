@@ -1,91 +1,779 @@
-<!DOCTYPE html>
+
+﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>出勤・退勤メモ</title>
-
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
+<title>出勤・退勤LINE送信用ツール</title>
 <style>
-body {margin:0;font-family:sans-serif;background:#f5f7f9;color:#2a424c;}
-.container {max-width:480px;margin:0 auto;padding:16px;}
+body{
+  margin:0;
+  font-family: 'Zen Maru Gothic', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  background:#f5f7fb;
+  color:#1f2937;
+}
+.topbar{
+  max-width:1200px;
+  margin:20px auto 0;
+  padding:0 12px;
+}
+.shell{
+  max-width:1200px;
+  margin:12px auto 24px;
+  padding:12px;
+}
+.header-card,.page-card{
+  background:#fff;
+  border-radius:18px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+.header-card{
+  padding:22px;
+}
+h1{
+  font-size:26px;
+  font-weight:bold;
+  color:#2a424c;
+  letter-spacing:1px;
+}
+button{
+  font-family: 'Zen Maru Gothic', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  border:none;
+  border-radius:16px;
+  padding:16px;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+  transition: all 0.2s ease;
+  letter-spacing:1px;
+}
 
-.card {background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 4px 12px rgba(0,0,0,0.08);}
-.card h2 {margin:0 0 8px;font-size:18px;}
-.desc {font-size:14px;color:#666;margin-bottom:12px;}
+/* 押した時 */
+button:active{
+  transform: scale(0.96);
+}
 
-.btn {display:block;width:100%;padding:14px;margin-top:10px;border:none;border-radius:10px;font-size:16px;font-weight:bold;}
-.btn-start {background:#2a424c;color:#fff;}
-.btn-end {background:#fee846;color:#2a424c;}
+/* ホバー（PC用） */
+button:hover{
+  opacity:0.9;
+}
+.sub{
+  margin:0;
+  color:#6b7280;
+  font-size:14px;
+  line-height:1.7;
+}
+.menu{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-top:18px;
+}
+.menu button{
+  border:none;
+  border-radius:14px;
+  padding:18px;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.btn-shukkin{background:#2a424c;color:#fff;}
+.btn-nippo{background:#fee846;color:#2a424c;}
+.page-card{
+  margin-top:18px;
+  padding:18px;
+}
+.page{
+  display:none;
+}
+.page.active{
+  display:block;
+}
+.page-title{
+  margin:0 0 14px;
+  font-size:22px;
+}
+.back-row{
+  margin-bottom:14px;
+}
+.back-btn{
+  border:none;
+  background:#e5e7eb;
+  color:#111827;
+  border-radius:12px;
+  padding:10px 14px;
+  font-size:14px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.wrap{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+.card{
+  background:#fff;
+  padding:20px;
+  border-radius:16px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+.output{
+  white-space:pre-wrap;
+  background:#f9fafb;
+  padding:15px;
+  border-radius:12px;
+  min-height:320px;
+  border:1px solid #ccc;
+  font-size:15px;
+  line-height:1.9;
+}
+.status{
+  margin-top:12px;
+  min-height:20px;
+  font-size:13px;
+  font-weight:bold;
+  color:#2a424c;
+}
+.buttons{
+  display:grid;
+  gap:12px;
+  margin-top:15px;
+}
+button.action{
+  width:100%;
+  padding:16px;
+  font-size:18px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+}
+.primary{background:#2a424c;color:#fff;}
+.secondary{background:#fee846;color:#2a424c;}
+.line{background:#06c755;color:#fff;}
+.ghost{background:#ddd;color:#111;}
+.note{
+  margin-top:8px;
+  font-size:12px;
+  color:#6b7280;
+  line-height:1.6;
+}
+@media(max-width:900px){
+  .menu{grid-template-columns:1fr;}
+  .wrap{grid-template-columns:1fr;}
+}
 
-.benefit-card {padding:18px;background:#fffdf7;border:2px solid #f3e2b3;border-radius:16px;}
-.badge {display:inline-block;background:#d93025;color:#fff;padding:4px 10px;border-radius:20px;font-size:12px;margin-bottom:8px;}
+/* 出勤LINE用 */
+.sh-row{ margin-bottom:14px; }
+.sh-label{
+  display:block;
+  font-size:14px;
+  font-weight:bold;
+  margin-bottom:6px;
+}
+.sh-input, .sh-select, .sh-textarea{
+  width:100%;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+  box-sizing:border-box;
+}
+.sh-textarea{ min-height:88px; resize:vertical; }
+.sh-inline-group{
+  display:grid;
+  grid-template-columns:110px 1fr auto;
+  gap:10px;
+  align-items:center;
+  margin-bottom:10px;
+}
+.sh-inline-group .small{
+  width:auto;
+  min-width:72px;
+  padding:10px 12px;
+  font-size:14px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold;
+  background:#eef2f7;
+  color:#1f2937;
+}
+@media(max-width:800px){
+  .sh-inline-group{grid-template-columns:1fr;}
+  .sh-inline-group .small{width:100%;}
+}
 
-.date-3m,.until-orange{color:#e68a00;font-weight:700;}
-.date-6m,.until-red{color:#d93025;font-weight:700;}
-.date-cb,.until-blue{color:#1a73e8;font-weight:700;}
-.note{font-size:13px;color:#666;margin-top:10px;}
+/* 退勤LINE用 */
+.np-grid{
+  display:grid;
+  grid-template-columns:140px 1fr;
+  gap:10px;
+  align-items:center;
+}
+.np-label{
+  font-size:14px;
+  font-weight:bold;
+}
+.np-input,.np-textarea{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+  box-sizing:border-box;
+}
+.np-textarea{
+  min-height:90px;
+  resize:vertical;
+}
+@media(max-width:800px){
+  .np-grid{grid-template-columns:1fr;}
+}
+
+.np-label-top{
+  align-self:start;
+  padding-top:8px;
+}
+.np-area-row{
+  margin:8px 0;
+}
+.np-area-row .np-input,
+.np-area-row select{
+  margin-top:4px;
+  margin-bottom:4px;
+}
+.np-add-btn{
+  margin-top:-2px;
+}
+
+
+/* 追加：特典カード */
+.benefit-card{
+  margin-top:18px;
+  padding:18px;
+  background:#fffdf7;
+  border:2px solid #f3e2b3;
+  border-radius:18px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+.benefit-title{font-size:18px;font-weight:bold;margin-bottom:8px;color:#2a424c;}
+.benefit-today{font-size:15px;font-weight:bold;margin-bottom:10px;color:#2a424c;}
+.benefit-item{margin:6px 0;font-size:14px;}
+.date-3m{color:#e58a00;font-weight:bold;}
+.date-6m{color:#d93025;font-weight:bold;}
+.date-cb{color:#1a73e8;font-weight:bold;}
+
 </style>
 </head>
-
 <body>
-<div class="container">
 
-<div class="card">
-<h2>出勤・退勤LINE用(自分用)</h2>
-<div class="desc">出勤・退勤LINE送信用の自分用簡易コピペツール。入力内容はそれぞれ自動保存。</div>
-<button class="btn btn-start">出勤LINE用を開く</button>
-<button class="btn btn-end">退勤LINE用を開く</button>
+<div class="topbar">
+  <div class="header-card">
+    <h1>出勤・退勤LINE用(自分用)</h1>
+    <p class="sub">出勤・退勤LINE送信用の自分用簡易コピペツール。入力内容はそれぞれ自動保存。</p>
+
+    <div class="menu" id="homeMenu">
+      <button class="btn-shukkin" type="button" onclick="showPage('shukkinPage')">出勤LINE用を開く</button>
+      <button class="btn-nippo" type="button" onclick="showPage('nippoPage')">退勤LINE用を開く</button>
+    </div>
+  </div>
 </div>
 
-<div class="benefit-card">
-<div id="badgeArea"></div>
-<div id="todayText"></div>
 
-<div>●月会費無料期間</div>
+<div class="shell">
+  <div class="benefit-card">
+    <div class="benefit-title">今入会した場合の特典期間</div>
+    <div class="benefit-today" id="benefitToday"></div>
 
-<div>・3ヶ月無料の場合：
-<span id="date3m" class="date-3m"></span>
-<span class="until-orange">まで</span>
+    <div class="benefit-item">●月会費無料期間</div>
+    <div class="benefit-item">・3ヶ月無料の場合：<span id="date3m" class="date-3m"></span>まで</div>
+    <div class="benefit-item">・半年間無料の場合：<span id="date6m" class="date-6m"></span>まで</div>
+    <div class="benefit-item">・キャッシュバック終了：<span id="dateCb" class="date-cb"></span>まで</div>
+    <div class="note">※17日基準で1ヶ月伸びます</div>
+  </div>
 </div>
 
-<div>・半年間無料の場合：
-<span id="date6m" class="date-6m"></span>
-<span class="until-red">まで</span>
-</div>
 
-<div>・キャッシュバック終了：
-<span id="dateCb" class="date-cb"></span>
-<span class="until-blue">まで</span>
-</div>
+<div class="shell">
+  <div class="page-card page" id="shukkinPage">
+    <div class="back-row">
+      <button class="back-btn" type="button" onclick="showHome()">← トップに戻る</button>
+    </div>
+    <h2 class="page-title">出勤LINE用</h2>
 
-<div class="note">※17日基準で1ヶ月伸びます</div>
-</div>
+    <div class="wrap">
+      <div class="card">
+        <div class="sh-row">
+          <label class="sh-label" for="sh_name">名前</label>
+          <input class="sh-input" id="sh_name" type="text" placeholder="名前を入力">
+        </div>
 
+        <div class="sh-row">
+          <label class="sh-label">スタート地点（複数追加できます）</label>
+          <div id="sh_startPoints"></div>
+          <button class="small" type="button" onclick="shAddStartPoint()">＋ 追加</button>
+          <div class="note">例： (四)○○・(鈴)△△ のように横並びの「・」区切りで出力されます。</div>
+        </div>
+
+        <div class="sh-row">
+          <label class="sh-label" for="sh_locationSelect">打刻場所</label>
+          <div class="sh-inline-group">
+            <select class="sh-select" id="sh_locationSelect">
+              <option value=""></option>
+              <option value="店舗">店舗</option>
+              <option value="本社">本社</option>
+              <option value="manual">手動入力</option>
+            </select>
+            <input class="sh-input" id="sh_locationManual" type="text" placeholder="手動入力する場合はこちら">
+            <div></div>
+          </div>
+        </div>
+
+        <div class="sh-row">
+          <label class="sh-label" for="sh_extraText">追加の自由入力（未入力なら非表示）</label>
+          <textarea class="sh-textarea" id="sh_extraText" placeholder="必要なときだけ入力してください"></textarea>
+        </div>
+
+        <div class="buttons">
+          <button class="action primary" type="button" onclick="shGenerate()">出力</button>
+          <button class="action secondary" type="button" onclick="shCopyText()">コピー</button>
+          <button class="action ghost" type="button" onclick="shClearAll()">クリア</button>
+        </div>
+
+        <div id="sh_status" class="status"></div>
+      </div>
+
+      <div class="card">
+        <div id="sh_out" class="output">ここに出力されます。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-card page" id="nippoPage">
+    <div class="back-row">
+      <button class="back-btn" type="button" onclick="showHome()">← トップに戻る</button>
+    </div>
+    <h2 class="page-title">退勤LINE用</h2>
+
+    <div class="wrap">
+      <div class="card">
+        <div class="np-grid">
+          <label class="np-label" for="np_name">名前</label><input class="np-input" id="np_name">
+          <label class="np-label np-label-top">エリア</label><div id="np_areas"></div><button class="small np-add-btn" type="button" onclick="npAddArea()">＋ 追加</button><div class="note">例：(四)○○・(鈴)△△</div>
+          <label class="np-label" for="np_minutes">分数</label><input class="np-input" id="np_minutes">
+          <label class="np-label" for="np_cases">件数</label><input class="np-input" id="np_cases">
+          <label class="np-label" for="np_home">在宅</label><input class="np-input" id="np_home">
+          <label class="np-label" for="np_miai">目合</label><input class="np-input" id="np_miai">
+          <label class="np-label" for="np_referral">紹介依頼</label><input class="np-input" id="np_referral">
+          <label class="np-label" for="np_appointment">アポ</label><input class="np-input" id="np_appointment">
+          <label class="np-label" for="np_contract">成約</label><input class="np-input" id="np_contract">
+          <label class="np-label" for="np_introContract">紹介成約</label><input class="np-input" id="np_introContract">
+          <label class="np-label" for="np_other">その他</label><textarea class="np-textarea" id="np_other"></textarea>
+          <label class="np-label" for="np_leave">退勤時刻</label><input class="np-input" id="np_leave">
+          <label class="np-label" for="np_form">申込用紙</label><input class="np-input" id="np_form">
+        </div>
+
+        <div class="buttons">
+          <button class="action primary" type="button" onclick="npGenerate()">出力</button>
+          <button class="action secondary" type="button" onclick="npCopyText()">コピー</button>
+          <button class="action line" type="button" onclick="npSendLine()">LINE</button>
+          <button class="action ghost" type="button" onclick="npClearAll()">クリア</button>
+        </div>
+
+        <div id="np_status" class="status"></div>
+      </div>
+
+      <div class="card">
+        <div id="np_out" class="output">ここに出力されます。</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-function formatDate(d){return d.getFullYear()+"年"+(d.getMonth()+1)+"月"+d.getDate()+"日";}
-
-function getEndDate(m){
- const t=new Date();
- const extra=t.getDate()>=17?1:0;
- return new Date(t.getFullYear(),t.getMonth()+m+extra,20);
+/* トップ切り替え */
+function showPage(pageId){
+  document.getElementById("homeMenu").style.display = "none";
+  document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
+  document.getElementById(pageId).classList.add("active");
+}
+function showHome(){
+  document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
+  document.getElementById("homeMenu").style.display = "grid";
 }
 
-function render(){
- const t=new Date();
- document.getElementById("todayText").textContent=
- "今日("+t.getFullYear()+"/"+(t.getMonth()+1)+"/"+t.getDate()+")入会すると…";
-
- document.getElementById("date3m").textContent=formatDate(getEndDate(3));
- document.getElementById("date6m").textContent=formatDate(getEndDate(6));
- document.getElementById("dateCb").textContent=formatDate(getEndDate(3));
-
- if(t.getDate()>=17){
-   document.getElementById("badgeArea").innerHTML='<span class="badge">本日がお得！</span>';
- }
+/* 共通コピー */
+async function copyWithFallback(text){
+  if (navigator.clipboard && window.isSecureContext){
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const temp = document.createElement("textarea");
+  temp.value = text;
+  temp.setAttribute("readonly", "");
+  temp.style.position = "fixed";
+  temp.style.top = "-9999px";
+  temp.style.left = "-9999px";
+  document.body.appendChild(temp);
+  temp.focus();
+  temp.select();
+  temp.setSelectionRange(0, temp.value.length);
+  const ok = document.execCommand("copy");
+  document.body.removeChild(temp);
+  if(!ok) throw new Error("copy failed");
 }
-render();
+
+/* 出勤LINE用 */
+const SH_STORAGE_KEY = "top_shukkin_memo_v1";
+const shBaseIds = ["sh_name", "sh_locationSelect", "sh_locationManual", "sh_extraText"];
+const shAreaOptions = ["", "(四)", "(鈴)", "(桑)", "(三)", "(い)"];
+
+function shById(id){ return document.getElementById(id); }
+function shSetStatus(msg){ shById("sh_status").textContent = msg; }
+
+function shCreateSelect(selectedValue=""){
+  const select = document.createElement("select");
+  select.className = "sh-select sh-start-code";
+  shAreaOptions.forEach(opt => {
+    const option = document.createElement("option");
+    option.value = opt;
+    option.textContent = opt;
+    if (opt === selectedValue) option.selected = true;
+    select.appendChild(option);
+  });
+  return select;
+}
+
+function shCreateStartPointRow(code="", text=""){
+  const row = document.createElement("div");
+  row.className = "sh-inline-group sh-start-point-row";
+
+  const select = shCreateSelect(code);
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "sh-input sh-start-text";
+  input.placeholder = "続けて自由入力";
+  input.value = text;
+
+  const removeBtn = document.createElement("button");
+  removeBtn.type = "button";
+  removeBtn.className = "small";
+  removeBtn.textContent = "削除";
+  removeBtn.onclick = () => {
+    row.remove();
+    if (document.querySelectorAll(".sh-start-point-row").length === 0) {
+      shAddStartPoint();
+    }
+    shSave();
+    shGeneratePreviewOnly();
+  };
+
+  select.addEventListener("change", () => { shSave(); shGeneratePreviewOnly(); });
+  input.addEventListener("input", () => { shSave(); shGeneratePreviewOnly(); });
+
+  row.appendChild(select);
+  row.appendChild(input);
+  row.appendChild(removeBtn);
+  return row;
+}
+
+function shAddStartPoint(code="", text=""){
+  shById("sh_startPoints").appendChild(shCreateStartPointRow(code, text));
+  shSave();
+}
+
+function shGetStartPointsText(){
+  const rows = Array.from(document.querySelectorAll(".sh-start-point-row"));
+  const parts = rows.map(row => {
+    const code = row.querySelector(".sh-start-code").value.trim();
+    const text = row.querySelector(".sh-start-text").value.trim();
+    return (code + text).trim();
+  }).filter(Boolean);
+  return parts.length ? parts.join("・") : " ";
+}
+
+function shGetLocationText(){
+  const selected = shById("sh_locationSelect").value;
+  const manual = shById("sh_locationManual").value.trim();
+  if (selected === "manual") return manual || " ";
+  if (manual !== "") return manual;
+  return selected || " ";
+}
+
+function shBuild(){
+  const extra = shById("sh_extraText").value.trim();
+  let text = `おはようございます。
+${shById("sh_name").value.trim() || " "}
+${shGetStartPointsText()}よりスタートいたします。
+${shGetLocationText()}打刻済みです。`;
+  if (extra !== "") text += `\n${extra}`;
+  return text;
+}
+
+function shGenerate(){
+  shById("sh_out").textContent = shBuild();
+  shSave();
+  shSetStatus("出力しました。");
+}
+function shGeneratePreviewOnly(){
+  shById("sh_out").textContent = shBuild();
+}
+async function shCopyText(){
+  const text = shBuild();
+  shById("sh_out").textContent = text;
+  try{
+    await copyWithFallback(text);
+    shSave();
+    shSetStatus("コピーしました。");
+  }catch(e){
+    shSetStatus("コピーできませんでした。出力結果を長押ししてコピーしてください。");
+  }
+}
+function shSave(){
+  const data = {};
+  shBaseIds.forEach(id => data[id] = shById(id).value);
+  data.startPoints = Array.from(document.querySelectorAll(".sh-start-point-row")).map(row => ({
+    code: row.querySelector(".sh-start-code").value,
+    text: row.querySelector(".sh-start-text").value
+  }));
+  localStorage.setItem(SH_STORAGE_KEY, JSON.stringify(data));
+}
+function shLoad(){
+  const raw = localStorage.getItem(SH_STORAGE_KEY);
+  if (!raw) {
+    shAddStartPoint();
+    return;
+  }
+  try{
+    const data = JSON.parse(raw);
+    shBaseIds.forEach(id => {
+      if (typeof data[id] === "string") shById(id).value = data[id];
+    });
+    shById("sh_startPoints").innerHTML = "";
+    if (Array.isArray(data.startPoints) && data.startPoints.length) {
+      data.startPoints.forEach(item => shAddStartPoint(item.code || "", item.text || ""));
+    } else {
+      shAddStartPoint();
+    }
+  }catch(e){
+    shById("sh_startPoints").innerHTML = "";
+    shAddStartPoint();
+  }
+}
+function shClearAll(){
+  shBaseIds.forEach(id => shById(id).value = "");
+  shById("sh_startPoints").innerHTML = "";
+  shAddStartPoint();
+  shById("sh_out").textContent = "ここに出力されます。";
+  localStorage.removeItem(SH_STORAGE_KEY);
+  shSetStatus("クリアしました。");
+}
+
+/* 退勤LINE用 */
+const NP_STORAGE_KEY = "top_nippo_memo_v1";
+const npIds = ["np_name","np_minutes","np_cases","np_home","np_miai","np_referral","np_appointment","np_contract","np_introContract","np_other","np_leave","np_form"];
+
+function npById(id){ return document.getElementById(id); }
+function npSetStatus(msg){ npById("np_status").textContent = msg; }
+function npNowTime(){
+  const d = new Date();
+  return String(d.getHours()).padStart(2,'0') + ":" + String(d.getMinutes()).padStart(2,'0');
+}
+function npV(id){
+  const val = npById(id).value.trim();
+  return val === "" ? " " : val;
+}
+
+const npAreaOptions = ["", "(四)", "(鈴)", "(桑)", "(三)", "(い)"];
+
+function npCreateSelect(val=""){
+  const select = document.createElement("select");
+  select.className = "np-input";
+  npAreaOptions.forEach(opt=>{
+    const o = document.createElement("option");
+    o.value = opt;
+    o.textContent = opt;
+    if(opt===val) o.selected = true;
+    select.appendChild(o);
+  });
+  return select;
+}
+
+function npCreateRow(code="", text=""){
+  const row = document.createElement("div");
+  row.className = "inline-group np-area-row";
+
+  const select = npCreateSelect(code);
+
+  const input = document.createElement("input");
+  input.className = "np-input";
+  input.value = text;
+  input.placeholder = "続けて入力";
+
+  const btn = document.createElement("button");
+  btn.textContent = "削除";
+  btn.className = "small";
+  btn.onclick = ()=>{
+    row.remove();
+    if(document.querySelectorAll(".np-area-row").length===0){
+      npAddArea();
+    }
+    npSave();
+  };
+
+  select.onchange = ()=>npSave();
+  input.oninput = ()=>npSave();
+
+  row.append(select,input,btn);
+  return row;
+}
+
+function npAddArea(code="", text=""){
+  document.getElementById("np_areas")
+    .appendChild(npCreateRow(code,text));
+  npSave();
+}
+
+function npGetAreas(){
+  return [...document.querySelectorAll(".np-area-row")]
+    .map(r=>{
+      const c=r.querySelector("select").value;
+      const t=r.querySelector("input").value;
+      return (c+t).trim();
+    })
+    .filter(Boolean)
+    .join("・") || " ";
+}
+
+
+function npAppointmentFormat(){
+  const val = npById("np_appointment").value.trim();
+  if(val==="") return "0 ( / )";
+  return val;
+}
+
+function npBuild(){
+  return `お疲れ様です。
+${npV("np_name")}
+エリア：${npGetAreas()}
+分数：${npV("np_minutes")}
+件数：${npV("np_cases")}
+在宅：${npV("np_home")}
+目合：${npV("np_miai")}
+紹介依頼：${npV("np_referral")}
+アポ：${npAppointmentFormat()}
+成約：${npV("np_contract")}(紹介成約：${npV("np_introContract")})
+その他：${npV("np_other")}
+退勤時刻：${npV("np_leave")}
+申込用紙：${npV("np_form")}
+
+以上で業務終了いたします。`;
+}
+function npGenerate(){
+  npById("np_out").textContent = npBuild();
+  npSave();
+  npSetStatus("出力しました。");
+}
+async function npCopyText(){
+  const text = npBuild();
+  npById("np_out").textContent = text;
+  try{
+    await copyWithFallback(text);
+    npSave();
+    npSetStatus("コピーしました。");
+  }catch(e){
+    npSetStatus("コピーできませんでした。出力結果を長押ししてコピーしてください。");
+  }
+}
+function npSendLine(){
+  const text = npBuild();
+  npById("np_out").textContent = text;
+  npSave();
+  location.href = "https://line.me/R/msg/text/?" + encodeURIComponent(text);
+}
+function npSave(){
+  const data = {};
+  npIds.forEach(id => data[id] = npById(id).value);
+  data.areas = Array.from(document.querySelectorAll(".np-area-row")).map(row => ({
+    code: row.querySelector("select").value,
+    text: row.querySelector("input").value
+  }));
+  localStorage.setItem(NP_STORAGE_KEY, JSON.stringify(data));
+}
+function npLoad(){
+  const data = JSON.parse(localStorage.getItem(NP_STORAGE_KEY) || "{}");
+  npIds.forEach(id => {
+    if (typeof data[id] === "string") npById(id).value = data[id];
+  });
+  const areasBox = document.getElementById("np_areas");
+  if (areasBox){
+    areasBox.innerHTML = "";
+    if (Array.isArray(data.areas) && data.areas.length){
+      data.areas.forEach(item => npAddArea(item.code || "", item.text || ""));
+    } else {
+      npAddArea();
+    }
+  }
+}
+function npClearAll(){
+  npIds.forEach(id => npById(id).value = "");
+  const areasBox = document.getElementById("np_areas");
+  if (areasBox){
+    areasBox.innerHTML = "";
+    npAddArea();
+  }
+  npById("np_out").textContent = "ここに出力されます。";
+  localStorage.removeItem(NP_STORAGE_KEY);
+  npById("np_leave").value = npNowTime();
+  npSetStatus("クリアしました。");
+}
+
+/* 初期化 */
+window.addEventListener("DOMContentLoaded", () => {
+  shLoad();
+  shBaseIds.forEach(id => {
+    shById(id).addEventListener("input", () => { shSave(); shGeneratePreviewOnly(); });
+    shById(id).addEventListener("change", () => { shSave(); shGeneratePreviewOnly(); });
+  });
+  shGeneratePreviewOnly();
+
+  npLoad();
+  if (document.getElementById("np_areas") && document.querySelectorAll(".np-area-row").length === 0) {
+    npAddArea();
+  }
+  if(!npById("np_leave").value){
+    npById("np_leave").value = npNowTime();
+  }
+  if(!npById("np_appointment").value){
+    npById("np_appointment").value = "0 ( / )";
+  }
+  npIds.forEach(id => {
+    npById(id).addEventListener("input", npSave);
+    npById(id).addEventListener("change", npSave);
+  });
+});
+
+// 特典計算
+function benefitDate(months){
+  const t=new Date();
+  const extra=t.getDate()>=17?1:0;
+  return new Date(t.getFullYear(),t.getMonth()+months+extra,20);
+}
+function format(d){
+  return d.getFullYear()+"年"+(d.getMonth()+1)+"月"+d.getDate()+"日";
+}
+function renderBenefit(){
+  const t=new Date();
+  document.getElementById("benefitToday").textContent=
+  "今日("+t.getFullYear()+"/"+(t.getMonth()+1)+"/"+t.getDate()+")入会すると…";
+  document.getElementById("date3m").textContent=format(benefitDate(3));
+  document.getElementById("date6m").textContent=format(benefitDate(6));
+  document.getElementById("dateCb").textContent=format(benefitDate(3));
+}
+window.addEventListener("DOMContentLoaded",renderBenefit);
+
 </script>
 
 </body>
