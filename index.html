@@ -641,7 +641,7 @@ button.action{
 <div class="shell" id="deliverySearchShell">
   <div class="delivery-card" id="deliverySearchCard">
     <div class="delivery-title">スーパーサンシ宅配サービス 配達エリア検索</div>
-    <p class="delivery-sub">町名や郵便番号から、どの店舗からの配達かを確認できます。判定できない場合は手動追加もできます。</p>
+    <p class="delivery-sub">市・郡（市町村）や郵便番号から、どの店舗からの配達かを確認できます。判定できない場合は手動追加もできます。</p>
     <button class="delivery-open-btn" type="button" onclick="showPage('deliverySearchPage')">配達店舗検索</button>
   </div>
 </div>
@@ -888,11 +888,28 @@ button.action{
     <div class="wrap">
       <div class="card">
         <div class="delivery-grid">
-          <label class="delivery-label" for="ds_town">町名</label>
-          <input class="delivery-input" id="ds_town" type="text" placeholder="例：○○町">
+          <label class="delivery-label" for="ds_town">市・郡（市町村）</label>
+          <select class="delivery-select" id="ds_town">
+            <option value="">選択してください</option>
+            <option value="四日市市">四日市市</option>
+            <option value="桑名市">桑名市</option>
+            <option value="桑名郡木曽岬町">桑名郡木曽岬町</option>
+            <option value="三重郡菰野町">三重郡菰野町</option>
+            <option value="三重郡川越町">三重郡川越町</option>
+            <option value="三重郡朝日町">三重郡朝日町</option>
+            <option value="いなべ市">いなべ市</option>
+            <option value="亀山市">亀山市</option>
+            <option value="鈴鹿市">鈴鹿市</option>
+            <option value="津市">津市</option>
+            <option value="弥富市">弥富市</option>
+            <option value="海部郡蟹江町">海部郡蟹江町</option>
+          </select>
+
+          <label class="delivery-label" for="ds_area">町名</label>
+          <input class="delivery-input" id="ds_area" type="text" placeholder="例：笹川 / 羽津 / 白子町 など">
 
           <label class="delivery-label" for="ds_zip">郵便番号</label>
-          <input class="delivery-input" id="ds_zip" type="text" placeholder="例：510-0000">
+          <input class="delivery-input" id="ds_zip" type="text" inputmode="numeric" placeholder="例：5100000">
 
           <label class="delivery-label" for="ds_store">手動追加店舗名</label>
           <input class="delivery-input" id="ds_store" type="text" placeholder="不明時のみ追加用">
@@ -908,7 +925,7 @@ button.action{
 
         <div class="delivery-manual">
           <div class="delivery-manual-title">手動追加について</div>
-          <div class="note">検索で判定できない場合は「不明です」と表示されます。ご自身で配達エリア内と確認できた場合のみ、町名・郵便番号・店舗名を入力して追加してください。</div>
+          <div class="note">検索で判定できない場合は「不明です」と表示されます。ご自身で配達エリア内と確認できた場合のみ、市・郡（市町村）・郵便番号・店舗名を入力して追加してください。</div>
         </div>
       </div>
 
@@ -1367,9 +1384,8 @@ const DELIVERY_OUT_TEXT = "配達エリア外です";
 
 /*
   画像資料をもとにした保守的な配達エリア辞書です。
-  判定に自信が持てる町名・地域名だけ登録し、
+  判定に自信が持てる市町村・町名だけ登録し、
   あいまいな場合は「不明です」に落とします。
-  郵便番号のみでの自動判定は、手動追加データがある場合のみ対応します。
 */
 const DELIVERY_REFERENCE_AREAS = [
   {
@@ -1388,14 +1404,14 @@ const DELIVERY_REFERENCE_AREAS = [
       "北勢町京ヶ野新田","北勢町阿下喜","北勢町麻生田","北勢町東村","北勢町瀬木","北勢町向平",
       "藤原町古田","藤原町篠立","藤原町山口","藤原町坂本","藤原町大貝戸","藤原町本郷","藤原町上之山田",
       "藤原町上相場","藤原町下相場","藤原町長尾","藤原町川合","藤原町石川","藤原町別名","藤原町東禅寺",
-      "藤原町西野尻","藤原町市場","藤原町下野尻","藤原町志礼石新田","いなべ市"
+      "藤原町西野尻","藤原町市場","藤原町下野尻","藤原町志礼石新田"
     ]
   },
   {
     store: "エコー店",
     keywords: [
-      "坂本","井田川","みずほ台","能褒野町","川崎町","小川町","関町","関ヶ丘","関ヶ丘住宅",
-      "亀山IC","亀山市","田村町","安坂山町","中部中","福徳町","川俣町","両尾町","野村","野登","羽若町"
+      "坂本","井田川","みずほ台","能褒野町","川崎町","小川町","関町","関ヶ丘","亀山IC","田村町","安坂山町",
+      "中部中","福徳町","川俣町","両尾町","野村","野登","羽若町"
     ]
   },
   {
@@ -1404,28 +1420,28 @@ const DELIVERY_REFERENCE_AREAS = [
       "大安町丹生川上","大安町丹生川久下","大安町片樋","大安町石榑北山","大安町石榑北","大安町石榑南",
       "大安町石榑東","大安町石榑下","大安町高柳","大安町門前","大安町梅戸","田光","切畑","鍋坂",
       "根の平","千草","神","竹成","永井","小島","平尾町","江村町","川北","諏訪","諏訪町","鵜川原",
-      "朝明","桜町","智積町","菰野町","菰野"
+      "朝明","桜町","智積町","菰野"
     ]
   },
   {
     store: "みえ川越インター店",
     keywords: [
-      "みえ川越","川越町","川越富洲原","みえ川越IC","湾岸桑名IC","朝日町","川越","朝日"
+      "みえ川越","川越","川越富洲原","みえ川越IC"
     ]
   },
   {
     store: "河芸店",
     keywords: [
       "河芸町","河芸町上野","河芸町千里ヶ丘","河芸町東千里","河芸町南黒田","河芸町中別保","河芸町浜田",
-      "白子町","白子","白塚町","千里","千里駅","河原田","徳田町","三宅町","寺家町","稲生",
-      "南玉垣町","北若松町","若松東","若松中","江島台","岸岡町","白子本町","鼓ヶ浦","鈴鹿市南部"
+      "白子町","白子","白塚町","千里","河原田","徳田町","三宅町","寺家町","稲生",
+      "南玉垣町","北若松町","若松東","若松中","江島台","岸岡町","白子本町","鼓ヶ浦"
     ]
   },
   {
     store: "桑名店",
     keywords: [
-      "木曽岬町","弥富市","弥富市木曽岬IC","飛島","飛島小","飛島IC","蟹江町","蟹江IC","海南こどもの国",
-      "長島","長島町","ながしま","弥富木曽岬IC","湾岸長島IC"
+      "木曽岬町","飛島","飛島小","飛島IC","蟹江町","蟹江IC","海南こどもの国","長島","長島町","ながしま",
+      "湾岸長島IC"
     ]
   },
   {
@@ -1433,7 +1449,7 @@ const DELIVERY_REFERENCE_AREAS = [
     keywords: [
       "桑名CC","城山小","桑名工高","大山田西小","桑名西高","あのつ","ななわ","はしかわ","ありよし",
       "れんげじ","うまみち","にしくわな","にしべっしょ","ますお","くわな","はりま","しもふかや",
-      "ただ","大山田","大山田西","桑名市北部"
+      "ただ","大山田","大山田西"
     ]
   },
   {
@@ -1441,7 +1457,7 @@ const DELIVERY_REFERENCE_AREAS = [
     keywords: [
       "日永","日永西","泊","泊村","泊駅","泊小","西日野","南日永","追分","追分町","泊村町",
       "楠町本郷","楠町南五味塚","楠町北五味塚","楠町小倉","大治田","貝塚町","六呂見","采女が丘",
-      "高岡台","鹿間町","山田町","波木町","泊山","南部丘陵公園","四日市南部"
+      "高岡台","鹿間町","山田町","波木町"
     ]
   },
   {
@@ -1449,19 +1465,26 @@ const DELIVERY_REFERENCE_AREAS = [
     keywords: [
       "平田町","住吉","住吉町","石薬師町","上田町","三日市町","和泉町","算所","算所町","算所IC",
       "青少年の森","鈴鹿サーキット","稲生","稲生町","寺家","寺家町","国分町","高岡町","高岡台",
-      "南長太町","若松東","若松中","岸岡町","西玉垣町","東玉垣町","白子","白子駅","鈴鹿市中央部"
+      "南長太町","若松東","若松中","岸岡町","西玉垣町","東玉垣町","白子","白子駅"
     ]
   }
 ];
 
 const DELIVERY_MUNICIPAL_HINTS = [
   { keyword: "いなべ市", store: "いなべ店" },
+  { keyword: "三重郡菰野町", store: "こもの繁盛店" },
   { keyword: "菰野町", store: "こもの繁盛店" },
   { keyword: "亀山市", store: "エコー店" },
+  { keyword: "三重郡川越町", store: "みえ川越インター店" },
   { keyword: "川越町", store: "みえ川越インター店" },
+  { keyword: "三重郡朝日町", store: "みえ川越インター店" },
   { keyword: "朝日町", store: "みえ川越インター店" },
+  { keyword: "桑名郡木曽岬町", store: "桑名店" },
   { keyword: "木曽岬町", store: "桑名店" },
-  { keyword: "弥富市", store: "桑名店" }
+  { keyword: "弥富市", store: "桑名店" },
+  { keyword: "海部郡蟹江町", store: "桑名店" },
+  { keyword: "蟹江町", store: "桑名店" },
+  { keyword: "津市", store: "河芸店" }
 ];
 
 function dsById(id){ return document.getElementById(id); }
@@ -1469,8 +1492,8 @@ function dsById(id){ return document.getElementById(id); }
 function normalizeZip(zip){
   return String(zip || "").replace(/[^\d]/g, "");
 }
-function normalizeTown(town){
-  return String(town || "").trim().replace(/\s+/g, "");
+function normalizeText(value){
+  return String(value || "").trim().replace(/\s+/g, "");
 }
 function getDeliveryManualData(){
   try{
@@ -1483,20 +1506,31 @@ function getDeliveryManualData(){
 function setDeliveryManualData(data){
   localStorage.setItem(DELIVERY_STORAGE_KEY, JSON.stringify(data));
 }
+function buildFullAreaName(municipality, area){
+  return [municipality || "", area || ""].join("").trim();
+}
 
-function findManualDeliveryMatch(nt, nz){
+function findManualDeliveryMatch(municipality, area, zip){
+  const nm = normalizeText(municipality);
+  const na = normalizeText(area);
+  const nf = normalizeText(buildFullAreaName(municipality, area));
+  const nz = normalizeZip(zip);
   const manual = getDeliveryManualData();
 
   for(const item of manual){
-    const itemTown = normalizeTown(item.town);
+    const itemMunicipality = normalizeText(item.municipality);
+    const itemArea = normalizeText(item.area);
+    const itemFull = normalizeText(buildFullAreaName(item.municipality, item.area));
     const itemZip = normalizeZip(item.zip);
 
-    if ((nt && itemTown && (nt === itemTown || nt.includes(itemTown) || itemTown.includes(nt))) ||
+    if ((nf && itemFull && (nf === itemFull || nf.includes(itemFull) || itemFull.includes(nf))) ||
+        (nm && itemMunicipality && nm === itemMunicipality && (!na || !itemArea || na === itemArea || false)) ||
         (nz && itemZip && nz === itemZip)) {
       return {
         status: "in",
         store: item.store,
-        town: item.town,
+        municipality: item.municipality,
+        area: item.area,
         zip: item.zip,
         source: "manual"
       };
@@ -1505,27 +1539,31 @@ function findManualDeliveryMatch(nt, nz){
   return null;
 }
 
-function findReferenceDeliveryMatch(nt){
-  if (!nt) return null;
+function findReferenceDeliveryMatch(municipality, area){
+  const nm = normalizeText(municipality);
+  const na = normalizeText(area);
+  const nf = normalizeText(buildFullAreaName(municipality, area));
 
-  for (const area of DELIVERY_REFERENCE_AREAS){
-    for (const keyword of area.keywords){
-      const nk = normalizeTown(keyword);
-      if (!nk) continue;
-      if (nt === nk || nt.includes(nk) || nk.includes(nt)){
-        return {
-          status: "in",
-          store: area.store,
-          source: "reference",
-          matchedKeyword: keyword
-        };
+  if (na) {
+    for (const areaDef of DELIVERY_REFERENCE_AREAS){
+      for (const keyword of areaDef.keywords){
+        const nk = normalizeText(keyword);
+        if (!nk) continue;
+        if (na === nk || na.includes(nk) || nk.includes(na) || nf === nk || nf.includes(nk) || nk.includes(nf)){
+          return {
+            status: "in",
+            store: areaDef.store,
+            source: "reference",
+            matchedKeyword: keyword
+          };
+        }
       }
     }
   }
 
   for (const hint of DELIVERY_MUNICIPAL_HINTS){
-    const nk = normalizeTown(hint.keyword);
-    if (nt === nk || nt.includes(nk) || nk.includes(nt)){
+    const nk = normalizeText(hint.keyword);
+    if (nm === nk || nm.includes(nk) || nk.includes(nm)){
       return {
         status: "in",
         store: hint.store,
@@ -1538,25 +1576,33 @@ function findReferenceDeliveryMatch(nt){
   return null;
 }
 
-function looksClearlyOutsideSupportedArea(nt){
-  if (!nt) return false;
+function looksClearlyOutsideSupportedArea(municipality, area){
+  const text = normalizeText(buildFullAreaName(municipality, area));
+  if (!text) return false;
   const outsideKeywords = [
     "名古屋","愛知県","岐阜","岐阜県","松阪","伊勢","志摩","尾鷲","熊野","鳥羽","多気","明和","玉城","度会"
   ];
-  return outsideKeywords.some(keyword => nt.includes(normalizeTown(keyword)));
+  return outsideKeywords.some(keyword => text.includes(normalizeText(keyword)));
 }
 
-function findDeliveryMatch(town, zip){
-  const nt = normalizeTown(town);
+function formatDeliveryResultText(store, zip, municipality, area){
+  const zipText = normalizeZip(zip) || "未入力";
+  const areaText = buildFullAreaName(municipality, area) || "未入力";
+  return `配達店舗：${store}\n${zipText}\n${areaText}`;
+}
+
+function findDeliveryMatch(municipality, area, zip){
+  const nm = normalizeText(municipality);
+  const na = normalizeText(area);
   const nz = normalizeZip(zip);
 
-  const manualMatch = findManualDeliveryMatch(nt, nz);
+  const manualMatch = findManualDeliveryMatch(municipality, area, zip);
   if (manualMatch) return manualMatch;
 
-  if (!nt && !nz){
+  if (!nm){
     return {
       status: "unknown",
-      message: "町名か郵便番号を入力してください。"
+      message: "市・郡（市町村）を選択してください。"
     };
   }
 
@@ -1567,17 +1613,17 @@ function findDeliveryMatch(town, zip){
     };
   }
 
-  if (!nt && nz){
+  const referenceMatch = findReferenceDeliveryMatch(municipality, area);
+  if (referenceMatch) {
     return {
-      status: "unknown",
-      message: "郵便番号だけでは自動判定できません。不明です\n町名も入力するか、確認後に手動追加してください。"
+      ...referenceMatch,
+      municipality,
+      area,
+      zip: nz
     };
   }
 
-  const referenceMatch = findReferenceDeliveryMatch(nt);
-  if (referenceMatch) return referenceMatch;
-
-  if (looksClearlyOutsideSupportedArea(nt)){
+  if (looksClearlyOutsideSupportedArea(municipality, area)){
     return {
       status: "out",
       message: DELIVERY_OUT_TEXT
@@ -1596,7 +1642,12 @@ function renderDeliveryResult(result){
 
   if(result.status === "in"){
     box.classList.add("in");
-    box.textContent = "配達店舗：" + (result.store || "不明");
+    box.textContent = formatDeliveryResultText(
+      result.store || "不明",
+      result.zip || "",
+      result.municipality || dsById("ds_town").value || "",
+      result.area || dsById("ds_area").value || ""
+    );
     return;
   }
   if(result.status === "out"){
@@ -1609,18 +1660,24 @@ function renderDeliveryResult(result){
 }
 
 function deliverySearch(){
-  const town = dsById("ds_town").value;
+  const municipality = dsById("ds_town").value;
+  const area = dsById("ds_area").value;
   const zip = dsById("ds_zip").value;
-  const result = findDeliveryMatch(town, zip);
+  const result = findDeliveryMatch(municipality, area, zip);
   renderDeliveryResult(result);
 }
 
 function deliveryAddManual(){
-  const town = dsById("ds_town").value.trim();
-  const zip = dsById("ds_zip").value.trim();
+  const municipality = dsById("ds_town").value.trim();
+  const area = dsById("ds_area").value.trim();
+  const zip = normalizeZip(dsById("ds_zip").value.trim());
   const store = dsById("ds_store").value.trim();
 
-  if (!town && !zip){
+  if (!municipality){
+    renderDeliveryResult({status:"unknown", message:"手動追加するには、市・郡（市町村）を選択してください。"});
+    return;
+  }
+  if (!area && !zip){
     renderDeliveryResult({status:"unknown", message:"手動追加するには、町名または郵便番号を入力してください。"});
     return;
   }
@@ -1630,16 +1687,16 @@ function deliveryAddManual(){
   }
 
   const data = getDeliveryManualData();
-  const nt = normalizeTown(town);
-  const nz = normalizeZip(zip);
+  const full = normalizeText(buildFullAreaName(municipality, area));
 
   const existingIndex = data.findIndex(item => {
-    const it = normalizeTown(item.town);
-    const iz = normalizeZip(item.zip);
-    return (nt && it && (nt === it || nt.includes(it) || it.includes(nt))) || (nz && iz && nz === iz);
+    const itemFull = normalizeText(buildFullAreaName(item.municipality, item.area));
+    const itemZip = normalizeZip(item.zip);
+    return (full && itemFull && (full === itemFull || full.includes(itemFull) || itemFull.includes(full))) ||
+           (zip && itemZip && zip === itemZip);
   });
 
-  const record = { town, zip, store };
+  const record = { municipality, area, zip, store };
 
   if (existingIndex >= 0){
     data[existingIndex] = record;
@@ -1649,7 +1706,7 @@ function deliveryAddManual(){
 
   setDeliveryManualData(data);
   renderDeliveryManualList();
-  renderDeliveryResult({status:"in", store:store});
+  renderDeliveryResult({status:"in", store, municipality, area, zip});
 }
 
 function deliveryDeleteManual(index){
@@ -1661,6 +1718,7 @@ function deliveryDeleteManual(index){
 
 function deliveryClearForm(){
   dsById("ds_town").value = "";
+  dsById("ds_area").value = "";
   dsById("ds_zip").value = "";
   dsById("ds_store").value = "";
   const box = dsById("delivery_result");
@@ -1681,8 +1739,8 @@ function renderDeliveryManualList(){
   box.innerHTML = data.map((item, index) => {
     return `
       <div class="delivery-item">
-        <div class="delivery-item-text">町名：${escapeHtmlDelivery(item.town || "")}
-郵便番号：${escapeHtmlDelivery(item.zip || "")}
+        <div class="delivery-item-text">郵便番号：${escapeHtmlDelivery(item.zip || "")}
+地域：${escapeHtmlDelivery(buildFullAreaName(item.municipality || "", item.area || ""))}
 店舗名：${escapeHtmlDelivery(item.store || "")}</div>
         <button class="delivery-delete-btn" type="button" onclick="deliveryDeleteManual(${index})">削除</button>
       </div>
