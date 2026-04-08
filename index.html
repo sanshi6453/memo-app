@@ -15,7 +15,7 @@ body{
 }
 .topbar{
   max-width:1200px;
-  margin:20px auto 0;
+  margin:8px auto 0;
   padding:0 12px;
 }
 .shell{
@@ -271,9 +271,21 @@ button.action{
   color:#2a424c;
 }
 .benefit-item{
-  margin:8px 0;
+  margin:6px 0;
   font-size:16px;
-  line-height:1.9;
+  line-height:1.6;
+}
+.benefit-today{
+  font-size:16px;
+  font-weight:bold;
+}
+.benefit-main{
+  font-size:16px;
+  font-weight:bold;
+}
+.benefit-note{
+  font-size:15px;
+  font-weight:bold;
 }
 .benefit-main{
   font-size:16px;
@@ -300,7 +312,7 @@ button.action{
 <body>
 
 <div class="topbar">
-  <div class="header-card">
+  <div class="header-card" id="headerCard">
     <h1>出勤・退勤LINE用(自分用)</h1>
     <p class="sub">出勤・退勤LINE送信用の自分用簡易コピペツール。入力内容はそれぞれ自動保存。</p>
 
@@ -312,15 +324,15 @@ button.action{
 </div>
 
 
-<div class="shell">
+<div class="shell" id="benefitShell">
   <div class="benefit-card" id="benefitCard">
     <div class="benefit-title">今入会した場合の特典期間</div>
     <div class="benefit-today" id="benefitToday"></div>
 
     <div class="benefit-item benefit-main">●月会費無料期間</div>
-    <div class="benefit-item">・3ヶ月無料の場合：<span id="date3m" class="date-3m"></span><span class="until-orange">&nbsp;まで</span></div>
-    <div class="benefit-item">・半年間無料の場合：<span id="date6m" class="date-6m"></span><span class="until-red">&nbsp;まで</span></div>
-    <div class="benefit-item">・キャッシュバック終了：<span id="dateCb" class="date-cb"></span><span class="until-blue">&nbsp;まで</span></div>
+    <div class="benefit-item">・3ヶ月無料の場合：<span id="date3m" class="date-3m" style="font-weight:700"></span><span class="until-orange"> まで</span></div>
+    <div class="benefit-item">・半年間無料の場合：<span id="date6m" class="date-6m" style="font-weight:700"></span><span class="until-red"> まで</span></div>
+    <div class="benefit-item">・キャッシュバック終了：<span id="dateCb" class="date-cb" style="font-weight:700"></span><span class="until-blue"> まで</span></div>
     <div class="note">※17日基準で1ヶ月伸びます</div>
   </div>
 </div>
@@ -426,16 +438,37 @@ button.action{
 /* トップ切り替え */
 function showPage(pageId){
   document.getElementById("homeMenu").style.display = "none";
+
   const benefit = document.getElementById("benefitCard");
   if (benefit) benefit.style.display = "none";
+
+  const benefitShell = document.getElementById("benefitShell");
+  if (benefitShell) benefitShell.style.display = "none";
+
+  const header = document.getElementById("headerCard");
+  if (header) header.style.display = "none";
+
+  const topbar = document.querySelector(".topbar");
+  if (topbar) topbar.style.display = "none";
+
   document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
   document.getElementById(pageId).classList.add("active");
 }
 function showHome(){
   document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
   document.getElementById("homeMenu").style.display = "grid";
+
   const benefit = document.getElementById("benefitCard");
   if (benefit) benefit.style.display = "";
+
+  const benefitShell = document.getElementById("benefitShell");
+  if (benefitShell) benefitShell.style.display = "";
+
+  const header = document.getElementById("headerCard");
+  if (header) header.style.display = "";
+
+  const topbar = document.querySelector(".topbar");
+  if (topbar) topbar.style.display = "";
 }
 
 /* 共通コピー */
