@@ -450,6 +450,151 @@ button.action{
 }
 
 .doccheck-important{color:#d93025;}
+
+/* 追加：配達店舗検索 */
+.delivery-card{
+  margin-top:18px;
+  padding:18px;
+  background:#ffffff;
+  border:2px solid #dfe8ec;
+  border-radius:18px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+.delivery-title{
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:8px;
+  color:#2a424c;
+}
+.delivery-sub{
+  margin:0 0 14px;
+  color:#6b7280;
+  font-size:14px;
+  line-height:1.7;
+}
+.delivery-open-btn{
+  background:#fee846;
+  color:#2a424c;
+  width:100%;
+}
+.delivery-page{
+  display:none;
+}
+.delivery-page.active{
+  display:block;
+}
+.delivery-grid{
+  display:grid;
+  grid-template-columns:140px 1fr;
+  gap:10px;
+  align-items:center;
+}
+.delivery-label{
+  font-size:14px;
+  font-weight:bold;
+}
+.delivery-input,.delivery-select{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+  box-sizing:border-box;
+}
+.delivery-result{
+  margin-top:16px;
+  padding:14px;
+  border-radius:12px;
+  background:#f9fafb;
+  border:1px solid #d7e0e6;
+  white-space:pre-wrap;
+  line-height:1.8;
+  min-height:72px;
+}
+.delivery-result.in{
+  color:#175cd3;
+  font-weight:bold;
+}
+.delivery-result.out{
+  color:#d93025;
+  font-weight:bold;
+}
+.delivery-result.unknown{
+  color:#2a424c;
+  font-weight:bold;
+}
+.delivery-actions{
+  display:grid;
+  gap:12px;
+  margin-top:16px;
+}
+.delivery-primary{
+  background:#2a424c;
+  color:#fff;
+}
+.delivery-secondary{
+  background:#fee846;
+  color:#2a424c;
+}
+.delivery-manual{
+  margin-top:18px;
+  padding:16px;
+  background:#fffdf7;
+  border:1px solid #f3e2b3;
+  border-radius:14px;
+}
+.delivery-manual-title{
+  margin:0 0 12px;
+  font-size:16px;
+  font-weight:bold;
+  color:#2a424c;
+}
+.delivery-list{
+  margin-top:18px;
+  padding:16px;
+  background:#f9fbfc;
+  border:1px solid #dbe5ea;
+  border-radius:14px;
+}
+.delivery-list-title{
+  margin:0 0 12px;
+  font-size:16px;
+  font-weight:bold;
+  color:#2a424c;
+}
+.delivery-list-empty{
+  color:#6b7280;
+  font-size:14px;
+}
+.delivery-item{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:flex-start;
+  padding:12px;
+  border:1px solid #d7e0e6;
+  border-radius:12px;
+  background:#fff;
+  margin-top:10px;
+}
+.delivery-item-text{
+  white-space:pre-wrap;
+  line-height:1.7;
+  font-size:14px;
+}
+.delivery-delete-btn{
+  background:#e5e7eb;
+  color:#111827;
+  padding:10px 12px;
+  border-radius:10px;
+  font-size:14px;
+}
+@media(max-width:800px){
+  .delivery-grid{
+    grid-template-columns:1fr;
+  }
+}
+
 </style>
 <link rel="icon" href="https://img.icons8.com/?size=100&id=fpAVFn3MN108&format=png&color=000000">
 </head>
@@ -490,6 +635,14 @@ button.action{
       <button class="doccheck-btn doccheck-btn-dark" type="button" onclick="showPage('doccheckConfirmPage')">お客様確認書</button>
       <button class="doccheck-btn doccheck-btn-dark" type="button" onclick="showPage('doccheckReceiptPage')">受付票</button>
     </div>
+  </div>
+</div>
+
+<div class="shell" id="deliverySearchShell">
+  <div class="delivery-card" id="deliverySearchCard">
+    <div class="delivery-title">スーパーサンシ宅配サービス 配達エリア検索</div>
+    <p class="delivery-sub">町名や郵便番号から、どの店舗からの配達かを確認できます。判定できない場合は手動追加もできます。</p>
+    <button class="delivery-open-btn" type="button" onclick="showPage('deliverySearchPage')">配達店舗検索</button>
   </div>
 </div>
 
@@ -726,6 +879,47 @@ button.action{
     </div>
     <div id="doccheckReceiptResult" class="doccheck-result"></div>
   </div>
+  <div class="page-card page delivery-page" id="deliverySearchPage">
+    <div class="back-row">
+      <button class="back-btn" type="button" onclick="showHome()">← トップに戻る</button>
+    </div>
+    <h2 class="page-title">配達店舗検索</h2>
+
+    <div class="wrap">
+      <div class="card">
+        <div class="delivery-grid">
+          <label class="delivery-label" for="ds_town">町名</label>
+          <input class="delivery-input" id="ds_town" type="text" placeholder="例：○○町">
+
+          <label class="delivery-label" for="ds_zip">郵便番号</label>
+          <input class="delivery-input" id="ds_zip" type="text" placeholder="例：510-0000">
+
+          <label class="delivery-label" for="ds_store">手動追加店舗名</label>
+          <input class="delivery-input" id="ds_store" type="text" placeholder="不明時のみ追加用">
+        </div>
+
+        <div class="delivery-actions">
+          <button class="action delivery-primary" type="button" onclick="deliverySearch()">検索する</button>
+          <button class="action delivery-secondary" type="button" onclick="deliveryAddManual()">手動で追加する</button>
+          <button class="action ghost" type="button" onclick="deliveryClearForm()">入力をクリア</button>
+        </div>
+
+        <div class="delivery-result" id="delivery_result">ここに検索結果が表示されます。</div>
+
+        <div class="delivery-manual">
+          <div class="delivery-manual-title">手動追加について</div>
+          <div class="note">検索で判定できない場合は「不明です」と表示されます。ご自身で配達エリア内と確認できた場合のみ、町名・郵便番号・店舗名を入力して追加してください。</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="delivery-list">
+          <div class="delivery-list-title">手動追加した配達エリア</div>
+          <div id="delivery_manual_list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -744,6 +938,12 @@ function showPage(pageId){
 
   const docCheckShell = document.getElementById("docCheckShell");
   if (docCheckShell) docCheckShell.style.display = "none";
+
+  const deliverySearchCard = document.getElementById("deliverySearchCard");
+  if (deliverySearchCard) deliverySearchCard.style.display = "none";
+
+  const deliverySearchShell = document.getElementById("deliverySearchShell");
+  if (deliverySearchShell) deliverySearchShell.style.display = "none";
 
   const header = document.getElementById("headerCard");
   if (header) header.style.display = "none";
@@ -769,6 +969,12 @@ function showHome(){
 
   const docCheckShell = document.getElementById("docCheckShell");
   if (docCheckShell) docCheckShell.style.display = "";
+
+  const deliverySearchCard = document.getElementById("deliverySearchCard");
+  if (deliverySearchCard) deliverySearchCard.style.display = "";
+
+  const deliverySearchShell = document.getElementById("deliverySearchShell");
+  if (deliverySearchShell) deliverySearchShell.style.display = "";
 
   const header = document.getElementById("headerCard");
   if (header) header.style.display = "";
@@ -1153,6 +1359,346 @@ function resetDocSheet(sheetName, resultId){
   result.textContent = "";
 }
 
+
+/* 配達店舗検索 */
+const DELIVERY_STORAGE_KEY = "sanshi_delivery_manual_v1";
+const DELIVERY_UNKNOWN_TEXT = "不明です";
+const DELIVERY_OUT_TEXT = "配達エリア外です";
+
+/*
+  画像資料をもとにした保守的な配達エリア辞書です。
+  判定に自信が持てる町名・地域名だけ登録し、
+  あいまいな場合は「不明です」に落とします。
+  郵便番号のみでの自動判定は、手動追加データがある場合のみ対応します。
+*/
+const DELIVERY_REFERENCE_AREAS = [
+  {
+    store: "いくわ店",
+    keywords: [
+      "札場町","小牧町","上海老町","下海老町","赤水町","山城町","八千代台","八千代台団地",
+      "伊坂町","大鐘町","黄金町","山村町","朝明町","あかつき台","あがたが丘","御在所SA",
+      "四日市東IC","四日市IC","四日市CC","大矢知町","羽津","羽津町","三重北小","大谷台","平津"
+    ]
+  },
+  {
+    store: "いなべ店",
+    keywords: [
+      "北勢町川原","北勢町塩崎","北勢町二之瀬","北勢町千司久連新田","北勢町田辺","北勢町畑毛",
+      "北勢町東貝野","北勢町飯倉","北勢町平野新田","北勢町大辻新田","北勢町其原","北勢町中山",
+      "北勢町京ヶ野新田","北勢町阿下喜","北勢町麻生田","北勢町東村","北勢町瀬木","北勢町向平",
+      "藤原町古田","藤原町篠立","藤原町山口","藤原町坂本","藤原町大貝戸","藤原町本郷","藤原町上之山田",
+      "藤原町上相場","藤原町下相場","藤原町長尾","藤原町川合","藤原町石川","藤原町別名","藤原町東禅寺",
+      "藤原町西野尻","藤原町市場","藤原町下野尻","藤原町志礼石新田","いなべ市"
+    ]
+  },
+  {
+    store: "エコー店",
+    keywords: [
+      "坂本","井田川","みずほ台","能褒野町","川崎町","小川町","関町","関ヶ丘","関ヶ丘住宅",
+      "亀山IC","亀山市","田村町","安坂山町","中部中","福徳町","川俣町","両尾町","野村","野登","羽若町"
+    ]
+  },
+  {
+    store: "こもの繁盛店",
+    keywords: [
+      "大安町丹生川上","大安町丹生川久下","大安町片樋","大安町石榑北山","大安町石榑北","大安町石榑南",
+      "大安町石榑東","大安町石榑下","大安町高柳","大安町門前","大安町梅戸","田光","切畑","鍋坂",
+      "根の平","千草","神","竹成","永井","小島","平尾町","江村町","川北","諏訪","諏訪町","鵜川原",
+      "朝明","桜町","智積町","菰野町","菰野"
+    ]
+  },
+  {
+    store: "みえ川越インター店",
+    keywords: [
+      "みえ川越","川越町","川越富洲原","みえ川越IC","湾岸桑名IC","朝日町","川越","朝日"
+    ]
+  },
+  {
+    store: "河芸店",
+    keywords: [
+      "河芸町","河芸町上野","河芸町千里ヶ丘","河芸町東千里","河芸町南黒田","河芸町中別保","河芸町浜田",
+      "白子町","白子","白塚町","千里","千里駅","河原田","徳田町","三宅町","寺家町","稲生",
+      "南玉垣町","北若松町","若松東","若松中","江島台","岸岡町","白子本町","鼓ヶ浦","鈴鹿市南部"
+    ]
+  },
+  {
+    store: "桑名店",
+    keywords: [
+      "木曽岬町","弥富市","弥富市木曽岬IC","飛島","飛島小","飛島IC","蟹江町","蟹江IC","海南こどもの国",
+      "長島","長島町","ながしま","弥富木曽岬IC","湾岸長島IC"
+    ]
+  },
+  {
+    store: "桑名店2",
+    keywords: [
+      "桑名CC","城山小","桑名工高","大山田西小","桑名西高","あのつ","ななわ","はしかわ","ありよし",
+      "れんげじ","うまみち","にしくわな","にしべっしょ","ますお","くわな","はりま","しもふかや",
+      "ただ","大山田","大山田西","桑名市北部"
+    ]
+  },
+  {
+    store: "日永カヨー店",
+    keywords: [
+      "日永","日永西","泊","泊村","泊駅","泊小","西日野","南日永","追分","追分町","泊村町",
+      "楠町本郷","楠町南五味塚","楠町北五味塚","楠町小倉","大治田","貝塚町","六呂見","采女が丘",
+      "高岡台","鹿間町","山田町","波木町","泊山","南部丘陵公園","四日市南部"
+    ]
+  },
+  {
+    store: "鈴鹿ハンター店",
+    keywords: [
+      "平田町","住吉","住吉町","石薬師町","上田町","三日市町","和泉町","算所","算所町","算所IC",
+      "青少年の森","鈴鹿サーキット","稲生","稲生町","寺家","寺家町","国分町","高岡町","高岡台",
+      "南長太町","若松東","若松中","岸岡町","西玉垣町","東玉垣町","白子","白子駅","鈴鹿市中央部"
+    ]
+  }
+];
+
+const DELIVERY_MUNICIPAL_HINTS = [
+  { keyword: "いなべ市", store: "いなべ店" },
+  { keyword: "菰野町", store: "こもの繁盛店" },
+  { keyword: "亀山市", store: "エコー店" },
+  { keyword: "川越町", store: "みえ川越インター店" },
+  { keyword: "朝日町", store: "みえ川越インター店" },
+  { keyword: "木曽岬町", store: "桑名店" },
+  { keyword: "弥富市", store: "桑名店" }
+];
+
+function dsById(id){ return document.getElementById(id); }
+
+function normalizeZip(zip){
+  return String(zip || "").replace(/[^\d]/g, "");
+}
+function normalizeTown(town){
+  return String(town || "").trim().replace(/\s+/g, "");
+}
+function getDeliveryManualData(){
+  try{
+    const data = JSON.parse(localStorage.getItem(DELIVERY_STORAGE_KEY) || "[]");
+    return Array.isArray(data) ? data : [];
+  }catch(e){
+    return [];
+  }
+}
+function setDeliveryManualData(data){
+  localStorage.setItem(DELIVERY_STORAGE_KEY, JSON.stringify(data));
+}
+
+function findManualDeliveryMatch(nt, nz){
+  const manual = getDeliveryManualData();
+
+  for(const item of manual){
+    const itemTown = normalizeTown(item.town);
+    const itemZip = normalizeZip(item.zip);
+
+    if ((nt && itemTown && (nt === itemTown || nt.includes(itemTown) || itemTown.includes(nt))) ||
+        (nz && itemZip && nz === itemZip)) {
+      return {
+        status: "in",
+        store: item.store,
+        town: item.town,
+        zip: item.zip,
+        source: "manual"
+      };
+    }
+  }
+  return null;
+}
+
+function findReferenceDeliveryMatch(nt){
+  if (!nt) return null;
+
+  for (const area of DELIVERY_REFERENCE_AREAS){
+    for (const keyword of area.keywords){
+      const nk = normalizeTown(keyword);
+      if (!nk) continue;
+      if (nt === nk || nt.includes(nk) || nk.includes(nt)){
+        return {
+          status: "in",
+          store: area.store,
+          source: "reference",
+          matchedKeyword: keyword
+        };
+      }
+    }
+  }
+
+  for (const hint of DELIVERY_MUNICIPAL_HINTS){
+    const nk = normalizeTown(hint.keyword);
+    if (nt === nk || nt.includes(nk) || nk.includes(nt)){
+      return {
+        status: "in",
+        store: hint.store,
+        source: "municipal_hint",
+        matchedKeyword: hint.keyword
+      };
+    }
+  }
+
+  return null;
+}
+
+function looksClearlyOutsideSupportedArea(nt){
+  if (!nt) return false;
+  const outsideKeywords = [
+    "名古屋","愛知県","岐阜","岐阜県","松阪","伊勢","志摩","尾鷲","熊野","鳥羽","多気","明和","玉城","度会"
+  ];
+  return outsideKeywords.some(keyword => nt.includes(normalizeTown(keyword)));
+}
+
+function findDeliveryMatch(town, zip){
+  const nt = normalizeTown(town);
+  const nz = normalizeZip(zip);
+
+  const manualMatch = findManualDeliveryMatch(nt, nz);
+  if (manualMatch) return manualMatch;
+
+  if (!nt && !nz){
+    return {
+      status: "unknown",
+      message: "町名か郵便番号を入力してください。"
+    };
+  }
+
+  if (nz && nz.length > 0 && nz.length < 7){
+    return {
+      status: "unknown",
+      message: "郵便番号の桁数が不足しているため判定できません。不明です"
+    };
+  }
+
+  if (!nt && nz){
+    return {
+      status: "unknown",
+      message: "郵便番号だけでは自動判定できません。不明です\n町名も入力するか、確認後に手動追加してください。"
+    };
+  }
+
+  const referenceMatch = findReferenceDeliveryMatch(nt);
+  if (referenceMatch) return referenceMatch;
+
+  if (looksClearlyOutsideSupportedArea(nt)){
+    return {
+      status: "out",
+      message: DELIVERY_OUT_TEXT
+    };
+  }
+
+  return {
+    status: "unknown",
+    message: "不明です\n画像資料ベースで安全側に判定しているため、自動判定できませんでした。ご自身で確認後、配達エリア内なら手動追加してください。"
+  };
+}
+
+function renderDeliveryResult(result){
+  const box = dsById("delivery_result");
+  box.className = "delivery-result";
+
+  if(result.status === "in"){
+    box.classList.add("in");
+    box.textContent = "配達店舗：" + (result.store || "不明");
+    return;
+  }
+  if(result.status === "out"){
+    box.classList.add("out");
+    box.textContent = DELIVERY_OUT_TEXT;
+    return;
+  }
+  box.classList.add("unknown");
+  box.textContent = result.message || DELIVERY_UNKNOWN_TEXT;
+}
+
+function deliverySearch(){
+  const town = dsById("ds_town").value;
+  const zip = dsById("ds_zip").value;
+  const result = findDeliveryMatch(town, zip);
+  renderDeliveryResult(result);
+}
+
+function deliveryAddManual(){
+  const town = dsById("ds_town").value.trim();
+  const zip = dsById("ds_zip").value.trim();
+  const store = dsById("ds_store").value.trim();
+
+  if (!town && !zip){
+    renderDeliveryResult({status:"unknown", message:"手動追加するには、町名または郵便番号を入力してください。"});
+    return;
+  }
+  if (!store){
+    renderDeliveryResult({status:"unknown", message:"手動追加するには、店舗名を入力してください。"});
+    return;
+  }
+
+  const data = getDeliveryManualData();
+  const nt = normalizeTown(town);
+  const nz = normalizeZip(zip);
+
+  const existingIndex = data.findIndex(item => {
+    const it = normalizeTown(item.town);
+    const iz = normalizeZip(item.zip);
+    return (nt && it && (nt === it || nt.includes(it) || it.includes(nt))) || (nz && iz && nz === iz);
+  });
+
+  const record = { town, zip, store };
+
+  if (existingIndex >= 0){
+    data[existingIndex] = record;
+  } else {
+    data.unshift(record);
+  }
+
+  setDeliveryManualData(data);
+  renderDeliveryManualList();
+  renderDeliveryResult({status:"in", store:store});
+}
+
+function deliveryDeleteManual(index){
+  const data = getDeliveryManualData();
+  data.splice(index, 1);
+  setDeliveryManualData(data);
+  renderDeliveryManualList();
+}
+
+function deliveryClearForm(){
+  dsById("ds_town").value = "";
+  dsById("ds_zip").value = "";
+  dsById("ds_store").value = "";
+  const box = dsById("delivery_result");
+  box.className = "delivery-result";
+  box.textContent = "ここに検索結果が表示されます。";
+}
+
+function renderDeliveryManualList(){
+  const box = dsById("delivery_manual_list");
+  if(!box) return;
+
+  const data = getDeliveryManualData();
+  if (!data.length){
+    box.innerHTML = '<div class="delivery-list-empty">まだ手動追加はありません。</div>';
+    return;
+  }
+
+  box.innerHTML = data.map((item, index) => {
+    return `
+      <div class="delivery-item">
+        <div class="delivery-item-text">町名：${escapeHtmlDelivery(item.town || "")}
+郵便番号：${escapeHtmlDelivery(item.zip || "")}
+店舗名：${escapeHtmlDelivery(item.store || "")}</div>
+        <button class="delivery-delete-btn" type="button" onclick="deliveryDeleteManual(${index})">削除</button>
+      </div>
+    `;
+  }).join("");
+}
+
+function escapeHtmlDelivery(str){
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /* 初期化 */
 window.addEventListener("DOMContentLoaded", () => {
   shLoad();
@@ -1185,6 +1731,8 @@ window.addEventListener("DOMContentLoaded", () => {
   bindDocSheetAutoSave("cardholder");
   bindDocSheetAutoSave("confirm");
   bindDocSheetAutoSave("receipt");
+
+  renderDeliveryManualList();
 });
 
 // 曜日取得
