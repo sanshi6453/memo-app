@@ -426,12 +426,16 @@ button.action{
 /* トップ切り替え */
 function showPage(pageId){
   document.getElementById("homeMenu").style.display = "none";
+  const benefit = document.getElementById("benefitCard");
+  if (benefit) benefit.style.display = "none";
   document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
   document.getElementById(pageId).classList.add("active");
 }
 function showHome(){
   document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
   document.getElementById("homeMenu").style.display = "grid";
+  const benefit = document.getElementById("benefitCard");
+  if (benefit) benefit.style.display = "block";
 }
 
 /* 共通コピー */
