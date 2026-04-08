@@ -260,15 +260,41 @@ button.action{
 }
 .benefit-title{font-size:18px;font-weight:bold;margin-bottom:8px;color:#2a424c;}
 .benefit-today{font-size:15px;font-weight:bold;margin-bottom:10px;color:#2a424c;}
-.benefit-item{margin:6px 0;font-size:14px;line-height:1.8;}
+.benefit-item{
+  margin:10px 0;
+  font-size:18px;
+  line-height:2.0;
+  letter-spacing:0.06em;
+}
+.benefit-item-main{
+  margin:10px 0 14px;
+  font-size:20px;
+  line-height:1.8;
+  letter-spacing:0.08em;
+  font-weight:700;
+}
 .date-3m,.date-6m,.date-cb,
 .until-orange,.until-red,.until-blue{
-  font-weight:700 !important;
-  -webkit-text-stroke:0.01px transparent;
+  font-weight:900 !important;
+  font-family:'Zen Maru Gothic','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif !important;
+  display:inline-block;
 }
 .date-3m,.until-orange{color:#e58a00;}
 .date-6m,.until-red{color:#d93025;}
 .date-cb,.until-blue{color:#1a73e8;}
+
+@media(max-width:900px){
+  .benefit-item{
+    font-size:20px;
+    line-height:2.05;
+    letter-spacing:0.07em;
+  }
+  .benefit-item-main{
+    font-size:22px;
+    line-height:1.9;
+    letter-spacing:0.09em;
+  }
+}
 
 </style>
 </head>
@@ -292,10 +318,10 @@ button.action{
     <div class="benefit-title">今入会した場合の特典期間</div>
     <div class="benefit-today" id="benefitToday"></div>
 
-    <div class="benefit-item">●月会費無料期間</div>
-    <div class="benefit-item">・3ヶ月無料の場合：<span id="date3m" class="date-3m"></span><span class="until-orange">まで</span></div>
-    <div class="benefit-item">・半年間無料の場合：<span id="date6m" class="date-6m"></span><span class="until-red">まで</span></div>
-    <div class="benefit-item">・キャッシュバック終了：<span id="dateCb" class="date-cb"></span><span class="until-blue">まで</span></div>
+    <div class="benefit-item benefit-item-main">●月会費無料期間</div>
+    <div class="benefit-item">・3ヶ月無料の場合：<strong id="date3m" class="date-3m"></strong><strong class="until-orange">まで</strong></div>
+    <div class="benefit-item">・半年間無料の場合：<strong id="date6m" class="date-6m"></strong><strong class="until-red">まで</strong></div>
+    <div class="benefit-item">・キャッシュバック終了：<strong id="dateCb" class="date-cb"></strong><strong class="until-blue">まで</strong></div>
     <div class="note">※17日基準で1ヶ月伸びます</div>
   </div>
 </div>
