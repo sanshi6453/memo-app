@@ -838,6 +838,18 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+
+// 曜日取得
+function getWeekdayJP(date){
+  const days = ["日","月","火","水","木","金","土"];
+  return days[date.getDay()];
+}
+
+// フォーマット変更
+function formatDateWithWeek(date){
+  return date.getFullYear()+"年"+(date.getMonth()+1)+"月"+date.getDate()+"日("+getWeekdayJP(date)+")";
+}
+
 // 特典計算
 function benefitDate(months){
   const t=new Date();
@@ -845,12 +857,12 @@ function benefitDate(months){
   return new Date(t.getFullYear(),t.getMonth()+months+extra,20);
 }
 function format(d){
-  return d.getFullYear()+"年"+(d.getMonth()+1)+"月"+d.getDate()+"日";
+  return formatDateWithWeek(d);
 }
 function renderBenefit(){
   const t=new Date();
   document.getElementById("benefitToday").textContent=
-  "今日("+t.getFullYear()+"/"+(t.getMonth()+1)+"/"+t.getDate()+")入会すると…";
+  "今日("+t.getFullYear()+"/"+(t.getMonth()+1)+"/"+t.getDate()+" "+["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][t.getDay()]+")入会すると…";
   document.getElementById("date3m").textContent=format(benefitDate(3));
   document.getElementById("date6m").textContent=format(benefitDate(6));
   document.getElementById("dateCb").textContent=format(benefitDate(3));
