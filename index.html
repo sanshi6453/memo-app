@@ -313,7 +313,7 @@ button.action{
 
 
 <div class="shell">
-  <div class="benefit-card">
+  <div class="benefit-card" id="benefitCard">
     <div class="benefit-title">今入会した場合の特典期間</div>
     <div class="benefit-today" id="benefitToday"></div>
 
@@ -435,7 +435,7 @@ function showHome(){
   document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
   document.getElementById("homeMenu").style.display = "grid";
   const benefit = document.getElementById("benefitCard");
-  if (benefit) benefit.style.display = "block";
+  if (benefit) benefit.style.display = "";
 }
 
 /* 共通コピー */
