@@ -1,5 +1,4 @@
-
-﻿﻿﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -248,7 +247,6 @@ button.action{
   margin-top:-2px;
 }
 
-
 /* 追加：特典カード */
 .benefit-card{
   margin-top:18px;
@@ -309,20 +307,149 @@ button.action{
   }
 }
 
-
-
 .benefit-card .note{
   font-size:16px !important;
   font-weight:normal !important;
   line-height:1.4 !important;
 }
 
-
 .benefit-card .benefit-tight{
   margin:2px 0 !important;
   line-height:1.2 !important;
 }
 
+/* 追加：申込書類チェックシート */
+.doccheck-card{
+  margin-top:18px;
+  padding:18px;
+  background:#ffffff;
+  border:2px solid #dfe8ec;
+  border-radius:18px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+.doccheck-title{
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:8px;
+  color:#2a424c;
+}
+.doccheck-sub{
+  margin:0 0 14px;
+  color:#6b7280;
+  font-size:14px;
+  line-height:1.7;
+}
+.doccheck-menu{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.doccheck-menu button{
+  min-height:84px;
+  padding:16px 12px;
+  border-radius:14px;
+  font-size:17px;
+  line-height:1.45;
+}
+.doccheck-btn{
+  border:1px solid transparent;
+}
+.doccheck-btn-dark{
+  background:#2a424c;
+  color:#fff;
+}
+.doccheck-btn-yellow{
+  background:#fee846;
+  color:#2a424c;
+}
+
+.doccheck-page{
+  display:none;
+}
+.doccheck-page.active{
+  display:block;
+}
+.doccheck-section{
+  margin-top:18px;
+  padding:16px;
+  background:#f9fbfc;
+  border:1px solid #dbe5ea;
+  border-radius:14px;
+}
+.doccheck-section-title{
+  margin:0 0 12px;
+  font-size:18px;
+  color:#2a424c;
+}
+.doccheck-list{
+  display:grid;
+  gap:10px;
+}
+.doccheck-item{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  padding:12px 14px;
+  background:#fff;
+  border:1px solid #d7e0e6;
+  border-radius:12px;
+  cursor:pointer;
+  user-select:none;
+}
+.doccheck-item input[type="checkbox"]{
+  width:20px;
+  height:20px;
+  margin-top:2px;
+  flex:0 0 auto;
+}
+.doccheck-item span{
+  display:block;
+  font-size:15px;
+  line-height:1.7;
+}
+.doccheck-result{
+  margin-top:16px;
+  font-size:20px;
+  font-weight:bold;
+  line-height:1.7;
+  white-space:pre-wrap;
+}
+.doccheck-result.error{
+  color:#d93025;
+}
+.doccheck-result.success{
+  color:#1a73e8;
+}
+.doccheck-actions{
+  display:grid;
+  gap:12px;
+  margin-top:16px;
+}
+.doccheck-confirm{
+  background:#2a424c;
+  color:#fff;
+}
+.doccheck-reset{
+  background:#fee846;
+  color:#2a424c;
+}
+@media(max-width:900px){
+  .doccheck-menu{
+    grid-template-columns:1fr 1fr;
+  }
+}
+@media(max-width:640px){
+  .doccheck-menu{
+    grid-template-columns:1fr 1fr;
+  }
+  .doccheck-menu button{
+    font-size:15px;
+    min-height:78px;
+    padding:14px 10px;
+  }
+}
+
+.doccheck-important{color:#d93025;}
 </style>
 </head>
 <body>
@@ -339,7 +466,6 @@ button.action{
   </div>
 </div>
 
-
 <div class="shell" id="benefitShell">
   <div class="benefit-card" id="benefitCard">
     <div class="benefit-title">今入会した場合の特典期間</div>
@@ -353,6 +479,18 @@ button.action{
   </div>
 </div>
 
+<div class="shell" id="docCheckShell">
+  <div class="doccheck-card" id="docCheckCard">
+    <div class="doccheck-title">申込書類チェックシート</div>
+    <p class="doccheck-sub">本社提出前に、必要書類の記入漏れがないか確認できます。</p>
+    <div class="doccheck-menu" id="docCheckMenu">
+      <button class="doccheck-btn doccheck-btn-dark" type="button" onclick="showPage('doccheckApplicationPage')">申込書</button>
+      <button class="doccheck-btn doccheck-btn-yellow" type="button" onclick="showPage('doccheckCardholderPage')">サンシカード所持者</button>
+      <button class="doccheck-btn doccheck-btn-dark" type="button" onclick="showPage('doccheckConfirmPage')">お客様確認書</button>
+      <button class="doccheck-btn doccheck-btn-dark" type="button" onclick="showPage('doccheckReceiptPage')">受付票</button>
+    </div>
+  </div>
+</div>
 
 <div class="shell">
   <div class="page-card page" id="shukkinPage">
@@ -448,6 +586,145 @@ button.action{
       </div>
     </div>
   </div>
+
+  <div class="page-card page doccheck-page" id="doccheckApplicationPage">
+    <div class="back-row">
+      <button class="back-btn" type="button" onclick="showHome()">← トップに戻る</button>
+    </div>
+    <h2 class="page-title">申込書チェックシート</h2>
+
+    <div class="doccheck-section">
+      <h3 class="doccheck-section-title">申込書1枚目</h3>
+      <div class="doccheck-list">
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="①お申込み日"><span>①お申込み日</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="②目的(生活費の決済)"><span>②目的(生活費の決済)</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="③カード入会希望"><span>③カード入会希望</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="④サンシかベリーか(申込)"><span>④サンシかベリーか(申込)</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑤お申込ご本人について：名前とフリガナ"><span>⑤お申込ご本人について：名前とフリガナ</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑤お申込ご本人について：生年月日/年齢/性別"><span>⑤お申込ご本人について：生年月日/年齢/性別</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑤お申込ご本人について：携帯番号/自宅電話(!重要 どちらか必須)"><span class="doccheck-important">⑤お申込ご本人について：携帯番号/自宅電話(!重要 どちらか必須)</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑤お申込ご本人について：カード申込の場合はカード暗証番号(4桁)"><span>⑤お申込ご本人について：カード申込の場合はカード暗証番号(4桁)</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑤お申込ご本人について：ご住所とフリガナ"><span>⑤お申込ご本人について：ご住所とフリガナ</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑤お申込ご本人について：配偶者/子供/同居家族/同一生計人数"><span>⑤お申込ご本人について：配偶者/子供/同居家族/同一生計人数</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑤お申込ご本人について：居住年数/お住まい"><span>⑤お申込ご本人について：居住年数/お住まい</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑤お申込ご本人について：一人住まい/単身赴任の場合の連絡先"><span>⑤お申込ご本人について：一人住まい/単身赴任の場合の連絡先</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑥ご職業について"><span>⑥ご職業について</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑦お勤め先について(年金の場合は年金の種類を記入)"><span>⑦お勤め先について(年金の場合は年金の種類を記入)</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑧ご年収について"><span>⑧ご年収について</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑨本人確認欄：免許証/マイナンバーいずれかのチェック"><span class="doccheck-important">⑨本人確認欄：免許証/マイナンバーいずれかのチェック</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑨本人確認欄：確認日時"><span class="doccheck-important">⑨本人確認欄：確認日時</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑨本人確認欄：店舗欄(店舗名か自宅)"><span class="doccheck-important">⑨本人確認欄：店舗欄(店舗名か自宅)</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑨本人確認欄：担当欄"><span class="doccheck-important">⑨本人確認欄：担当欄</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑩口座情報欄：金融機関名/支店名"><span>⑩口座情報欄：金融機関名/支店名</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑩口座情報欄：口座番号"><span>⑩口座情報欄：口座番号</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑩口座情報欄：口座名義人/フリガナ"><span>⑩口座情報欄：口座名義人/フリガナ</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑩口座情報欄：印鑑2ヶ所"><span class="doccheck-important">⑩口座情報欄：印鑑2ヶ所</span></label>
+      </div>
+    </div>
+
+    <div class="doccheck-section">
+      <h3 class="doccheck-section-title">申込書2枚目</h3>
+      <div class="doccheck-list">
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑪宅配アプリの暗証番号"><span>⑪宅配アプリの暗証番号</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑫ご世帯主名"><span>⑫ご世帯主名</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑬宅配サービス登録料に〇"><span>⑬宅配サービス登録料に〇</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑭注文方法に〇"><span>⑭注文方法に〇</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="application" data-label="⑮3枚目の控えを渡してきたか"><span>⑮3枚目の控えを渡してきたか</span></label>
+      </div>
+    </div>
+
+    <div class="doccheck-actions">
+      <button class="doccheck-confirm" type="button" onclick="checkDocSheet('application','doccheckApplicationResult')">確認する</button>
+      <button class="doccheck-reset" type="button" onclick="resetDocSheet('application','doccheckApplicationResult')">チェックを外す</button>
+    </div>
+    <div id="doccheckApplicationResult" class="doccheck-result"></div>
+  </div>
+
+  <div class="page-card page doccheck-page" id="doccheckCardholderPage">
+    <div class="back-row">
+      <button class="back-btn" type="button" onclick="showHome()">← トップに戻る</button>
+    </div>
+    <h2 class="page-title">サンシカード所持者チェックシート</h2>
+
+    <div class="doccheck-section">
+      <h3 class="doccheck-section-title">確認項目</h3>
+      <div class="doccheck-list">
+        <label class="doccheck-item"><input type="checkbox" data-sheet="cardholder" data-label="①お申込日"><span>①お申込日</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="cardholder" data-label="②名前/フリガナ"><span>②名前/フリガナ</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="cardholder" data-label="③カード番号"><span>③カード番号</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="cardholder" data-label="④生年月日"><span>④生年月日</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="cardholder" data-label="⑤有効期限"><span>⑤有効期限</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="cardholder" data-label="⑥住所/フリガナ"><span>⑥住所/フリガナ</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="cardholder" data-label="⑦電話番号"><span class="doccheck-important">⑦電話番号</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="cardholder" data-label="⑧ロッカー設置位置"><span>⑧ロッカー設置位置</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="cardholder" data-label="⑨ご利用コース"><span>⑨ご利用コース</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="cardholder" data-label="⑩宅配注文用暗証番号"><span>⑩宅配注文用暗証番号</span></label>
+      </div>
+    </div>
+
+    <div class="doccheck-actions">
+      <button class="doccheck-confirm" type="button" onclick="checkDocSheet('cardholder','doccheckCardholderResult')">確認する</button>
+      <button class="doccheck-reset" type="button" onclick="resetDocSheet('cardholder','doccheckCardholderResult')">チェックを外す</button>
+    </div>
+    <div id="doccheckCardholderResult" class="doccheck-result"></div>
+  </div>
+
+  <div class="page-card page doccheck-page" id="doccheckConfirmPage">
+    <div class="back-row">
+      <button class="back-btn" type="button" onclick="showHome()">← トップに戻る</button>
+    </div>
+    <h2 class="page-title">お客様確認書チェックシート</h2>
+
+    <div class="doccheck-section">
+      <h3 class="doccheck-section-title">確認項目</h3>
+      <div class="doccheck-list">
+        <label class="doccheck-item"><input type="checkbox" data-sheet="confirm" data-label="①レ点項目の抜けがないか"><span>①レ点項目の抜けがないか</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="confirm" data-label="②ご本人署名と日付(裏面)"><span class="doccheck-important">②ご本人署名と日付(裏面)</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="confirm" data-label="③ご本人確認方法欄チェック"><span class="doccheck-important">③ご本人確認方法欄チェック</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="confirm" data-label="④確認日時"><span class="doccheck-important">④確認日時</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="confirm" data-label="⑤取引時確認者印"><span class="doccheck-important">⑤取引時確認者印</span></label>
+      </div>
+    </div>
+
+    <div class="doccheck-actions">
+      <button class="doccheck-confirm" type="button" onclick="checkDocSheet('confirm','doccheckConfirmResult')">確認する</button>
+      <button class="doccheck-reset" type="button" onclick="resetDocSheet('confirm','doccheckConfirmResult')">チェックを外す</button>
+    </div>
+    <div id="doccheckConfirmResult" class="doccheck-result"></div>
+  </div>
+
+  <div class="page-card page doccheck-page" id="doccheckReceiptPage">
+    <div class="back-row">
+      <button class="back-btn" type="button" onclick="showHome()">← トップに戻る</button>
+    </div>
+    <h2 class="page-title">受付票チェックシート</h2>
+
+    <div class="doccheck-section">
+      <h3 class="doccheck-section-title">確認項目</h3>
+      <div class="doccheck-list">
+        <label class="doccheck-item"><input type="checkbox" data-sheet="receipt" data-label="①お申込人様名"><span class="doccheck-important">①お申込人様名</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="receipt" data-label="②担当者"><span class="doccheck-important">②担当者</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="receipt" data-label="③担当デポ"><span class="doccheck-important">③担当デポ</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="receipt" data-label="④プレゼント"><span>④プレゼント</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="receipt" data-label="⑤ロッカー設置場所に〇"><span>⑤ロッカー設置場所に〇</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="receipt" data-label="⑥利用コースと方法に〇"><span class="doccheck-important">⑥利用コースと方法に〇</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="receipt" data-label="⑦追加特典に〇"><span class="doccheck-important">⑦追加特典に〇</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="receipt" data-label="⑧紹介者欄"><span>⑧紹介者欄</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="receipt" data-label="⑨ロッカーの鍵の置き場所に〇"><span>⑨ロッカーの鍵の置き場所に〇</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="receipt" data-label="⑩会費開始日付"><span class="doccheck-important">⑩会費開始日付</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="receipt" data-label="⑪週間お買い得情報誌"><span>⑪週間お買い得情報誌</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="receipt" data-label="⑫お客様連絡先"><span class="doccheck-important">⑫お客様連絡先</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="receipt" data-label="⑬ロッカーに荷物が入らない場合の確認(〇✖)"><span>⑬ロッカーに荷物が入らない場合の確認(〇✖)</span></label>
+        <label class="doccheck-item"><input type="checkbox" data-sheet="receipt" data-label="⑭オートロックマンションの宅配BOXサイズ確認(〇✖)"><span>⑭オートロックマンションの宅配BOXサイズ確認(〇✖)</span></label>
+      </div>
+    </div>
+
+    <div class="doccheck-actions">
+      <button class="doccheck-confirm" type="button" onclick="checkDocSheet('receipt','doccheckReceiptResult')">確認する</button>
+      <button class="doccheck-reset" type="button" onclick="resetDocSheet('receipt','doccheckReceiptResult')">チェックを外す</button>
+    </div>
+    <div id="doccheckReceiptResult" class="doccheck-result"></div>
+  </div>
 </div>
 
 <script>
@@ -460,6 +737,12 @@ function showPage(pageId){
 
   const benefitShell = document.getElementById("benefitShell");
   if (benefitShell) benefitShell.style.display = "none";
+
+  const docCheckCard = document.getElementById("docCheckCard");
+  if (docCheckCard) docCheckCard.style.display = "none";
+
+  const docCheckShell = document.getElementById("docCheckShell");
+  if (docCheckShell) docCheckShell.style.display = "none";
 
   const header = document.getElementById("headerCard");
   if (header) header.style.display = "none";
@@ -479,6 +762,12 @@ function showHome(){
 
   const benefitShell = document.getElementById("benefitShell");
   if (benefitShell) benefitShell.style.display = "";
+
+  const docCheckCard = document.getElementById("docCheckCard");
+  if (docCheckCard) docCheckCard.style.display = "";
+
+  const docCheckShell = document.getElementById("docCheckShell");
+  if (docCheckShell) docCheckShell.style.display = "";
 
   const header = document.getElementById("headerCard");
   if (header) header.style.display = "";
@@ -730,7 +1019,6 @@ function npGetAreas(){
     .join("・") || " ";
 }
 
-
 function npAppointmentFormat(){
   const val = npById("np_appointment").value.trim();
   if(val==="") return "0 ( / )";
@@ -813,6 +1101,57 @@ function npClearAll(){
   npSetStatus("クリアしました。");
 }
 
+/* 申込書類チェックシート */
+function getDocSheetKey(sheetName){
+  return "doccheck_" + sheetName + "_v1";
+}
+function saveDocSheet(sheetName){
+  const inputs = document.querySelectorAll('input[type="checkbox"][data-sheet="' + sheetName + '"]');
+  const values = [];
+  inputs.forEach((input, index) => {
+    values[index] = input.checked;
+  });
+  localStorage.setItem(getDocSheetKey(sheetName), JSON.stringify(values));
+}
+function loadDocSheet(sheetName){
+  const raw = localStorage.getItem(getDocSheetKey(sheetName));
+  if(!raw) return;
+  try{
+    const values = JSON.parse(raw);
+    const inputs = document.querySelectorAll('input[type="checkbox"][data-sheet="' + sheetName + '"]');
+    inputs.forEach((input, index) => {
+      input.checked = !!values[index];
+    });
+  }catch(e){}
+}
+function bindDocSheetAutoSave(sheetName){
+  const inputs = document.querySelectorAll('input[type="checkbox"][data-sheet="' + sheetName + '"]');
+  inputs.forEach(input => {
+    input.addEventListener("change", ()=>saveDocSheet(sheetName));
+  });
+}
+function checkDocSheet(sheetName, resultId){
+  const inputs = Array.from(document.querySelectorAll('input[type="checkbox"][data-sheet="' + sheetName + '"]'));
+  const missing = inputs.filter(input => !input.checked).map(input => input.getAttribute("data-label"));
+  const result = document.getElementById(resultId);
+
+  if(missing.length > 0){
+    result.className = "doccheck-result error";
+    result.textContent = "チェックが抜けている項目があります。\n" + missing.map(item => "・" + item).join("\n");
+  }else{
+    result.className = "doccheck-result success";
+    result.textContent = "すべてのチェックを完了しました";
+  }
+}
+function resetDocSheet(sheetName, resultId){
+  const inputs = document.querySelectorAll('input[type="checkbox"][data-sheet="' + sheetName + '"]');
+  inputs.forEach(input => input.checked = false);
+  localStorage.removeItem(getDocSheetKey(sheetName));
+  const result = document.getElementById(resultId);
+  result.className = "doccheck-result";
+  result.textContent = "";
+}
+
 /* 初期化 */
 window.addEventListener("DOMContentLoaded", () => {
   shLoad();
@@ -836,8 +1175,16 @@ window.addEventListener("DOMContentLoaded", () => {
     npById(id).addEventListener("input", npSave);
     npById(id).addEventListener("change", npSave);
   });
-});
 
+  loadDocSheet("application");
+  loadDocSheet("cardholder");
+  loadDocSheet("confirm");
+  loadDocSheet("receipt");
+  bindDocSheetAutoSave("application");
+  bindDocSheetAutoSave("cardholder");
+  bindDocSheetAutoSave("confirm");
+  bindDocSheetAutoSave("receipt");
+});
 
 // 曜日取得
 function getWeekdayJP(date){
@@ -868,7 +1215,6 @@ function renderBenefit(){
   document.getElementById("dateCb").textContent=format(benefitDate(3));
 }
 window.addEventListener("DOMContentLoaded",renderBenefit);
-
 </script>
 
 </body>
