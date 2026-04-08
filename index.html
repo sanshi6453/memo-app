@@ -260,10 +260,15 @@ button.action{
 }
 .benefit-title{font-size:18px;font-weight:bold;margin-bottom:8px;color:#2a424c;}
 .benefit-today{font-size:15px;font-weight:bold;margin-bottom:10px;color:#2a424c;}
-.benefit-item{margin:6px 0;font-size:14px;}
-.date-3m{color:#e58a00;font-weight:bold;}
-.date-6m{color:#d93025;font-weight:bold;}
-.date-cb{color:#1a73e8;font-weight:bold;}
+.benefit-item{margin:6px 0;font-size:14px;line-height:1.8;}
+.date-3m,.date-6m,.date-cb,
+.until-orange,.until-red,.until-blue{
+  font-weight:700 !important;
+  -webkit-text-stroke:0.01px transparent;
+}
+.date-3m,.until-orange{color:#e58a00;}
+.date-6m,.until-red{color:#d93025;}
+.date-cb,.until-blue{color:#1a73e8;}
 
 </style>
 </head>
@@ -288,9 +293,9 @@ button.action{
     <div class="benefit-today" id="benefitToday"></div>
 
     <div class="benefit-item">●月会費無料期間</div>
-    <div class="benefit-item">・3ヶ月無料の場合：<span id="date3m" class="date-3m"></span>まで</div>
-    <div class="benefit-item">・半年間無料の場合：<span id="date6m" class="date-6m"></span>まで</div>
-    <div class="benefit-item">・キャッシュバック終了：<span id="dateCb" class="date-cb"></span>まで</div>
+    <div class="benefit-item">・3ヶ月無料の場合：<span id="date3m" class="date-3m"></span><span class="until-orange">まで</span></div>
+    <div class="benefit-item">・半年間無料の場合：<span id="date6m" class="date-6m"></span><span class="until-red">まで</span></div>
+    <div class="benefit-item">・キャッシュバック終了：<span id="dateCb" class="date-cb"></span><span class="until-blue">まで</span></div>
     <div class="note">※17日基準で1ヶ月伸びます</div>
   </div>
 </div>
