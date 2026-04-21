@@ -156,6 +156,16 @@ button{
     </div>
 
     <div class="row">
+      <label for="flyer">チラシ配布</label>
+      <input id="flyer" type="text">
+    </div>
+
+    <div class="row">
+      <label for="other">その他</label>
+      <textarea id="other"></textarea>
+    </div>
+
+    <div class="row">
       <label for="appointment">アポ</label>
       <input id="appointment" type="text">
     </div>
@@ -168,11 +178,6 @@ button{
     <div class="row">
       <label for="introContract">紹介成約</label>
       <input id="introContract" type="text">
-    </div>
-
-    <div class="row">
-      <label for="other">その他</label>
-      <textarea id="other"></textarea>
     </div>
 
     <div class="row">
@@ -202,7 +207,7 @@ button{
 
 <script>
 const STORAGE_KEY = "taikin_line_multi_area_v1";
-const baseIds = ["name","minutes","cases","home","miai","referral","appointment","contract","introContract","other","leave","form"];
+const baseIds = ["name","minutes","cases","home","miai","referral","flyer","other","appointment","contract","introContract","leave","form"];
 const areaOptions = ["", "(四)", "(鈴)", "(桑)", "(三)", "(員)"];
 
 function byId(id){
@@ -294,9 +299,10 @@ ${v("name")}
 在宅：${v("home")}
 目合：${v("miai")}
 紹介依頼：${v("referral")}
+チラシ配布：${v("flyer")}
+その他：${v("other")}
 アポ：${v("appointment")}
 成約：${v("contract")}（紹介成約：${v("introContract")}）
-その他：${v("other")}
 退勤時刻：${v("leave")}
 申込用紙：${v("form")}
 
