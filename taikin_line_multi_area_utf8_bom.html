@@ -166,6 +166,14 @@ button{
     </div>
 
     <div class="row">
+      <label for="leave">退勤時刻</label>
+      <input id="leave" type="text">
+    </div>
+
+    <div class="row">
+      <label for="form">申込用紙</label>
+      <input id="form" type="text">
+    </div><div class="row">
       <label for="appointment">アポ</label>
       <input id="appointment" type="text">
     </div>
@@ -180,15 +188,7 @@ button{
       <input id="introContract" type="text">
     </div>
 
-    <div class="row">
-      <label for="leave">退勤時刻</label>
-      <input id="leave" type="text">
-    </div>
-
-    <div class="row">
-      <label for="form">申込用紙</label>
-      <input id="form" type="text">
-    </div>
+    
 
     <div class="buttons">
       <button class="primary" type="button" onclick="generate()">出力</button>
@@ -290,6 +290,10 @@ function v(id){
   return val === "" ? " " : val;
 }
 
+function appt(){
+  const a = byId("appointment").value.trim();
+  return a === "" ? "0 ( / )" : a;
+}
 function build(){
   return `お疲れ様です。
 ${v("name")}
@@ -301,10 +305,10 @@ ${v("name")}
 紹介依頼：${v("referral")}
 チラシ配布：${v("flyer")}
 その他：${v("other")}
-アポ：${v("appointment")}
-成約：${v("contract")}（紹介成約：${v("introContract")}）
 退勤時刻：${v("leave")}
 申込用紙：${v("form")}
+アポ：${appt()}
+成約：${v("contract")}（紹介成約：${v("introContract")}）
 
 以上で業務終了いたします。`;
 }
