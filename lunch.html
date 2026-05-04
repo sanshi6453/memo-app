@@ -2,12 +2,12 @@
 <html>
 <head>
 <meta charset="UTF-8">
-
 <title>ランチメモ</title>
-
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta http-equiv="refresh" content="0; url=https://script.google.com/macros/s/AKfycbz48TsNEfHPkR8R27qkx7dArbob33ZM4dAWZqA4wiNkv1xwppLT2fRYp8q6OrrA75an/exec">
+<script>
+location.replace("https://script.google.com/macros/s/AKfycbz48TsNEfHPkR8R27qkx7dArbob33ZM4dAWZqA4wiNkv1xwppLT2fRYp8q6OrrA75an/exec");
+</script>
 
 <style>
 body{
@@ -17,40 +17,30 @@ body{
   align-items:center;
   justify-content:center;
   background:#fee846;
-  font-family:'Zen Maru Gothic', sans-serif;
+  font-family:sans-serif;
   color:#2a424c;
 }
-
-.box{
-  text-align:center;
-}
-
-.title{
-  font-size:22px;
+.box{text-align:center;}
+.title{font-size:22px;font-weight:700;margin-bottom:14px;}
+a{
+  display:inline-block;
+  margin-top:18px;
+  padding:14px 22px;
+  background:#2a424c;
+  color:white;
+  border-radius:22px;
+  text-decoration:none;
   font-weight:700;
-  margin-bottom:14px;
-}
-
-.loader{
-  width:32px;
-  height:32px;
-  border:4px solid #2a424c;
-  border-top-color:transparent;
-  border-radius:50%;
-  margin:0 auto;
-  animation:spin 1s linear infinite;
-}
-
-@keyframes spin{
-  to{ transform:rotate(360deg); }
 }
 </style>
 </head>
 
 <body>
 <div class="box">
-  <div class="title">ランチメモ</div>
-  <div class="loader"></div>
+  <div class="title">ランチメモを開いています…</div>
+  <a href="https://script.google.com/macros/s/AKfycbz48TsNEfHPkR8R27qkx7dArbob33ZM4dAWZqA4wiNkv1xwppLT2fRYp8q6OrrA75an/exec">
+    開かない場合はこちら
+  </a>
 </div>
 </body>
 </html>
