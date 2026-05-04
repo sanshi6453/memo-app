@@ -65,7 +65,7 @@ body{
   height:100%;
   background:rgba(255,255,255,0.6);
   transform:skewX(-20deg);
-  animation:shineOnce 1s ease-out 0.3s 1 forwards;
+  animation:shineLoop 3s ease-in-out infinite;
   pointer-events:none;
 }
 
@@ -83,6 +83,13 @@ body{
   0%{ left:-90px; }
   100%{ left:120%; }
 }
+
+@keyframes shineLoop{
+  0%{ left:-80px; }
+  60%{ left:120%; }
+  100%{ left:120%; }
+}
+
 .tap{
   margin-top:14px;
   font-size:12px;
