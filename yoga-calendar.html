@@ -40,10 +40,10 @@ h1{font-size:20px;text-align:center;margin:8px 0 12px;font-weight:700;letter-spa
 .dayHit{position:absolute;border:1px dashed transparent;background:transparent;border-radius:8px;padding:0;z-index:3}
 .dayHit:active{background:rgba(140,129,117,.08);border-color:rgba(140,129,117,.28)}
 .mark{position:absolute;z-index:2;display:flex;align-items:center;justify-content:center;text-align:center;white-space:pre-line;pointer-events:none;color:var(--ink);font-weight:700;line-height:1.05}
-.mark.num,.mark.full{border-radius:50%;width:10.5%;aspect-ratio:1/1;font-size:clamp(18px,4.8vw,34px);transform:translate(-50%,-50%)}
+.mark.num,.mark.full{border-radius:50%;width:8.8%;aspect-ratio:1/1;font-size:clamp(15px,3.8vw,28px);transform:translate(-50%,-50%)}
 .mark.num{background:rgba(226,217,209,.9)}
 .mark.full{background:rgba(244,209,207,.92);color:#a84d4d}
-.mark.rest,.mark.text{transform:translate(-50%,-50%);font-size:clamp(17px,4.1vw,30px);padding:2px 5px;min-width:12%;max-width:18%}
+.mark.rest,.mark.text{transform:translate(-50%,-50%);font-size:clamp(12px,2.6vw,20px);padding:2px 4px;min-width:10%;max-width:10.5%;word-break:keep-all;overflow-wrap:normal}
 .modalBg{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-end;justify-content:center;z-index:50;padding:12px}
 .modal{width:min(520px,100%);background:#fff;border-radius:24px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
 .modal h2{font-size:18px;margin:0 0 10px;text-align:center}
@@ -52,13 +52,13 @@ h1{font-size:20px;text-align:center;margin:8px 0 12px;font-weight:700;letter-spa
 .quick button.full{background:var(--pink);color:#a84d4d}
 .quick button.rest{background:#fff}
 .custom{display:grid;grid-template-columns:1fr auto;gap:8px;margin:10px 0}
-.custom input{border:1px solid #ddd;border-radius:12px;padding:12px;font-size:16px;font-family:inherit;color:var(--ink)}
+.custom textarea{border:1px solid #ddd;border-radius:12px;padding:12px;font-size:16px;font-family:inherit;color:var(--ink);resize:none;min-height:86px;line-height:1.4}
 .modalActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 .modalActions button.ok{background:var(--btn);color:#fff}.modalActions button.clear{background:#fff0f0;color:#b34b4b}
 .uploadBox{display:grid;grid-template-columns:1fr;gap:7px;margin:8px 0 0}.uploadBox label{font-size:13px;text-align:center}.fileBtn{display:block;text-align:center;background:#fff}.fileBtn input{display:none}
 .small{font-size:12px;line-height:1.5;text-align:center;opacity:.82;margin:8px 0 0}
 @media(min-width:700px){.months{grid-template-columns:repeat(8,1fr)}.panel{padding:16px}.stageWrap{max-width:720px}.quick{grid-template-columns:repeat(7,1fr)}}
-@media(max-width:420px){body{padding-left:6px;padding-right:6px}.panel{padding:10px;border-radius:14px}.months button{font-size:14px;padding:9px 4px}.stageWrap{border-radius:6px}.actions{grid-template-columns:1fr}.mark.num,.mark.full{width:11.5%;font-size:24px}.mark.rest,.mark.text{font-size:21px}}
+@media(max-width:420px){body{padding-left:6px;padding-right:6px}.panel{padding:10px;border-radius:14px}.months button{font-size:14px;padding:9px 4px}.stageWrap{border-radius:6px}.actions{grid-template-columns:1fr}.mark.num,.mark.full{width:10%;font-size:20px}.mark.rest,.mark.text{font-size:14px}}
 </style>
 </head>
 <body>
@@ -82,7 +82,7 @@ h1{font-size:20px;text-align:center;margin:8px 0 12px;font-weight:700;letter-spa
   <div class="modal">
     <h2 id="modalTitle">入力</h2>
     <div class="quick" id="quickBtns"></div>
-    <div class="custom"><input id="customText" maxlength="6" placeholder="その他 例：午後のみ"><button id="customSet">入力</button></div>
+    <div class="custom"><textarea id="customText" maxlength="12" placeholder="その他 例：午後のみ&#10;夜間&#10;レッスン"></textarea><button id="customSet">入力</button></div>
     <div class="modalActions"><button class="clear" id="clearDay">この日を空白</button><button class="ok" id="closeModal">閉じる</button></div>
   </div>
 </div>
@@ -97,7 +97,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 });
 
 const MONTHS=[5,6,7,8,9,10,11,12];
-const IMG={5:'https://sanshi6453.github.io/memo-app/images/2026-05.png',6:'https://sanshi6453.github.io/memo-app/images/2026-06.png',7:'https://sanshi6453.github.io/memo-app/images/2026-07.png',8:'https://sanshi6453.github.io/memo-app/images/2026-08.png',9:'https://sanshi6453.github.io/memo-app/images/2026-09.png',10:'https://sanshi6453.github.io/memo-app/images/2026-10.png',11:'https://sanshi6453.github.io/memo-app/images/2026-11.png',12:'https://sanshi6453.github.io/memo-app/images/2026-12.png'};
+const IMG={5:'images/2026-05.png',6:'images/2026-06.png',7:'images/2026-07.png',8:'images/2026-08.png',9:'images/2026-09.png',10:'images/2026-10.png',11:'images/2026-11.png',12:'images/2026-12.png'};
 const DAYS={5:31,6:30,7:31,8:31,9:30,10:31,11:30,12:31};
 const START={5:5,6:1,7:3,8:6,9:2,10:4,11:0,12:2}; // 0=Sun
 const GRID={x:56,y:444,w:968,h:762,cols:7,rows:6};
@@ -112,13 +112,39 @@ function cellRectByDay(month,day){const idx=START[month]+day-1;const col=idx%7,r
 function pct(v,base){return (v/base*100)+'%'}
 function renderMonths(){const box=document.getElementById('months');box.innerHTML='';MONTHS.forEach(m=>{const b=document.createElement('button');b.textContent=m+'月';b.className=m===current?'active':'';b.onclick=()=>{current=m;render()};box.appendChild(b)})}
 function render(){renderMonths();baseImg.src=customImgs[current]||IMG[current];stage.querySelectorAll('.dayHit,.mark').forEach(e=>e.remove());for(let d=1;d<=DAYS[current];d++){const r=cellRectByDay(current,d);const hit=document.createElement('button');hit.className='dayHit';hit.style.left=pct(r.x,1080);hit.style.top=pct(r.y,1350);hit.style.width=pct(r.w,1080);hit.style.height=pct(r.h,1350);hit.setAttribute('aria-label',`${current}月${d}日`);hit.onclick=()=>openModal(d);stage.appendChild(hit);const v=data[key(current,d)];if(v){stage.appendChild(markEl(current,d,v));}}}
-function markEl(m,d,v){const r=cellRectByDay(m,d);const el=document.createElement('div');let cls='text';if(v.type==='num')cls='num';if(v.type==='full')cls='full';if(v.type==='rest')cls='rest';el.className='mark '+cls;el.textContent=v.text;el.style.left=pct(r.x+r.w*0.51,1080);el.style.top=pct(r.y+r.h*0.54,1350);return el}
+function displayText(v){
+  const t=String(v.text||'');
+  if(v.type!=='text') return t;
+  if(t.includes('\n')) return t;
+  if(t.length<=4) return t;
+  if(t.endsWith('レッスン')) return t.replace('レッスン','\nレッスン');
+  const cut=Math.ceil(t.length/2);
+  return t.slice(0,cut)+'\n'+t.slice(cut);
+}
+function textFontSize(t){
+  const raw=String(t||'').replace(/\n/g,'');
+  if(raw.length<=3) return 24;
+  if(raw.length<=4) return 26;
+  return 18;
+}
+function drawMultiLine(ctx,text,cx,cy,lineHeight){
+  const lines=String(text||'').split('\n');
+  const start=cy-(lines.length-1)*lineHeight/2;
+  lines.forEach((line,i)=>ctx.fillText(line,cx,start+i*lineHeight));
+}
+function markEl(m,d,v){const r=cellRectByDay(m,d);const el=document.createElement('div');let cls='text';if(v.type==='num')cls='num';if(v.type==='full')cls='full';if(v.type==='rest')cls='rest';el.className='mark '+cls;el.textContent=displayText(v);el.style.left=pct(r.x+r.w*0.51,1080);el.style.top=pct(r.y+r.h*0.54,1350);return el}
 function openModal(d){selectedDay=d;document.getElementById('modalTitle').textContent=`${current}月${d}日`;document.getElementById('customText').value=(data[key(current,d)]?.type==='text')?data[key(current,d)].text:'';document.getElementById('modalBg').style.display='flex'}
 function closeModal(){document.getElementById('modalBg').style.display='none'}
 function setVal(type,text){data[key(current,selectedDay)]={type,text};save();closeModal();render()}
 function initQuick(){const q=document.getElementById('quickBtns');q.innerHTML='';['1','2','3','4','5','6','7','8','9'].forEach(n=>{const b=document.createElement('button');b.textContent=n;b.onclick=()=>setVal('num',n);q.appendChild(b)});[{t:'満',c:'full',type:'full'},{t:'休み',c:'rest',type:'rest'}].forEach(o=>{const b=document.createElement('button');b.textContent=o.t;b.className=o.c;b.onclick=()=>setVal(o.type,o.t);q.appendChild(b)})}
 async function imageLoaded(img){if(img.complete) return; await new Promise(res=>img.onload=res)}
-async function makeCanvas(month){const img=new Image();img.crossOrigin='anonymous';img.src=customImgs[month]||IMG[month];await imageLoaded(img);const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1350;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,1080,1350);for(let d=1;d<=DAYS[month];d++){const v=data[key(month,d)];if(!v)continue;const r=cellRectByDay(month,d), cx=r.x+r.w*.51, cy=r.y+r.h*.54;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#746d62';ctx.font='700 34px "Zen Maru Gothic", sans-serif';if(v.type==='num'||v.type==='full'){ctx.beginPath();ctx.arc(cx,cy,33,0,Math.PI*2);ctx.fillStyle=v.type==='full'?'rgba(244,209,207,.92)':'rgba(226,217,209,.9)';ctx.fill();ctx.fillStyle=v.type==='full'?'#a84d4d':'#746d62';ctx.font='700 34px "Zen Maru Gothic", sans-serif';ctx.fillText(v.text,cx,cy+1)}else{ctx.fillStyle='#222';ctx.font='500 30px "Zen Maru Gothic", sans-serif';ctx.fillText(v.text,cx,cy+1)}}return canvas}
+async function makeCanvas(month){const img=new Image();img.crossOrigin='anonymous';img.src=customImgs[month]||IMG[month];await imageLoaded(img);const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1350;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,1080,1350);for(let d=1;d<=DAYS[month];d++){const v=data[key(month,d)];if(!v)continue;const r=cellRectByDay(month,d), cx=r.x+r.w*.51, cy=r.y+r.h*.54;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#746d62';ctx.font='700 34px "Zen Maru Gothic", sans-serif';if(v.type==='num'||v.type==='full'){ctx.beginPath();ctx.arc(cx,cy,33,0,Math.PI*2);ctx.fillStyle=v.type==='full'?'rgba(244,209,207,.92)':'rgba(226,217,209,.9)';ctx.fill();ctx.fillStyle=v.type==='full'?'#a84d4d':'#746d62';ctx.font='700 34px "Zen Maru Gothic", sans-serif';ctx.fillText(v.text,cx,cy+1)}else{
+ctx.fillStyle='#222';
+const shown=displayText(v);
+const fs=textFontSize(shown);
+ctx.font=`700 ${fs}px "Zen Maru Gothic", sans-serif`;
+drawMultiLine(ctx,shown,cx,cy+1,fs*1.05);
+}}return canvas}
 function downloadCanvas(canvas,filename){const a=document.createElement('a');a.download=filename;a.href=canvas.toDataURL('image/png');a.click()}
 document.getElementById('savePng').onclick=async()=>downloadCanvas(await makeCanvas(current),`yoga-calendar-2026-${String(current).padStart(2,'0')}.png`);
 document.getElementById('copyPng').onclick=async()=>{try{const canvas=await makeCanvas(current);canvas.toBlob(async blob=>{await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);alert('画像をコピーしました');});}catch(e){alert('この端末ではコピーできません。画像保存を使ってください。')}};
