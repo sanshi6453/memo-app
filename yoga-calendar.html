@@ -87,9 +87,10 @@ h1{font-size:20px;text-align:center;margin:8px 0 12px;font-weight:700;letter-spa
   </div>
 </div>
 <script>
-localStorage.clear();
+// スマホに残った壊れた台紙差し替えデータを毎回リセット
+localStorage.removeItem('yogaCalendarBaseImages2026');
 const MONTHS=[5,6,7,8,9,10,11,12];
-const IMG={5:'2026-05.jpg',6:'2026-06.png',7:'2026-07.png',8:'2026-08.png',9:'2026-09.png',10:'2026-10.png',11:'2026-11.png',12:'2026-12.png'};
+const IMG={5:'images/2026-05.png',6:'images/2026-06.png',7:'images/2026-07.png',8:'images/2026-08.png',9:'images/2026-09.png',10:'images/2026-10.png',11:'images/2026-11.png',12:'images/2026-12.png'};
 const DAYS={5:31,6:30,7:31,8:31,9:30,10:31,11:30,12:31};
 const START={5:5,6:1,7:3,8:6,9:2,10:4,11:0,12:2}; // 0=Sun
 const GRID={x:56,y:444,w:968,h:762,cols:7,rows:6};
@@ -97,6 +98,7 @@ let current=5, selectedDay=null;
 let data=JSON.parse(localStorage.getItem('yogaCalendarMarks2026')||'{}');
 let customImgs=JSON.parse(localStorage.getItem('yogaCalendarBaseImages2026')||'{}');
 const stage=document.getElementById('stage'), baseImg=document.getElementById('baseImg');
+baseImg.onerror=()=>{baseImg.alt='台紙画像を読み込めませんでした。imagesフォルダとファイル名を確認してください。'};
 function key(m,d){return `${m}-${d}`}
 function save(){localStorage.setItem('yogaCalendarMarks2026',JSON.stringify(data))}
 function saveImgs(){localStorage.setItem('yogaCalendarBaseImages2026',JSON.stringify(customImgs))}
