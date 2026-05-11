@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -451,6 +451,93 @@ button.action{
 
 .doccheck-important{color:#d93025;}
 
+/* 追加：残業・振休出メモ */
+.overtime-card{
+  margin-top:18px;
+  padding:18px;
+  background:#ffffff;
+  border:2px solid #dfe8ec;
+  border-radius:18px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+.overtime-title{
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:8px;
+  color:#2a424c;
+}
+.overtime-sub{
+  margin:0 0 14px;
+  color:#6b7280;
+  font-size:14px;
+  line-height:1.7;
+}
+.overtime-open-btn{
+  background:#2a424c;
+  color:#fff;
+  width:100%;
+}
+.overtime-page{
+  display:none;
+}
+.overtime-page.active{
+  display:block;
+}
+.overtime-section{
+  margin-bottom:18px;
+  padding:16px;
+  background:#f9fbfc;
+  border:1px solid #dbe5ea;
+  border-radius:14px;
+}
+.overtime-section-title{
+  margin:0 0 12px;
+  font-size:18px;
+  color:#2a424c;
+}
+.overtime-grid{
+  display:grid;
+  grid-template-columns:140px 1fr;
+  gap:10px;
+  align-items:center;
+}
+.overtime-label{
+  font-size:14px;
+  font-weight:bold;
+}
+.overtime-input,.overtime-select{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+  box-sizing:border-box;
+}
+.overtime-output{
+  min-height:320px;
+}
+.overtime-output-line{
+  margin:0 0 8px;
+  line-height:1.8;
+}
+.overtime-furikyu{
+  color:#d93025;
+  font-weight:bold;
+}
+.overtime-empty{
+  color:#6b7280;
+}
+.overtime-actions{
+  display:grid;
+  gap:12px;
+  margin-top:14px;
+}
+@media(max-width:800px){
+  .overtime-grid{
+    grid-template-columns:1fr;
+  }
+}
+
 /* 追加：配達店舗検索 */
 .delivery-card{
   margin-top:18px;
@@ -638,6 +725,15 @@ button.action{
   </div>
 </div>
 
+
+<div class="shell" id="overtimeShell">
+  <div class="overtime-card" id="overtimeCard">
+    <div class="overtime-title">残業・振休出メモ</div>
+    <p class="overtime-sub">残業時間と、振替出勤・振替休みをメモできます。データは毎月15日で自動リセットされます。</p>
+    <button class="overtime-open-btn" type="button" onclick="showPage('overtimePage')">残業・振休出メモを開く</button>
+  </div>
+</div>
+
 <div class="shell" id="deliverySearchShell">
   <div class="delivery-card" id="deliverySearchCard">
     <div class="delivery-title">スーパーサンシ宅配サービス 配達エリア検索</div>
@@ -738,6 +834,57 @@ button.action{
 
       <div class="card">
         <div id="np_out" class="output">ここに出力されます。</div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="page-card page overtime-page" id="overtimePage">
+    <div class="back-row">
+      <button class="back-btn" type="button" onclick="showHome()">← トップに戻る</button>
+    </div>
+    <h2 class="page-title">残業・振休出メモ</h2>
+
+    <div class="wrap">
+      <div class="card">
+        <div class="overtime-section">
+          <h3 class="overtime-section-title">残業メモ</h3>
+          <div class="overtime-grid">
+            <label class="overtime-label" for="ot_date">日付</label>
+            <input class="overtime-input" id="ot_date" type="date">
+
+            <label class="overtime-label" for="ot_minutes">残業時間</label>
+            <select class="overtime-select" id="ot_minutes"></select>
+          </div>
+          <div class="overtime-actions">
+            <button class="action primary" type="button" onclick="otAddOvertime()">残業を追加</button>
+          </div>
+        </div>
+
+        <div class="overtime-section">
+          <h3 class="overtime-section-title">振替出勤・休みメモ</h3>
+          <div class="overtime-grid">
+            <label class="overtime-label" for="ot_furide">振出</label>
+            <input class="overtime-input" id="ot_furide" type="date">
+
+            <label class="overtime-label" for="ot_furikyu">振休</label>
+            <input class="overtime-input" id="ot_furikyu" type="date">
+          </div>
+          <div class="overtime-actions">
+            <button class="action secondary" type="button" onclick="otAddFurikae()">振出/振休を追加</button>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button class="action secondary" type="button" onclick="otCopyText()">コピー</button>
+          <button class="action ghost" type="button" onclick="otClearAll()">全てクリア</button>
+        </div>
+
+        <div id="ot_status" class="status"></div>
+      </div>
+
+      <div class="card">
+        <div id="ot_output" class="output overtime-output">ここに出力されます。</div>
       </div>
     </div>
   </div>
@@ -957,6 +1104,12 @@ function showPage(pageId){
   const docCheckShell = document.getElementById("docCheckShell");
   if (docCheckShell) docCheckShell.style.display = "none";
 
+  const overtimeCard = document.getElementById("overtimeCard");
+  if (overtimeCard) overtimeCard.style.display = "none";
+
+  const overtimeShell = document.getElementById("overtimeShell");
+  if (overtimeShell) overtimeShell.style.display = "none";
+
   const deliverySearchCard = document.getElementById("deliverySearchCard");
   if (deliverySearchCard) deliverySearchCard.style.display = "none";
 
@@ -987,6 +1140,12 @@ function showHome(){
 
   const docCheckShell = document.getElementById("docCheckShell");
   if (docCheckShell) docCheckShell.style.display = "";
+
+  const overtimeCard = document.getElementById("overtimeCard");
+  if (overtimeCard) overtimeCard.style.display = "";
+
+  const overtimeShell = document.getElementById("overtimeShell");
+  if (overtimeShell) overtimeShell.style.display = "";
 
   const deliverySearchCard = document.getElementById("deliverySearchCard");
   if (deliverySearchCard) deliverySearchCard.style.display = "";
@@ -1376,6 +1535,161 @@ function resetDocSheet(sheetName, resultId){
   const result = document.getElementById(resultId);
   result.className = "doccheck-result";
   result.textContent = "";
+}
+
+
+
+/* 残業・振休出メモ */
+const OT_STORAGE_KEY = "watashi_overtime_furikae_v1";
+
+function otById(id){ return document.getElementById(id); }
+function otSetStatus(msg){ otById("ot_status").textContent = msg; }
+
+function otCurrentPeriodKey(){
+  const d = new Date();
+  let y = d.getFullYear();
+  let m = d.getMonth();
+  if (d.getDate() < 15) {
+    m -= 1;
+    if (m < 0) {
+      m = 11;
+      y -= 1;
+    }
+  }
+  return y + "-" + String(m + 1).padStart(2, "0");
+}
+
+function otGetData(){
+  const period = otCurrentPeriodKey();
+  try{
+    const data = JSON.parse(localStorage.getItem(OT_STORAGE_KEY) || "{}");
+    if (data.period !== period) {
+      localStorage.setItem(OT_STORAGE_KEY, JSON.stringify({period, records:[]}));
+      return {period, records:[]};
+    }
+    if (!Array.isArray(data.records)) data.records = [];
+    return data;
+  }catch(e){
+    return {period, records:[]};
+  }
+}
+
+function otSetData(data){
+  data.period = otCurrentPeriodKey();
+  localStorage.setItem(OT_STORAGE_KEY, JSON.stringify(data));
+}
+
+function otFormatDate(dateStr){
+  if(!dateStr) return "";
+  const parts = dateStr.split("-");
+  if(parts.length !== 3) return dateStr;
+  const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  const days = ["日","月","火","水","木","金","土"];
+  return d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate() + "(" + days[d.getDay()] + ")";
+}
+
+function otFormatMinutes(minutes){
+  const m = Number(minutes || 0);
+  const h = Math.floor(m / 60);
+  const r = m % 60;
+  if (h > 0 && r > 0) return h + "時間" + r + "分";
+  if (h > 0) return h + "時間";
+  return r + "分";
+}
+
+function otPopulateMinutes(){
+  const select = otById("ot_minutes");
+  if(!select || select.options.length) return;
+  for(let m = 30; m <= 480; m += 30){
+    const option = document.createElement("option");
+    option.value = String(m);
+    option.textContent = otFormatMinutes(m);
+    select.appendChild(option);
+  }
+}
+
+function otAddOvertime(){
+  const date = otById("ot_date").value;
+  const minutes = otById("ot_minutes").value;
+  if(!date){
+    otSetStatus("日付を入力してください。");
+    return;
+  }
+  const data = otGetData();
+  data.records.push({type:"overtime", date, minutes:Number(minutes)});
+  otSetData(data);
+  otById("ot_date").value = "";
+  otRender();
+  otSetStatus("残業を追加しました。");
+}
+
+function otAddFurikae(){
+  const furide = otById("ot_furide").value;
+  const furikyu = otById("ot_furikyu").value;
+  if(!furide || !furikyu){
+    otSetStatus("振出と振休の両方を入力してください。");
+    return;
+  }
+  const data = otGetData();
+  data.records.push({type:"furikae", furide, furikyu});
+  otSetData(data);
+  otById("ot_furide").value = "";
+  otById("ot_furikyu").value = "";
+  otRender();
+  otSetStatus("振出/振休を追加しました。");
+}
+
+function otBuildPlainText(){
+  const data = otGetData();
+  if(!data.records.length) return "";
+  return data.records.map(item => {
+    if(item.type === "overtime"){
+      return otFormatDate(item.date) + " " + otFormatMinutes(item.minutes);
+    }
+    return "振出：" + otFormatDate(item.furide) + "\n振休：" + otFormatDate(item.furikyu);
+  }).join("\n\n");
+}
+
+function otRender(){
+  const box = otById("ot_output");
+  if(!box) return;
+  const data = otGetData();
+  if(!data.records.length){
+    box.innerHTML = '<div class="overtime-empty">ここに出力されます。</div>';
+    return;
+  }
+  box.innerHTML = data.records.map((item, index) => {
+    if(item.type === "overtime"){
+      return '<div class="overtime-output-line">' + escapeHtmlDelivery(otFormatDate(item.date) + " " + otFormatMinutes(item.minutes)) + '</div>';
+    }
+    return '<div class="overtime-output-line">振出：' + escapeHtmlDelivery(otFormatDate(item.furide)) + '<br><span class="overtime-furikyu">振休：' + escapeHtmlDelivery(otFormatDate(item.furikyu)) + '</span></div>';
+  }).join("");
+}
+
+async function otCopyText(){
+  const text = otBuildPlainText();
+  if(!text){
+    otSetStatus("コピーする内容がありません。");
+    return;
+  }
+  try{
+    await copyWithFallback(text);
+    otSetStatus("コピーしました。");
+  }catch(e){
+    otSetStatus("コピーできませんでした。出力結果を長押ししてコピーしてください。");
+  }
+}
+
+function otClearAll(){
+  otSetData({period:otCurrentPeriodKey(), records:[]});
+  otRender();
+  otSetStatus("クリアしました。");
+}
+
+function otInit(){
+  otPopulateMinutes();
+  otGetData();
+  otRender();
 }
 
 
@@ -1793,6 +2107,7 @@ window.addEventListener("DOMContentLoaded", () => {
   bindDocSheetAutoSave("receipt");
 
   renderDeliveryManualList();
+  otInit();
 });
 
 // 曜日取得
