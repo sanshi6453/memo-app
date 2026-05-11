@@ -35,17 +35,23 @@ body{
   margin-bottom:12px;
 }
 
-/* 🔴 NEWラベル（赤） */
 .new-label{
   display:none;
-  margin-left:6px;
-  padding:3px 10px;
+
+  padding:2px 9px;
   border-radius:999px;
+
   background:#ff3b30;
-  color:white;
+  color:#fff;
+
   font-size:11px;
   font-weight:700;
-  vertical-align:middle;
+  line-height:1;
+
+  position:relative;
+  top:-1px;
+
+  flex-shrink:0;
 }
 
 .illust{
@@ -64,6 +70,12 @@ body{
   font-size:13px;
   opacity:0.8;
   margin-bottom:22px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
 }
 
 .btn{
@@ -121,56 +133,83 @@ body{
 <body>
 
 <div class="wrap">
+
   <div class="logo">
     フリマ・マルシェ<br>イベントメモ
   </div>
 
   <img class="illust" src="http://kiss.velvet.jp/files/tento.png">
 
-  <div class="sub">気になるイベントをまとめて管理</div>
+  <div class="sub">
+    気になるイベントをまとめて管理
+  </div>
 
   <div class="update">
-  <span id="updateText">最新登録：取得中...</span>
-  <span class="new-label" id="newLabel">NEW</span>
-</div>
+    <span id="updateText">
+      最新登録：取得中...
+    </span>
+
+    <span class="new-label" id="newLabel">
+      NEW
+    </span>
+  </div>
 
   <a class="btn" id="openBtn" href="#">
     <span class="shine"></span>
-    <span class="btn-text">タップして開く</span>
+
+    <span class="btn-text">
+      タップして開く
+    </span>
   </a>
 
-  <div class="tap">※タップでページが開きます</div>
+  <div class="tap">
+    ※タップでページが開きます
+  </div>
+
 </div>
 
 <script>
-const GAS_APP_URL = 'https://script.google.com/macros/s/AKfycbyRPHRTlcQIVU1vOcRoWR1IBtwvIleObraBgtIOfLKIqAHLonODJDY_imA8t4pFfbCb/exec';
+const GAS_APP_URL =
+'https://script.google.com/macros/s/AKfycbyRPHRTlcQIVU1vOcRoWR1IBtwvIleObraBgtIOfLKIqAHLonODJDY_imA8t4pFfbCb/exec';
 
 document.getElementById('openBtn').href = GAS_APP_URL;
 
 function latestCallback(data){
-  const updateText = document.getElementById('updateText');
-  const newLabel = document.getElementById('newLabel');
+
+  const updateText =
+    document.getElementById('updateText');
+
+  const newLabel =
+    document.getElementById('newLabel');
 
   if(!data || !data.latestCreatedAt){
-    updateText.textContent = '最新登録：まだありません';
+
+    updateText.textContent =
+      '最新登録：まだありません';
+
     return;
   }
 
-  updateText.textContent = '最新登録：' + data.latestCreatedAt;
+  updateText.textContent =
+    '最新登録：' + data.latestCreatedAt;
 
   if(data.hasNew){
-    newLabel.style.display = 'inline-block';
+    newLabel.style.display = 'inline-flex';
   }
 }
 
 function loadLatestCreatedAt(){
-  const script = document.createElement('script');
+
+  const script =
+    document.createElement('script');
+
   script.src =
     GAS_APP_URL +
     '?mode=latest&callback=latestCallback&v=' +
     new Date().getTime();
 
   script.onerror = function(){
+
     document.getElementById('updateText').textContent =
       '最新登録：取得できませんでした';
   };
