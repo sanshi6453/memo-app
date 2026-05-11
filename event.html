@@ -32,6 +32,18 @@ body{
   margin-bottom:12px;
 }
 
+.new-label{
+  display:none;
+  margin-left:6px;
+  padding:2px 8px;
+  border-radius:999px;
+  background:#43403F;
+  color:white;
+  font-size:11px;
+  font-weight:700;
+  vertical-align:middle;
+}
+
 .illust{
   width:200px;
   max-width:80%;
@@ -44,9 +56,9 @@ body{
   margin-bottom:8px;
 }
 
-.since{
+.update{
   font-size:13px;
-  opacity:0.75;
+  opacity:0.8;
   margin-bottom:22px;
 }
 
@@ -105,20 +117,64 @@ body{
 <body>
 
 <div class="wrap">
-  <div class="logo">フリマ・マルシェ<br>イベントメモ</div>
+  <div class="logo">
+    フリマ・マルシェ<br>イベントメモ
+    <span class="new-label" id="newLabel">NEW</span>
+  </div>
 
   <img class="illust" src="http://kiss.velvet.jp/files/tento.png">
 
   <div class="sub">気になるイベントをまとめて管理</div>
-  <div class="since">since 2026.05</div>
 
-  <a class="btn" href="ここにGASのURL">
+  <div class="update" id="updateText">最新登録：取得中...</div>
+
+  <a class="btn" id="openBtn" href="#">
     <span class="shine"></span>
     <span class="btn-text">タップして開く</span>
   </a>
 
   <div class="tap">※タップでページが開きます</div>
 </div>
+
+<script>
+const GAS_APP_URL = 'https://script.google.com/macros/s/AKfycbyRPHRTlcQIVU1vOcRoWR1IBtwvIleObraBgtIOfLKIqAHLonODJDY_imA8t4pFfbCb/exec';
+const NEW_DAYS = 7;
+
+document.getElementById('openBtn').href = GAS_APP_URL;
+
+function latestCallback(data){
+  const updateText = document.getElementById('updateText');
+  const newLabel = document.getElementById('newLabel');
+
+  if(!data || !data.latestCreatedAt){
+    updateText.textContent = '最新登録：まだありません';
+    return;
+  }
+
+  updateText.textContent = '最新登録：' + data.latestCreatedAt;
+
+  if(data.hasNew){
+    newLabel.style.display = 'inline-block';
+  }
+}
+
+function loadLatestCreatedAt(){
+  const script = document.createElement('script');
+  script.src =
+    GAS_APP_URL +
+    '?mode=latest&callback=latestCallback&v=' +
+    new Date().getTime();
+
+  script.onerror = function(){
+    document.getElementById('updateText').textContent =
+      '最新登録：取得できませんでした';
+  };
+
+  document.body.appendChild(script);
+}
+
+loadLatestCreatedAt();
+</script>
 
 </body>
 </html>
