@@ -1913,7 +1913,8 @@ function monthlyReset(){
 }
 
 function renderOvertime(){
-  const data = JSON.parse(localStorage.getItem(OVERTIME_KEY) || "[]");
+  const data = JSON.parse(localStorage.getItem(OVERTIME_KEY) || "[]")
+    .sort((a,b)=> new Date(a.date) - new Date(b.date));
   const el = document.getElementById("overtime_list");
 
   if(!data.length){
@@ -1927,7 +1928,8 @@ function renderOvertime(){
 }
 
 function renderFurikae(){
-  const data = JSON.parse(localStorage.getItem(FURIKAE_KEY) || "[]");
+  const data = JSON.parse(localStorage.getItem(FURIKAE_KEY) || "[]")
+    .sort((a,b)=> new Date(a.work) - new Date(b.work));
   const el = document.getElementById("furikae_list");
 
   if(!data.length){
