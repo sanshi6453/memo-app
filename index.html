@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -595,6 +595,110 @@ button.action{
   }
 }
 
+/* 追加：To Do */
+.todo-card{
+  margin-top:18px;
+  padding:18px;
+  background:#ffffff;
+  border:2px solid #dfe8ec;
+  border-radius:18px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+.todo-title{
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:8px;
+  color:#2a424c;
+}
+.todo-sub{
+  margin:0 0 14px;
+  color:#6b7280;
+  font-size:14px;
+  line-height:1.7;
+}
+.todo-open-btn{
+  background:#2a424c;
+  color:#fff;
+  width:100%;
+}
+.todo-input{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #ccc;
+  font-size:16px;
+  box-sizing:border-box;
+}
+.todo-output{
+  background:#f9fafb;
+  padding:15px;
+  border-radius:12px;
+  min-height:320px;
+  border:1px solid #ccc;
+}
+.todo-empty{
+  color:#6b7280;
+  font-size:15px;
+  line-height:1.8;
+}
+.todo-item{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  padding:10px 0;
+  border-bottom:1px solid #e5e7eb;
+  cursor:grab;
+}
+.todo-item:active{
+  cursor:grabbing;
+}
+.todo-item:last-child{
+  border-bottom:none;
+}
+.todo-item.dragging{
+  opacity:0.45;
+}
+.todo-item.drag-over{
+  background:#fffdf0;
+  border-radius:10px;
+}
+.todo-drag-handle{
+  flex:0 0 auto;
+  width:24px;
+  min-width:24px;
+  padding-top:1px;
+  color:#9ca3af;
+  font-size:20px;
+  line-height:1;
+  text-align:center;
+  user-select:none;
+  touch-action:none;
+}
+.todo-item input[type="checkbox"]{
+  width:22px;
+  height:22px;
+  margin-top:2px;
+  flex:0 0 auto;
+}
+.todo-text{
+  flex:1;
+  font-size:16px;
+  line-height:1.7;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+.todo-item.done .todo-text{
+  text-decoration:line-through;
+  color:#6b7280;
+}
+.todo-delete-btn{
+  background:#e5e7eb;
+  color:#111827;
+  padding:8px 10px;
+  border-radius:10px;
+  font-size:13px;
+}
+
 </style>
 <link rel="icon" href="https://img.icons8.com/?size=100&id=fpAVFn3MN108&format=png&color=000000">
 </head>
@@ -639,11 +743,11 @@ button.action{
 </div>
 
 
-<div class="shell" id="overtimeShell">
-  <div class="delivery-card">
-    <div class="delivery-title">残業・振休出メモ</div>
-    <p class="delivery-sub">残業メモと振出・振休メモを別々に保存できます。</p>
-    <button class="delivery-open-btn" type="button" onclick="showPage('overtimePage')" style="background:#2a424c;color:#fff;">残業・振休出メモ</button>
+<div class="shell" id="todoShell">
+  <div class="todo-card" id="todoCard">
+    <div class="todo-title">To Do</div>
+    <p class="todo-sub">やることを1行ずつ入力して追加できます。完了した項目はチェックで打ち消し線が入ります。</p>
+    <button class="todo-open-btn" type="button" onclick="showPage('todoPage')">To Do</button>
   </div>
 </div>
 
@@ -889,6 +993,36 @@ button.action{
     </div>
     <div id="doccheckReceiptResult" class="doccheck-result"></div>
   </div>
+
+  <div class="page-card page" id="todoPage">
+    <div class="back-row">
+      <button class="back-btn" type="button" onclick="showHome()">← トップに戻る</button>
+    </div>
+    <h2 class="page-title">To Do</h2>
+
+    <div class="wrap">
+      <div class="card">
+        <div class="sh-row">
+          <label class="sh-label" for="todo_text">やること</label>
+          <textarea class="todo-input" id="todo_text" rows="4" placeholder="1行ずつ入力してください"></textarea>
+          <div class="note">複数行入力すると、1行ずつTo Doに追加されます。</div>
+        </div>
+
+        <div class="buttons">
+          <button class="action primary" type="button" onclick="todoAdd()">追加</button>
+          <button class="action ghost" type="button" onclick="todoClearDone()">チェック済みを削除</button>
+          <button class="action secondary" type="button" onclick="todoClearAll()">すべて削除</button>
+        </div>
+
+        <div id="todo_status" class="status"></div>
+      </div>
+
+      <div class="card">
+        <div id="todo_output" class="todo-output"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="page-card page delivery-page" id="deliverySearchPage">
     <div class="back-row">
       <button class="back-btn" type="button" onclick="showHome()">← トップに戻る</button>
@@ -947,61 +1081,7 @@ button.action{
       </div>
     </div>
   </div>
-
-<div class="page-card page" id="overtimePage">
-  <div class="back-row">
-    <button class="back-btn" type="button" onclick="showHome()">← トップに戻る</button>
-  </div>
-
-  <h2 class="page-title">残業・振休出メモ</h2>
-
-  <div class="wrap">
-    <div class="card">
-      <h3>残業メモ</h3>
-      <div class="delivery-grid">
-        <label class="delivery-label">日付</label>
-        <input type="date" class="delivery-input" id="ot_date">
-
-        <label class="delivery-label">残業時間</label>
-        <select class="delivery-select" id="ot_time">
-          <option value="30分">30分</option>
-          <option value="1時間">1時間</option>
-          <option value="1時間30分">1時間30分</option>
-          <option value="2時間">2時間</option>
-          <option value="2時間30分">2時間30分</option>
-          <option value="3時間">3時間</option>
-        </select>
-      </div>
-
-      <div class="buttons">
-        <button class="action primary" type="button" onclick="addOvertime()">追加</button>
-        <button class="action ghost" type="button" onclick="clearOvertime()">残業のみクリア</button>
-      </div>
-
-      <div id="overtime_list" class="output" style="margin-top:14px;min-height:120px;"></div>
-    </div>
-
-    <div class="card">
-      <h3>振出・振休メモ</h3>
-
-      <div class="delivery-grid">
-        <label class="delivery-label">振出</label>
-        <input type="date" class="delivery-input" id="furi_work">
-
-        <label class="delivery-label">振休</label>
-        <input type="date" class="delivery-input" id="furi_rest">
-      </div>
-
-      <div class="buttons">
-        <button class="action primary" type="button" onclick="addFurikae()">追加</button>
-        <button class="action ghost" type="button" onclick="clearFurikae()">振出・振休のみクリア</button>
-      </div>
-
-      <div id="furikae_list" class="output" style="margin-top:14px;min-height:120px;"></div>
-    </div>
-  </div>
 </div>
-
 
 <script>
 /* トップ切り替え */
@@ -1019,6 +1099,12 @@ function showPage(pageId){
 
   const docCheckShell = document.getElementById("docCheckShell");
   if (docCheckShell) docCheckShell.style.display = "none";
+
+  const todoCard = document.getElementById("todoCard");
+  if (todoCard) todoCard.style.display = "none";
+
+  const todoShell = document.getElementById("todoShell");
+  if (todoShell) todoShell.style.display = "none";
 
   const deliverySearchCard = document.getElementById("deliverySearchCard");
   if (deliverySearchCard) deliverySearchCard.style.display = "none";
@@ -1050,6 +1136,12 @@ function showHome(){
 
   const docCheckShell = document.getElementById("docCheckShell");
   if (docCheckShell) docCheckShell.style.display = "";
+
+  const todoCard = document.getElementById("todoCard");
+  if (todoCard) todoCard.style.display = "";
+
+  const todoShell = document.getElementById("todoShell");
+  if (todoShell) todoShell.style.display = "";
 
   const deliverySearchCard = document.getElementById("deliverySearchCard");
   if (deliverySearchCard) deliverySearchCard.style.display = "";
@@ -1439,6 +1531,160 @@ function resetDocSheet(sheetName, resultId){
   const result = document.getElementById(resultId);
   result.className = "doccheck-result";
   result.textContent = "";
+}
+
+
+
+/* To Do */
+const TODO_STORAGE_KEY = "watashi_todo_v1";
+let todoItems = [];
+let todoDragFromIndex = null;
+
+function todoById(id){ return document.getElementById(id); }
+function todoSetStatus(msg){
+  const el = todoById("todo_status");
+  if(el) el.textContent = msg;
+}
+function todoSave(){
+  localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(todoItems));
+}
+function todoLoad(){
+  try{
+    const data = JSON.parse(localStorage.getItem(TODO_STORAGE_KEY) || "[]");
+    todoItems = Array.isArray(data) ? data : [];
+  }catch(e){
+    todoItems = [];
+  }
+  todoRender();
+}
+function todoRender(){
+  const box = todoById("todo_output");
+  if(!box) return;
+  box.innerHTML = "";
+
+  if(todoItems.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "todo-empty";
+    empty.textContent = "ここにTo Doが表示されます。";
+    box.appendChild(empty);
+    return;
+  }
+
+  todoItems.forEach((item, index) => {
+    const row = document.createElement("div");
+    row.className = "todo-item" + (item.done ? " done" : "");
+    row.draggable = true;
+    row.dataset.index = String(index);
+
+    row.addEventListener("dragstart", (e) => {
+      todoDragFromIndex = index;
+      row.classList.add("dragging");
+      if(e.dataTransfer){
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", String(index));
+      }
+    });
+
+    row.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      row.classList.add("drag-over");
+      if(e.dataTransfer) e.dataTransfer.dropEffect = "move";
+    });
+
+    row.addEventListener("dragleave", () => {
+      row.classList.remove("drag-over");
+    });
+
+    row.addEventListener("drop", (e) => {
+      e.preventDefault();
+      row.classList.remove("drag-over");
+      const fromIndex = todoDragFromIndex;
+      const toIndex = index;
+      if(fromIndex === null || fromIndex === toIndex) return;
+      const moved = todoItems.splice(fromIndex, 1)[0];
+      todoItems.splice(toIndex, 0, moved);
+      todoDragFromIndex = null;
+      todoSave();
+      todoRender();
+      todoSetStatus("順番を変更しました。");
+    });
+
+    row.addEventListener("dragend", () => {
+      todoDragFromIndex = null;
+      document.querySelectorAll(".todo-item").forEach(el => {
+        el.classList.remove("dragging");
+        el.classList.remove("drag-over");
+      });
+    });
+
+    const handle = document.createElement("span");
+    handle.className = "todo-drag-handle";
+    handle.textContent = "☰";
+    handle.title = "ドラッグで並べ替え";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = !!item.done;
+    checkbox.addEventListener("change", () => {
+      todoItems[index].done = checkbox.checked;
+      todoSave();
+      todoRender();
+    });
+
+    const text = document.createElement("span");
+    text.className = "todo-text";
+    text.textContent = item.text || "";
+
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "todo-delete-btn";
+    del.textContent = "削除";
+    del.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      todoItems.splice(index, 1);
+      todoSave();
+      todoRender();
+      todoSetStatus("削除しました。");
+    });
+
+    row.appendChild(handle);
+    row.appendChild(checkbox);
+    row.appendChild(text);
+    row.appendChild(del);
+    box.appendChild(row);
+  });
+}
+function todoAdd(){
+  const input = todoById("todo_text");
+  if(!input) return;
+  const lines = input.value.split(/\r?\n/).map(v => v.trim()).filter(Boolean);
+  if(lines.length === 0){
+    todoSetStatus("入力してください。");
+    return;
+  }
+  lines.forEach(line => todoItems.push({ text: line, done: false }));
+  input.value = "";
+  todoSave();
+  todoRender();
+  todoSetStatus("追加しました。");
+}
+function todoClearDone(){
+  const before = todoItems.length;
+  todoItems = todoItems.filter(item => !item.done);
+  todoSave();
+  todoRender();
+  todoSetStatus(before === todoItems.length ? "チェック済みの項目はありません。" : "チェック済みを削除しました。");
+}
+function todoClearAll(){
+  if(todoItems.length === 0){
+    todoSetStatus("削除する項目はありません。");
+    return;
+  }
+  todoItems = [];
+  localStorage.removeItem(TODO_STORAGE_KEY);
+  todoRender();
+  todoSetStatus("すべて削除しました。");
 }
 
 
@@ -1855,6 +2101,8 @@ window.addEventListener("DOMContentLoaded", () => {
   bindDocSheetAutoSave("confirm");
   bindDocSheetAutoSave("receipt");
 
+  todoLoad();
+
   renderDeliveryManualList();
 });
 
@@ -1887,103 +2135,6 @@ function renderBenefit(){
   document.getElementById("dateCb").textContent=format(benefitDate(3));
 }
 window.addEventListener("DOMContentLoaded",renderBenefit);
-
-const OVERTIME_KEY = "overtime_memo_v2";
-const FURIKAE_KEY = "furikae_memo_v2";
-const RESET_KEY = "overtime_reset_month_v2";
-
-function jpDate(str){
-  if(!str) return "";
-  const d = new Date(str);
-  const w = ["日","月","火","水","木","金","土"][d.getDay()];
-  return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}(${w})`;
-}
-
-function monthlyReset(){
-  const now = new Date();
-  const ym = now.getFullYear() + "-" + (now.getMonth()+1);
-
-  const saved = localStorage.getItem(RESET_KEY);
-
-  if(saved !== ym && now.getDate() >= 15){
-    localStorage.removeItem(OVERTIME_KEY);
-    localStorage.removeItem(FURIKAE_KEY);
-    localStorage.setItem(RESET_KEY, ym);
-  }
-}
-
-function renderOvertime(){
-  const data = JSON.parse(localStorage.getItem(OVERTIME_KEY) || "[]")
-    .sort((a,b)=> new Date(a.date) - new Date(b.date));
-  const el = document.getElementById("overtime_list");
-
-  if(!data.length){
-    el.textContent = "ここに表示されます。";
-    return;
-  }
-
-  el.innerHTML = data.map(v =>
-    `${jpDate(v.date)} ${v.time}`
-  ).join("<br>");
-}
-
-function renderFurikae(){
-  const data = JSON.parse(localStorage.getItem(FURIKAE_KEY) || "[]")
-    .sort((a,b)=> new Date(a.work) - new Date(b.work));
-  const el = document.getElementById("furikae_list");
-
-  if(!data.length){
-    el.textContent = "ここに表示されます。";
-    return;
-  }
-
-  el.innerHTML = data.map(v =>
-    `振出：${jpDate(v.work)}<br><span style="color:#d93025;font-weight:bold;">振休：${jpDate(v.rest)}</span>`
-  ).join("<br><br>");
-}
-
-function addOvertime(){
-  const date = document.getElementById("ot_date").value;
-  const time = document.getElementById("ot_time").value;
-
-  if(!date) return;
-
-  const data = JSON.parse(localStorage.getItem(OVERTIME_KEY) || "[]");
-  data.unshift({date,time});
-
-  localStorage.setItem(OVERTIME_KEY, JSON.stringify(data));
-  renderOvertime();
-}
-
-function addFurikae(){
-  const work = document.getElementById("furi_work").value;
-  const rest = document.getElementById("furi_rest").value;
-
-  if(!work || !rest) return;
-
-  const data = JSON.parse(localStorage.getItem(FURIKAE_KEY) || "[]");
-  data.unshift({work,rest});
-
-  localStorage.setItem(FURIKAE_KEY, JSON.stringify(data));
-  renderFurikae();
-}
-
-function clearOvertime(){
-  localStorage.removeItem(OVERTIME_KEY);
-  renderOvertime();
-}
-
-function clearFurikae(){
-  localStorage.removeItem(FURIKAE_KEY);
-  renderFurikae();
-}
-
-monthlyReset();
-setTimeout(()=>{
-  renderOvertime();
-  renderFurikae();
-},100);
-
 </script>
 
 </body>
