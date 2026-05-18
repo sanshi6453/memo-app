@@ -3,434 +3,368 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>週間予定表</title>
-
 <link rel="icon" href="mom.ico">
-
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
-
-*{
-  box-sizing:border-box;
-}
-
-body{
-  margin:0;
-  background:#ececec;
-  font-family:'Zen Maru Gothic',sans-serif;
-  color:#222;
-}
-
-.topbar{
-  width:100%;
-  padding:14px;
-  background:#2a424c;
-  color:#fff;
-  position:sticky;
-  top:0;
-  z-index:999;
-}
-
-.topbar-inner{
-  max-width:1500px;
-  margin:auto;
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-}
-
-button{
-  border:none;
-  background:#fee846;
-  color:#2a424c;
-  font-weight:700;
-  border-radius:10px;
-  padding:10px 16px;
-  cursor:pointer;
-  font-family:'Zen Maru Gothic',sans-serif;
-}
-
-button:hover{
-  opacity:.9;
-}
-
-select,input,textarea{
-  font-family:'Zen Maru Gothic',sans-serif;
-}
-
-.wrapper{
-  width:1400px;
-  margin:0 auto;
-  display:flex;
-  align-items:flex-start;
-}
-
-.paper{
-  width:794px;
-  min-height:1123px;
-  background:#fff;
-}
-
-.right-space{
-  flex:1;
-  min-height:1123px;
-}
-
-.header{
-  border-bottom:1px solid #999;
-  padding:8px 10px;
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:20px;
-}
-
-.header-left{
-  display:flex;
-  align-items:flex-start;
-  gap:10px;
-}
-
-.flower{
-  font-size:38px;
-  line-height:1;
-}
-
-.water-guide{
-  font-size:14px;
-  font-weight:700;
-  line-height:1.4;
-}
-
-.water-guide .red{
-  color:red;
-  font-size:22px;
-}
-
-.water-checks{
-  letter-spacing:2px;
-  color:#555;
-}
-
-.header-right{
-  font-size:14px;
-  font-weight:700;
-  line-height:1.5;
-}
-
-.week{
-  width:100%;
-}
-
-.day-row{
-  display:flex;
-  border-bottom:1px solid #999;
-  min-height:150px;
-}
-
-.date-col{
-  width:145px;
-  border-right:1px solid #ccc;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  background:#fafafa;
-}
-
-.date-col.sat{
-  background:#eaf6ff;
-}
-
-.date-col.sun{
-  background:#ffecec;
-}
-
-.date-main{
-  font-size:42px;
-  font-weight:700;
-  line-height:1;
-}
-
-.day-jp{
-  font-size:52px;
-  font-weight:700;
-  line-height:1;
-  margin-top:8px;
-}
-
-.content-col{
-  flex:1;
-  position:relative;
-  overflow:hidden;
-}
-
-.am{
-  height:50%;
-  background:#f6f6f6;
-  padding:8px 10px;
-}
-
-.pm{
-  height:50%;
-  background:#ececec;
-  padding:8px 10px;
-}
-
-.exercise{
-  position:absolute;
-  right:12px;
-  top:10px;
-  color:#0085c7;
-  font-weight:700;
-  line-height:1.5;
-  font-size:15px;
-  width:170px;
-}
-
-.exercise label{
-  display:grid;
-  grid-template-columns:18px 1fr;
-  align-items:center;
-  column-gap:6px;
-  text-align:left;
-}
-
-.exercise input[type="checkbox"]{
-  width:16px;
-  height:16px;
-  margin:0;
-}
-
-.bait-area{
-  position:absolute;
-  right:12px;
-  top:88px;
-  width:190px;
-  font-size:15px;
-  font-weight:700;
-  color:#888;
-  line-height:1.4;
-}
-
-.water-row{
-  position:absolute;
-  bottom:6px;
-  right:8px;
-  font-size:16px;
-  color:#666;
-  letter-spacing:1px;
-}
-
-.schedule{
-  margin-bottom:4px;
-  font-size:16px;
-  line-height:1.4;
-  font-weight:700;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  cursor:pointer;
-}
-
-.schedule.gray{
-  color:#888;
-}
-
-.schedule.red{
-  color:red;
-}
-
-.schedule i{
-  width:22px;
-  text-align:center;
-}
-
-.schedule-text{
-  flex:1;
-}
-
-.delete-btn{
-  border:none;
-  background:none;
-  color:#999;
-  font-size:14px;
-  cursor:pointer;
-  padding:0 4px;
-}
-
-.delete-btn:hover{
-  color:red;
-}
-
-.input-area{
-  padding:16px;
-  background:#fff;
-  border-top:4px solid #2a424c;
-}
-
-.input-title{
-  font-size:24px;
-  font-weight:700;
-  margin-bottom:14px;
-  color:#2a424c;
-}
-
-.form-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-  gap:12px;
-}
-
-.card{
-  border:1px solid #ccc;
-  border-radius:12px;
-  padding:12px;
-  background:#fafafa;
-}
-
-.card h3{
-  margin:0 0 10px;
-  font-size:16px;
-}
-
-.card label{
-  display:block;
-  margin-bottom:6px;
-  font-size:14px;
-}
-
-.card input,
-.card select,
-.card textarea{
-  width:100%;
-  border:1px solid #ccc;
-  border-radius:8px;
-  padding:8px;
-  font-size:14px;
-}
-
-textarea{
-  resize:vertical;
-}
-
-.time-wrap{
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-
-.time-wrap select{
-  width:90px;
-}
-
-.colon{
-  font-size:22px;
-  font-weight:700;
-}
-
-.editing{
-  color:#d00000;
-  font-size:14px;
-  font-weight:700;
-  margin-bottom:8px;
-}
-
+*{box-sizing:border-box}
+body{margin:0;background:#ececec;font-family:'Zen Maru Gothic',sans-serif;color:#222}
+.topbar{width:100%;padding:14px;background:#2a424c;color:#fff;position:sticky;top:0;z-index:999}
+.topbar-inner{max-width:1500px;margin:auto;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button{border:none;background:#fee846;color:#2a424c;font-weight:700;border-radius:10px;padding:10px 16px;cursor:pointer;font-family:'Zen Maru Gothic',sans-serif}
+button:hover{opacity:.9}
+select,input,textarea{font-family:'Zen Maru Gothic',sans-serif}
+.wrapper{width:1400px;margin:0 auto;display:flex;align-items:flex-start}
+.paper{width:794px;min-height:1123px;background:#fff}
+.right-space{flex:1;min-height:1123px}
+.header{border-bottom:1px solid #999;padding:8px 10px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.header-left{display:flex;align-items:flex-start;gap:10px}
+.flower{font-size:38px;line-height:1}
+.water-guide{font-size:14px;font-weight:700;line-height:1.4}
+.water-guide .red{color:red;font-size:22px}
+.water-checks{letter-spacing:2px;color:#555}
+.header-right{font-size:14px;font-weight:700;line-height:1.5}
+.week{width:100%}
+.day-row{display:flex;border-bottom:1px solid #999;min-height:150px}
+.date-col{width:145px;border-right:1px solid #ccc;display:flex;align-items:center;justify-content:center;flex-direction:column;background:#fafafa}
+.date-col.sat{background:#eaf6ff}
+.date-col.sun{background:#ffecec}
+.date-main{font-size:42px;font-weight:700;line-height:1}
+.day-jp{font-size:52px;font-weight:700;line-height:1;margin-top:8px}
+.content-col{flex:1;position:relative;overflow:hidden}
+.am{height:50%;background:#f6f6f6;padding:8px 10px}
+.pm{height:50%;background:#ececec;padding:8px 10px}
+.exercise{position:absolute;right:12px;top:10px;color:#0085c7;font-weight:700;line-height:1.5;font-size:15px;width:170px}
+.exercise label{display:grid;grid-template-columns:18px 1fr;align-items:center;column-gap:6px;text-align:left}
+.exercise input[type="checkbox"]{width:16px;height:16px;margin:0}
+.bait-area{position:absolute;right:12px;top:88px;width:190px;font-size:15px;font-weight:700;color:#888;line-height:1.4}
+.water-row{position:absolute;bottom:6px;right:8px;font-size:16px;color:#666;letter-spacing:1px}
+.schedule{margin-bottom:4px;font-size:16px;line-height:1.4;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer}
+.schedule.gray{color:#888}
+.schedule.red{color:red}
+.schedule i{width:22px;text-align:center}
+.schedule-text{flex:1}
+.delete-btn{border:none;background:none;color:#999;font-size:14px;cursor:pointer;padding:0 4px}
+.delete-btn:hover{color:red}
+.input-area{padding:16px;background:#fff;border-top:4px solid #2a424c}
+.input-title{font-size:24px;font-weight:700;margin-bottom:14px;color:#2a424c}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{border:1px solid #ccc;border-radius:12px;padding:12px;background:#fafafa}
+.card h3{margin:0 0 10px;font-size:16px}
+.card label{display:block;margin-bottom:6px;font-size:14px}
+.card input,.card select,.card textarea{width:100%;border:1px solid #ccc;border-radius:8px;padding:8px;font-size:14px}
+textarea{resize:vertical}
+.time-wrap{display:flex;align-items:center;gap:6px}
+.time-wrap select{width:90px}
+.colon{font-size:22px;font-weight:700}
+.editing{color:#d00000;font-size:14px;font-weight:700;margin-bottom:8px}
 @media print{
-
-  body{
-    background:#fff;
-  }
-
-  .topbar,
-  .input-area,
-  .delete-btn{
-    display:none;
-  }
-
-  .wrapper{
-    width:auto;
-  }
-
-  .paper{
-    width:100%;
-  }
-
-  .right-space{
-    width:220px;
-  }
-
-  @page{
-    size:A4 portrait;
-    margin:0;
-  }
-
+  body{background:#fff}
+  .topbar,.input-area,.delete-btn{display:none}
+  .wrapper{width:auto}
+  .paper{width:100%}
+  .right-space{width:220px}
+  @page{size:A4 portrait;margin:0}
 }
-
 </style>
 </head>
+
 <body>
 
 <div class="topbar">
   <div class="topbar-inner">
-
     <button onclick="generateWeek()">今週を表示</button>
-
     <label style="display:flex;align-items:center;gap:8px;">
-      開始日：
-      <input type="date" id="startDate">
+      開始日：<input type="date" id="startDate">
     </label>
-
     <button onclick="generateWeek()">週間予定表を更新</button>
-
     <button onclick="window.print()">印刷</button>
-
     <button onclick="clearSchedules()">予定を全削除</button>
-
   </div>
 </div>
 
 <div class="wrapper">
-
   <div class="paper">
-
     <div class="header">
-
       <div class="header-left">
         <div class="flower">🌸</div>
-
         <div class="water-guide">
           ★ こまめに水分を摂る<br>
           （1日の目安：湯のみ <span class="red">13</span> 杯）<br>
-
-          <div class="water-checks">
-            □□□□□□□□□□□□□□□
-          </div>
+          <div class="water-checks">□□□□□□□□□□□□□□□</div>
         </div>
       </div>
-
       <div class="header-right">
         ★ 少しでも良いので毎日歩く<br>
         ★ 椅子で足上げ(筋力アップ)<br>
         ★ よく噛んでゆっくり食べる
       </div>
-
     </div>
-
     <div class="week" id="week"></div>
-
   </div>
-
   <div class="right-space"></div>
-
 </div>
 
-<!-- 以下script含めそれ以外は前回と同じ -->
+<div class="input-area">
+  <div class="input-title">予定入力</div>
+  <div class="editing" id="editingText" style="display:none;">編集中です。保存すると上書きされます。</div>
+
+  <div class="form-grid">
+    <div class="card">
+      <h3>予定を追加</h3>
+
+      <label>曜日
+        <select id="daySelect">
+          <option value="0">月</option><option value="1">火</option><option value="2">水</option>
+          <option value="3">木</option><option value="4">金</option><option value="5">土</option><option value="6">日</option>
+        </select>
+      </label>
+
+      <label>午前 / 午後
+        <select id="ampm">
+          <option value="am">午前</option>
+          <option value="pm">午後</option>
+        </select>
+      </label>
+
+      <label>時間
+        <div class="time-wrap">
+          <select id="hour"></select>
+          <div class="colon">:</div>
+          <select id="minute"></select>
+        </div>
+      </label>
+
+      <label>テンプレート
+        <select id="template">
+          <option value="">選択してください</option>
+          <option value="gray|<i class='fa-solid fa-car-side'></i> リエコバイト">リエコバイト</option>
+          <option value="gray|<i class='fa-solid fa-hospital'></i> リエコ歯医者">リエコ歯医者</option>
+          <option value="gray|<i class='fa-solid fa-hospital'></i> リエコ糖尿病">リエコ糖尿病</option>
+          <option value="black|<i class='fa-solid fa-microphone'></i> カラオケ">カラオケ</option>
+          <option value="black|<i class='fa-solid fa-mug-hot'></i> サロン">サロン</option>
+          <option value="black|<i class='fa-solid fa-hospital'></i> 長谷川医院">長谷川医院</option>
+          <option value="black|<i class='fa-solid fa-hospital'></i> 小野外科内科">小野外科内科</option>
+          <option value="black|<i class='fa-solid fa-hot-tub-person'></i> グリーンホテル">グリーンホテル</option>
+          <option value="black|<i class='fa-solid fa-utensils'></i> 夕飯準備">夕飯準備</option>
+          <option value="red|<i class='fa-solid fa-bowl-rice'></i> 米3合">米3合</option>
+        </select>
+      </label>
+
+      <label>自由入力
+        <textarea id="freeText" rows="3"></textarea>
+      </label>
+
+      <button onclick="addSchedule()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'weekly_schedule_data_v2';
+const jpDays = ['月','火','水','木','金','土','日'];
+
+let schedules = [[],[],[],[],[],[],[]];
+let editingIndex = null;
+let editingDay = null;
+
+function saveSchedules(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(schedules));
+}
+
+function loadSchedules(){
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if(saved){
+    schedules = JSON.parse(saved);
+  }
+}
+
+function clearSchedules(){
+  if(!confirm('予定をすべて削除しますか？')) return;
+  schedules = [[],[],[],[],[],[],[]];
+  saveSchedules();
+  renderSchedules();
+}
+
+function buildTimeSelect(){
+  const hour = document.getElementById('hour');
+  const minute = document.getElementById('minute');
+
+  hour.innerHTML = '';
+  minute.innerHTML = '';
+
+  for(let h=0; h<=23; h++){
+    const hh = String(h).padStart(2,'0');
+    hour.innerHTML += `<option value="${hh}">${hh}</option>`;
+  }
+
+  for(let m=0; m<=55; m+=5){
+    const mm = String(m).padStart(2,'0');
+    minute.innerHTML += `<option value="${mm}">${mm}</option>`;
+  }
+}
+
+function getMonday(date){
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d;
+}
+
+function formatDate(date){
+  return `${date.getMonth()+1}/${date.getDate()}`;
+}
+
+function generateWeek(){
+  const week = document.getElementById('week');
+  week.innerHTML = '';
+
+  const start = document.getElementById('startDate').value;
+  const baseDate = start ? getMonday(new Date(start)) : getMonday(new Date());
+
+  for(let i=0;i<7;i++){
+    const d = new Date(baseDate);
+    d.setDate(baseDate.getDate()+i);
+
+    const row = document.createElement('div');
+    row.className = 'day-row';
+
+    row.innerHTML = `
+      <div class="date-col ${i === 5 ? 'sat' : ''} ${i === 6 ? 'sun' : ''}">
+        <div class="date-main">${formatDate(d)}</div>
+        <div class="day-jp">${jpDays[i]}</div>
+      </div>
+
+      <div class="content-col">
+        <div class="exercise">
+          <label><input type="checkbox">ウォーキング</label>
+          <label><input type="checkbox">かかと上げ</label>
+          <label><input type="checkbox">椅子で足上げ</label>
+        </div>
+
+        <div class="bait-area" id="bait-${i}"></div>
+        <div class="am" id="am-${i}"></div>
+        <div class="pm" id="pm-${i}"></div>
+
+        <div class="water-row">□□□□□□□□□□□□□□□</div>
+      </div>
+    `;
+
+    week.appendChild(row);
+  }
+
+  renderSchedules();
+}
+
+function addSchedule(){
+  const day = Number(document.getElementById('daySelect').value);
+  const ampm = document.getElementById('ampm').value;
+  const hour = document.getElementById('hour').value;
+  const minute = document.getElementById('minute').value;
+  const time = `${hour}:${minute}`;
+  const template = document.getElementById('template').value;
+  const freeText = document.getElementById('freeText').value.trim();
+
+  let color = 'black';
+  let text = '';
+
+  if(template){
+    const split = template.split('|');
+    color = split[0];
+    text = split[1];
+  }
+
+  if(freeText){
+    text += ' ' + freeText;
+  }
+
+  if(!text.trim()) return;
+
+  const item = { ampm, time, color, text, template, freeText };
+
+  if(editingIndex !== null){
+    schedules[editingDay][editingIndex] = item;
+    editingIndex = null;
+    editingDay = null;
+    document.getElementById('editingText').style.display = 'none';
+  }else{
+    schedules[day].push(item);
+  }
+
+  saveSchedules();
+  renderSchedules();
+
+  document.getElementById('template').value = '';
+  document.getElementById('freeText').value = '';
+}
+
+function deleteSchedule(day,index){
+  if(!confirm('この予定を削除しますか？')) return;
+  schedules[day].splice(index,1);
+  saveSchedules();
+  renderSchedules();
+}
+
+function editSchedule(day,index){
+  const item = schedules[day][index];
+
+  document.getElementById('daySelect').value = day;
+  document.getElementById('ampm').value = item.ampm;
+
+  const timeSplit = item.time.split(':');
+  document.getElementById('hour').value = timeSplit[0];
+  document.getElementById('minute').value = timeSplit[1];
+
+  document.getElementById('template').value = item.template || '';
+  document.getElementById('freeText').value = item.freeText || '';
+
+  editingIndex = index;
+  editingDay = day;
+
+  document.getElementById('editingText').style.display = 'block';
+
+  window.scrollTo({
+    top:document.body.scrollHeight,
+    behavior:'smooth'
+  });
+}
+
+function renderSchedules(){
+  for(let i=0;i<7;i++){
+    document.getElementById(`am-${i}`).innerHTML = '';
+    document.getElementById(`pm-${i}`).innerHTML = '';
+    document.getElementById(`bait-${i}`).innerHTML = '';
+
+    schedules[i].forEach((item,index)=>{
+      const div = document.createElement('div');
+      div.className = 'schedule';
+
+      if(item.color === 'gray') div.classList.add('gray');
+      if(item.color === 'red') div.classList.add('red');
+
+      div.innerHTML = `
+        <div class="schedule-text" onclick="editSchedule(${i},${index})">
+          ${item.time} ${item.text}
+        </div>
+        <button class="delete-btn" onclick="deleteSchedule(${i},${index})">✕</button>
+      `;
+
+      if(item.text.includes('リエコバイト')){
+        document.getElementById(`bait-${i}`).appendChild(div);
+      }else{
+        document.getElementById(`${item.ampm}-${i}`).appendChild(div);
+      }
+    });
+  }
+}
+
+buildTimeSelect();
+loadSchedules();
+generateWeek();
+</script>
+
 </body>
 </html>
