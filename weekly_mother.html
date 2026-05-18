@@ -235,9 +235,8 @@ select,input,textarea{
   line-height:1.4;
   font-weight:700;
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   gap:6px;
-  cursor:pointer;
 }
 
 .schedule.gray{
@@ -262,6 +261,7 @@ select,input,textarea{
 
 .schedule-text{
   flex:1;
+  cursor:pointer;
 }
 
 .delete-btn{
@@ -271,6 +271,12 @@ select,input,textarea{
   font-size:14px;
   cursor:pointer;
   padding:0 4px;
+  line-height:1;
+  min-width:auto;
+}
+
+.delete-btn:hover{
+  color:red;
 }
 
 .input-area{
@@ -466,10 +472,6 @@ textarea{
 
   <div class="input-title">予定入力</div>
 
-  <div class="editing" id="editingText" style="display:none;">
-    編集中です。保存すると上書きされます。
-  </div>
-
   <div class="form-grid">
 
     <div class="card">
@@ -559,7 +561,7 @@ textarea{
 
 <script>
 
-const STORAGE_KEY = 'weekly_schedule_data_v7';
+const STORAGE_KEY = 'weekly_schedule_data_v8';
 
 const jpDays = ['月','火','水','木','金','土','日'];
 
@@ -597,6 +599,20 @@ function clearSchedules(){
   schedules = [
     [],[],[],[],[],[],[]
   ];
+
+  saveSchedules();
+
+  renderSchedules();
+
+}
+
+function deleteSchedule(day,index){
+
+  if(!confirm('この予定を削除しますか？')){
+    return;
+  }
+
+  schedules[day].splice(index,1);
 
   saveSchedules();
 
@@ -802,7 +818,7 @@ function renderSchedules(){
 
     document.getElementById(`bait-${i}`).innerHTML = '';
 
-    schedules[i].forEach((item)=>{
+    schedules[i].forEach((item,index)=>{
 
       const div = document.createElement('div');
 
@@ -831,6 +847,15 @@ function renderSchedules(){
           ${item.text}
 
         </div>
+
+        <button
+          class="delete-btn"
+          onclick="deleteSchedule(${i},${index})"
+          type="button">
+
+          ✕
+
+        </button>
 
       `;
 
