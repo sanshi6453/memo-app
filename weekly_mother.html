@@ -6,14 +6,10 @@
 <title>週間予定表</title>
 
 <link rel="icon" href="mom.ico">
-
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
-
 *{
   box-sizing:border-box;
   -webkit-print-color-adjust:exact !important;
@@ -62,10 +58,8 @@ select,input,textarea{
 }
 
 .wrapper{
-  width:1400px;
+  width:794px;
   margin:0 auto;
-  display:flex;
-  align-items:flex-start;
 }
 
 .paper{
@@ -75,9 +69,10 @@ select,input,textarea{
   overflow:hidden;
 }
 
-.right-space{
-  flex:1;
-  min-height:1122px;
+.sheet{
+  width:560px;
+  height:1122px;
+  background:#fff;
 }
 
 .header{
@@ -86,7 +81,7 @@ select,input,textarea{
   display:flex;
   justify-content:space-between;
   align-items:flex-start;
-  gap:20px;
+  gap:12px;
 }
 
 .header-left{
@@ -120,6 +115,7 @@ select,input,textarea{
   font-size:14px;
   font-weight:700;
   line-height:1.5;
+  white-space:nowrap;
 }
 
 .week{
@@ -136,7 +132,7 @@ select,input,textarea{
 }
 
 .date-col{
-  width:145px;
+  width:138px;
   border-right:1px solid #ccc;
   display:flex;
   align-items:center;
@@ -186,13 +182,13 @@ select,input,textarea{
 
 .exercise{
   position:absolute;
-  right:12px;
-  top:10px;
+  right:8px;
+  top:8px;
   color:#0085c7;
   font-weight:700;
   line-height:1.5;
   font-size:15px;
-  width:170px;
+  width:160px;
 }
 
 .exercise label{
@@ -211,9 +207,9 @@ select,input,textarea{
 
 .bait-area{
   position:absolute;
-  right:12px;
-  top:88px;
-  width:190px;
+  right:8px;
+  top:84px;
+  width:180px;
   font-size:15px;
   font-weight:700;
   color:#888;
@@ -272,7 +268,6 @@ select,input,textarea{
   cursor:pointer;
   padding:0 4px;
   line-height:1;
-  min-width:auto;
 }
 
 .delete-btn:hover{
@@ -396,8 +391,10 @@ textarea{
     background:#fff !important;
   }
 
-  .right-space{
-    display:none !important;
+  .sheet{
+    width:560px !important;
+    height:1122px !important;
+    background:#fff !important;
   }
 
   @page{
@@ -435,42 +432,48 @@ textarea{
 
   <div class="paper">
 
-    <div class="header">
+    <div class="sheet">
 
-      <div class="header-left">
+      <div class="header">
 
-        <div class="flower">🌸</div>
+        <div class="header-left">
 
-        <div class="water-guide">
-          ★ こまめに水分を摂る<br>
-          （1日の目安：湯のみ <span class="red">13</span> 杯）<br>
+          <div class="flower">🌸</div>
 
-          <div class="water-checks">
-            □□□□□□□□□□□□□□□
+          <div class="water-guide">
+            ★ こまめに水分を摂る<br>
+            （1日の目安：湯のみ <span class="red">13</span> 杯）<br>
+
+            <div class="water-checks">
+              □□□□□□□□□□□□□□□
+            </div>
           </div>
+
+        </div>
+
+        <div class="header-right">
+          ★ 少しでも良いので毎日歩く<br>
+          ★ 椅子で足上げ(筋力アップ)<br>
+          ★ よく噛んでゆっくり食べる
         </div>
 
       </div>
 
-      <div class="header-right">
-        ★ 少しでも良いので毎日歩く<br>
-        ★ 椅子で足上げ(筋力アップ)<br>
-        ★ よく噛んでゆっくり食べる
-      </div>
+      <div class="week" id="week"></div>
 
     </div>
 
-    <div class="week" id="week"></div>
-
   </div>
-
-  <div class="right-space"></div>
 
 </div>
 
 <div class="input-area">
 
   <div class="input-title">予定入力</div>
+
+  <div class="editing" id="editingText" style="display:none;">
+    編集中です。保存すると上書きされます。
+  </div>
 
   <div class="form-grid">
 
@@ -561,13 +564,16 @@ textarea{
 
 <script>
 
-const STORAGE_KEY = 'weekly_schedule_data_v8';
+const STORAGE_KEY = 'weekly_schedule_data_v9';
 
 const jpDays = ['月','火','水','木','金','土','日'];
 
 let schedules = [
   [],[],[],[],[],[],[]
 ];
+
+let editingIndex = null;
+let editingDay = null;
 
 function saveSchedules(){
 
@@ -784,13 +790,31 @@ function addSchedule(){
     return;
   }
 
-  schedules[day].push({
+  const item = {
     ampm,
     time,
     color,
     text,
+    template,
+    freeText,
     important
-  });
+  };
+
+  if(editingIndex !== null){
+
+    schedules[editingDay][editingIndex] = item;
+
+    editingIndex = null;
+
+    editingDay = null;
+
+    document.getElementById('editingText').style.display = 'none';
+
+  }else{
+
+    schedules[day].push(item);
+
+  }
 
   saveSchedules();
 
@@ -805,6 +829,49 @@ function addSchedule(){
   document.getElementById('minute').value = '';
 
   document.getElementById('important').checked = false;
+
+}
+
+function editSchedule(day,index){
+
+  const item = schedules[day][index];
+
+  document.getElementById('daySelect').value = day;
+
+  document.getElementById('ampm').value = item.ampm;
+
+  if(item.time){
+
+    const timeSplit = item.time.split(':');
+
+    document.getElementById('hour').value = timeSplit[0];
+
+    document.getElementById('minute').value = timeSplit[1];
+
+  }else{
+
+    document.getElementById('hour').value = '';
+
+    document.getElementById('minute').value = '';
+
+  }
+
+  document.getElementById('template').value = item.template || '';
+
+  document.getElementById('freeText').value = item.freeText || '';
+
+  document.getElementById('important').checked = item.important || false;
+
+  editingIndex = index;
+
+  editingDay = day;
+
+  document.getElementById('editingText').style.display = 'block';
+
+  window.scrollTo({
+    top:document.body.scrollHeight,
+    behavior:'smooth'
+  });
 
 }
 
@@ -838,7 +905,8 @@ function renderSchedules(){
 
       div.innerHTML = `
 
-        <div class="schedule-text">
+        <div class="schedule-text"
+          onclick="editSchedule(${i},${index})">
 
           ${item.time && item.time !== '00:00'
             ? item.time + ' '
