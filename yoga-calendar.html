@@ -33,6 +33,24 @@ body{
   margin:auto;
 }
 
+.page-title{
+  margin:6px 0 14px;
+  text-align:center;
+  font-size:28px;
+  font-weight:900;
+  color:#2a424c;
+  letter-spacing:.03em;
+  text-shadow:0 1px 2px rgba(255,255,255,.7);
+}
+
+@media(max-width:600px){
+  .page-title{
+    font-size:20px;
+    line-height:1.35;
+    margin-bottom:12px;
+  }
+}
+
 .top{
   background:#fff;
   padding:10px;
@@ -65,8 +83,11 @@ button{
 }
 
 .calendar-wrap{
-  background:#f4f0ea;
-  padding:12px;
+  background:url('images/cbg.png') center center / cover no-repeat;
+  padding:14px;
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:0 4px 16px rgba(42,66,76,.12);
 }
 
 .head{
@@ -88,7 +109,8 @@ table{
   width:100%;
   border-collapse:collapse;
   table-layout:fixed;
-  border:2px solid var(--line);
+  border:1.5px solid rgba(64,76,80,.45);
+  background:rgba(255,255,255,.05);
 }
 
 th,td{
@@ -104,14 +126,22 @@ td{
   position:relative;
   height:96px;
   vertical-align:top;
+
+  background:rgba(255,255,255,.28);
+
+  border-right:1.2px solid rgba(64,76,80,.45);
+  border-bottom:1.2px solid rgba(64,76,80,.45);
+
+  backdrop-filter:blur(.8px);
+  -webkit-backdrop-filter:blur(.8px);
 }
 
 .sun{
-  background:var(--sun);
+  background:rgba(239,216,220,.55);
 }
 
 .sat{
-  background:var(--sat);
+  background:rgba(217,230,238,.55);
 }
 
 .day{
@@ -185,7 +215,8 @@ td{
 }
 
 .logo img{
-  width:140px;
+  width:320px;
+  max-width:80%;
 }
 
 .modal-bg{
@@ -308,6 +339,8 @@ td{
 
 <div class="wrap">
 
+<h1 class="page-title">Yoga flower予約状況カレンダー作成ツール</h1>
+
 <div class="top">
 
 <div class="row">
@@ -316,8 +349,8 @@ td{
 </div>
 
 <div class="row">
-<button onclick="build()">カレンダー作成</button>
-<button onclick="saveImage()">画像保存</button>
+<button type="button" onclick="build()">カレンダー作成</button>
+<button type="button" onclick="saveImage()">画像保存</button>
 </div>
 
 </div>
@@ -347,7 +380,7 @@ td{
 </table>
 
 <div class="logo">
-<img src="images/yoga-flower_logo.png">
+<img src="images/yoga-flower_logo.png" crossorigin="anonymous" alt="yoga flower">
 </div>
 
 </div>
@@ -608,15 +641,63 @@ function formatMemo(t){
 
 async function saveImage(){
 
- const canvas=await html2canvas(document.getElementById('capture'),{
-   scale:3,
-   backgroundColor:'#f4f0ea'
- });
+ const target=document.getElementById('capture');
+
+ try{
+
+   const canvas=await html2canvas(target,{
+     scale:3,
+     backgroundColor:null,
+     useCORS:true,
+     allowTaint:false,
+     logging:false
+   });
+
+   const fileName='yoga-flower-calendar.png';
+
+   if(canvas.toBlob){
+
+     canvas.toBlob(function(blob){
+
+       if(!blob){
+         fallbackDownload(canvas,fileName);
+         return;
+       }
+
+       const url=URL.createObjectURL(blob);
+       const a=document.createElement('a');
+       a.href=url;
+       a.download=fileName;
+       document.body.appendChild(a);
+       a.click();
+       a.remove();
+
+       setTimeout(function(){
+         URL.revokeObjectURL(url);
+       },1000);
+
+     },'image/png');
+
+   }else{
+     fallbackDownload(canvas,fileName);
+   }
+
+ }catch(e){
+
+   alert('画像保存に失敗しました。ページをGitHub Pages上で開いているか、images/cbg.png とロゴ画像が正しく置かれているか確認してください。');
+
+ }
+
+}
+
+function fallbackDownload(canvas,fileName){
 
  const a=document.createElement('a');
- a.href=canvas.toDataURL();
- a.download='calendar.png';
+ a.href=canvas.toDataURL('image/png');
+ a.download=fileName;
+ document.body.appendChild(a);
  a.click();
+ a.remove();
 
 }
 
