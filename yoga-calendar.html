@@ -1,160 +1,639 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>yoga flower 予約カレンダー作成</title>
-<link rel="icon" href="favicon.ico">
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ヨガ予約カレンダー</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
 <style>
 :root{
-  --ink:#746d62;
-  --bg:#f4eee7;
-  --line:#c8bdb2;
-  --btn:#8c8175;
-  --pink:#f3d8d6;
-  --circle:#e8dfd8;
+  --bg:#ece8e2;
+  --line:#5b6a70;
+  --text:#2a424c;
+  --sun:#efd8dc;
+  --sat:#d9e6ee;
+  --beige:#a98558;
+  --blue:#2d86ff;
+  --red:#d64b4b;
 }
-*{box-sizing:border-box}
+
 body{
   margin:0;
+  padding:10px;
   background:var(--bg);
-  color:var(--ink);
-  font-family:'Zen Maru Gothic', system-ui, sans-serif;
-  padding:14px 10px 80px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  color:var(--text);
 }
-h1{font-size:20px;text-align:center;margin:8px 0 12px;font-weight:700;letter-spacing:.04em}
-.panel{max-width:980px;margin:0 auto 12px;background:rgba(255,255,255,.72);border:1px solid rgba(140,129,117,.18);border-radius:18px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,.05)}
-.note{font-size:13px;line-height:1.6;margin:4px 0 10px;text-align:center}
-.months{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px}
-.months button,.actions button,.modal button,.fileBtn{
-  border:0;border-radius:999px;padding:10px 8px;background:#fff;color:var(--ink);font-family:inherit;font-size:15px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.08);
+
+.wrap{
+  max-width:900px;
+  margin:auto;
 }
-.months button.active{background:var(--btn);color:#fff}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.actions button.primary{background:var(--btn);color:#fff}
-.actions button.danger{background:#fff0f0;color:#b34b4b}
-.stageWrap{width:100%;max-width:760px;margin:0 auto;position:relative;border-radius:10px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.08);background:#fff}
-.stage{position:relative;width:100%;aspect-ratio:1080/1350;}
-.stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;user-select:none;-webkit-user-drag:none}
-.dayHit{position:absolute;border:1px dashed transparent;background:transparent;border-radius:8px;padding:0;z-index:3}
-.dayHit:active{background:rgba(140,129,117,.08);border-color:rgba(140,129,117,.28)}
-.mark{position:absolute;z-index:2;display:flex;align-items:center;justify-content:center;text-align:center;white-space:pre-line;pointer-events:none;color:var(--ink);font-weight:700;line-height:1.05}
-.mark.num,.mark.full{border-radius:50%;width:8.8%;aspect-ratio:1/1;font-size:clamp(15px,3.8vw,28px);transform:translate(-50%,-50%)}
-.mark.num{background:rgba(226,217,209,.9)}
-.mark.full{background:rgba(244,209,207,.92);color:#a84d4d}
-.mark.rest,.mark.text{transform:translate(-50%,-50%);font-size:clamp(12px,2.6vw,20px);padding:2px 4px;min-width:10%;max-width:10.5%;word-break:keep-all;overflow-wrap:normal}
-.modalBg{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-end;justify-content:center;z-index:50;padding:12px}
-.modal{width:min(520px,100%);background:#fff;border-radius:24px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
-.modal h2{font-size:18px;margin:0 0 10px;text-align:center}
-.quick{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}
-.quick button{background:#f5f0eb;font-size:18px;padding:12px 6px}
-.quick button.full{background:var(--pink);color:#a84d4d}
-.quick button.rest{background:#fff}
-.custom{display:grid;grid-template-columns:1fr auto;gap:8px;margin:10px 0}
-.custom textarea{border:1px solid #ddd;border-radius:12px;padding:12px;font-size:16px;font-family:inherit;color:var(--ink);resize:none;min-height:86px;line-height:1.4}
-.modalActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.modalActions button.ok{background:var(--btn);color:#fff}.modalActions button.clear{background:#fff0f0;color:#b34b4b}
-.uploadBox{display:grid;grid-template-columns:1fr;gap:7px;margin:8px 0 0}.uploadBox label{font-size:13px;text-align:center}.fileBtn{display:block;text-align:center;background:#fff}.fileBtn input{display:none}
-.small{font-size:12px;line-height:1.5;text-align:center;opacity:.82;margin:8px 0 0}
-@media(min-width:700px){.months{grid-template-columns:repeat(8,1fr)}.panel{padding:16px}.stageWrap{max-width:720px}.quick{grid-template-columns:repeat(7,1fr)}}
-@media(max-width:420px){body{padding-left:6px;padding-right:6px}.panel{padding:10px;border-radius:14px}.months button{font-size:14px;padding:9px 4px}.stageWrap{border-radius:6px}.actions{grid-template-columns:1fr}.mark.num,.mark.full{width:10%;font-size:20px}.mark.rest,.mark.text{font-size:14px}}
+
+.top{
+  background:#fff;
+  padding:10px;
+  border-radius:14px;
+  margin-bottom:10px;
+}
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+input,button,textarea{
+  width:100%;
+  box-sizing:border-box;
+  padding:10px;
+  border-radius:10px;
+  border:2px solid #ccd3d7;
+  font-size:16px;
+  font-family:'Zen Maru Gothic', sans-serif;
+}
+
+button{
+  background:#2a424c;
+  color:#fff;
+  border:none;
+  font-weight:bold;
+}
+
+.calendar-wrap{
+  background:#f4f0ea;
+  padding:12px;
+}
+
+.head{
+  text-align:right;
+  margin-bottom:8px;
+}
+
+.year{
+  font-size:18px;
+  margin-right:8px;
+}
+
+.month{
+  font-size:36px;
+  font-weight:bold;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+  border:2px solid var(--line);
+}
+
+th,td{
+  border:1.5px solid var(--line);
+}
+
+th{
+  height:46px;
+  font-size:24px;
+}
+
+td{
+  position:relative;
+  height:96px;
+  vertical-align:top;
+}
+
+.sun{
+  background:var(--sun);
+}
+
+.sat{
+  background:var(--sat);
+}
+
+.day{
+  position:absolute;
+  top:6px;
+  left:8px;
+  font-size:22px;
+  font-weight:bold;
+}
+
+.night{
+  position:absolute;
+  top:8px;
+  right:8px;
+  font-size:13px;
+  font-weight:700;
+  color:#666;
+  display:flex;
+  align-items:center;
+  gap:3px;
+}
+
+.night i{
+  font-size:11px;
+}
+
+.circle{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:34px;
+  font-weight:900;
+  line-height:1;
+  padding-bottom:3px;
+}
+
+.circle.small-num{
+  font-size:25px;
+}
+
+.beige{ background:var(--beige); }
+.blue{ background:var(--blue); }
+.red{ background:var(--red); }
+
+.memo{
+  position:absolute;
+  bottom:4px;
+  left:4px;
+  right:4px;
+  height:30px;
+  overflow:hidden;
+  white-space:pre-line;
+  text-align:center;
+  font-size:11px;
+  line-height:1.2;
+  color:var(--beige);
+  font-weight:bold;
+}
+
+.logo{
+  text-align:center;
+  padding-top:10px;
+}
+
+.logo img{
+  width:140px;
+}
+
+.modal-bg{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+}
+
+.modal-bg.show{
+  display:flex;
+  align-items:flex-end;
+}
+
+.modal{
+  background:#fff;
+  width:100%;
+  border-radius:20px 20px 0 0;
+  padding:16px;
+}
+
+.choice{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.num-btn{
+  background:var(--beige);
+}
+
+.empty-btn{
+  background:var(--blue);
+}
+
+.full-btn{
+  background:var(--red);
+}
+
+.night-btn{
+  background:#7d8588;
+}
+
+.clear-btn{
+  background:#777;
+}
+
+.choice button.active,
+.num-btn.selected,
+.empty-btn.selected,
+.full-btn.selected,
+.night-btn.selected{
+  outline:4px solid #2a424c;
+  box-shadow:0 0 0 3px rgba(255,255,255,.9) inset;
+  transform:scale(.96);
+}
+
+.apply-btn{
+  background:#f0b429;
+  color:#2a424c;
+  font-size:18px;
+  border:3px solid #2a424c;
+}
+
+.apply-note{
+  margin:8px 0 0;
+  text-align:center;
+  font-size:14px;
+  font-weight:900;
+  color:#d64b4b;
+}
+
+.toggle{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+@media(max-width:600px){
+
+  th{
+    height:34px;
+    font-size:18px;
+  }
+
+  td{
+    height:68px;
+  }
+
+  .day{
+    font-size:16px;
+  }
+
+  .circle{
+    width:34px;
+    height:34px;
+    font-size:24px;
+    padding-bottom:2px;
+  }
+
+  .circle.small-num{
+    font-size:18px;
+  }
+
+  .month{
+    font-size:28px;
+  }
+
+  .memo{
+    font-size:9px;
+    height:22px;
+  }
+
+}
 </style>
 </head>
 <body>
-<h1>yoga flower 予約カレンダー作成</h1>
-<div class="panel">
-  <p class="note">月を選んで、日付のマスをタップしてください。人数・満・休み・短い文字を入れられます。</p>
-  <div class="months" id="months"></div>
-  <div class="stageWrap"><div class="stage" id="stage"><img id="baseImg" alt="カレンダー台紙"></div></div>
-  <div class="actions">
-    <button class="primary" id="savePng">この月を画像保存</button>
-    <button id="copyPng">画像をコピー</button>
-    <button id="downloadAll">5〜12月をまとめて保存</button>
-    <button class="danger" id="clearMonth">この月の入力を消す</button>
-  </div>
-  <div class="uploadBox" id="uploadBox">
-    <label class="fileBtn">この月の台紙画像を差し替える<input type="file" id="fileInput" accept="image/*"></label>
-    <p class="small">※カレンダー台紙を変更する場合は、お気軽に連絡ください</p>
-  </div>
-</div>
-<div class="modalBg" id="modalBg">
-  <div class="modal">
-    <h2 id="modalTitle">入力</h2>
-    <div class="quick" id="quickBtns"></div>
-    <div class="custom"><textarea id="customText" maxlength="12" placeholder="その他 例：午後のみ&#10;夜間&#10;レッスン"></textarea><button id="customSet">入力</button></div>
-    <div class="modalActions"><button class="clear" id="clearDay">この日を空白</button><button class="ok" id="closeModal">閉じる</button></div>
-  </div>
-</div>
-<script>
-const isAdmin = new URLSearchParams(location.search).get('admin') === '1';
 
-window.addEventListener('DOMContentLoaded',()=>{
-  if(!isAdmin){
-    const box=document.getElementById('uploadBox');
-    if(box) box.style.display='none';
-  }
+<div class="wrap">
+
+<div class="top">
+
+<div class="row">
+<input type="date" id="start">
+<input type="date" id="end">
+</div>
+
+<div class="row">
+<button onclick="build()">カレンダー作成</button>
+<button onclick="saveImage()">画像保存</button>
+</div>
+
+</div>
+
+<div class="calendar-wrap" id="capture">
+
+<div class="head">
+<span class="year" id="year"></span>
+<span class="month" id="month"></span>
+</div>
+
+<table>
+<thead>
+<tr>
+<th class="sun">日</th>
+<th>月</th>
+<th>火</th>
+<th>水</th>
+<th>木</th>
+<th>金</th>
+<th class="sat">土</th>
+</tr>
+</thead>
+
+<tbody id="body"></tbody>
+
+</table>
+
+<div class="logo">
+<img src="/images/yoga-flower_logo.png">
+</div>
+
+</div>
+
+</div>
+
+<div class="modal-bg" id="bg">
+
+<div class="modal">
+
+<h3 id="title"></h3>
+
+<div class="choice">
+<button class="num-btn" data-num="1" onclick="setNum('1')">1</button>
+<button class="num-btn" data-num="2" onclick="setNum('2')">2</button>
+<button class="num-btn" data-num="3" onclick="setNum('3')">3</button>
+<button class="num-btn" data-num="4" onclick="setNum('4')">4</button>
+<button class="num-btn" data-num="5" onclick="setNum('5')">5</button>
+<button class="num-btn" data-num="6" onclick="setNum('6')">6</button>
+<button class="num-btn" data-num="7" onclick="setNum('7')">7</button>
+<button class="num-btn" data-num="8" onclick="setNum('8')">8</button>
+<button class="num-btn" data-num="9" onclick="setNum('9')">9</button>
+<button class="num-btn" data-num="10" onclick="setNum('10')">10</button>
+</div>
+
+<div class="toggle">
+<button id="btn-empty" class="empty-btn" onclick="setType('empty')">空</button>
+<button id="btn-full" class="full-btn" onclick="setType('full')">満</button>
+<button id="btn-night" class="night-btn" onclick="toggleNight()">夜</button>
+</div>
+
+<textarea id="memo" placeholder="自由テキスト"></textarea>
+
+<div class="apply-note">選んだら最後に「反映」を押してください</div>
+
+<div class="row" style="margin-top:10px;">
+<button class="clear-btn" onclick="clearData()">消去</button>
+<button class="apply-btn" onclick="saveData()">反映する</button>
+</div>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script>
+
+let startDate = new Date(2026,4,15);
+let endDate = new Date(2026,5,30);
+
+let data = {};
+let current = null;
+let draft = {};
+
+function fmt(d){
+ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function dayText(d){
+ if(d.getDate()===1){
+   return (d.getMonth()+1)+'/1';
+ }
+ return d.getDate();
+}
+
+function build(){
+
+ const body = document.getElementById('body');
+ body.innerHTML='';
+
+ const cells=[];
+
+ for(let i=0;i<startDate.getDay();i++){
+   cells.push(null);
+ }
+
+ let d=new Date(startDate);
+
+ while(d<=endDate){
+   cells.push(new Date(d));
+   d.setDate(d.getDate()+1);
+ }
+
+ while(cells.length%7!==0){
+   cells.push(null);
+ }
+
+ for(let i=0;i<cells.length;i+=7){
+
+   const tr=document.createElement('tr');
+
+   for(let j=0;j<7;j++){
+
+     const td=document.createElement('td');
+
+     if(j===0) td.classList.add('sun');
+     if(j===6) td.classList.add('sat');
+
+     const date=cells[i+j];
+
+     if(date){
+
+       const key=fmt(date);
+
+       td.onclick=()=>openModal(key);
+
+       td.innerHTML=`
+       <div class="day">${dayText(date)}</div>
+       <div class="night" id="night-${key}"></div>
+       <div id="main-${key}"></div>
+       <div class="memo" id="memo-${key}"></div>
+       `;
+
+     }
+
+     tr.appendChild(td);
+
+   }
+
+   body.appendChild(tr);
+
+ }
+
+ updateTitle();
+ renderAll();
+
+}
+
+function updateTitle(){
+
+ const m1=startDate.getMonth()+1;
+ const m2=endDate.getMonth()+1;
+
+ document.getElementById('year').textContent=startDate.getFullYear();
+ document.getElementById('month').textContent=m1+'月〜'+m2+'月';
+
+}
+
+function openModal(key){
+
+ current=key;
+
+ draft=Object.assign({
+   num:'',
+   type:'',
+   night:false,
+   memo:''
+ },data[key]||{});
+
+ document.getElementById('title').textContent=key;
+
+ document.getElementById('memo').value=draft.memo||'';
+
+ updateButtons();
+
+ document.getElementById('bg').classList.add('show');
+
+}
+
+function updateButtons(){
+
+ document.querySelectorAll('.num-btn').forEach(btn=>{
+   btn.classList.toggle('selected', draft.num === btn.dataset.num && !draft.type);
+ });
+
+ document.getElementById('btn-empty').classList.toggle('selected', draft.type==='empty');
+ document.getElementById('btn-full').classList.toggle('selected', draft.type==='full');
+ document.getElementById('btn-night').classList.toggle('selected', !!draft.night);
+
+}
+
+function setNum(v){
+ draft.num=v;
+ draft.type='';
+ updateButtons();
+}
+
+function setType(v){
+ draft.type=v;
+ if(v==='empty' || v==='full') draft.num='';
+ updateButtons();
+}
+
+function toggleNight(){
+ draft.night=!draft.night;
+ updateButtons();
+}
+
+function saveData(){
+
+ draft.memo=document.getElementById('memo').value;
+
+ data[current]=draft;
+
+ render(current);
+
+ document.getElementById('bg').classList.remove('show');
+
+}
+
+function clearData(){
+
+ delete data[current];
+
+ render(current);
+
+ document.getElementById('bg').classList.remove('show');
+
+}
+
+function renderAll(){
+
+ Object.keys(data).forEach(k=>render(k));
+
+}
+
+function render(key){
+
+ const main=document.getElementById('main-'+key);
+ const night=document.getElementById('night-'+key);
+ const memo=document.getElementById('memo-'+key);
+
+ if(!main) return;
+
+ const d=data[key]||{};
+
+ night.innerHTML=d.night?'夜 <i class="fa-solid fa-moon"></i>':'';
+
+ if(d.type==='empty'){
+   main.innerHTML='<div class="circle blue">空</div>';
+ }else if(d.type==='full'){
+   main.innerHTML='<div class="circle red">満</div>';
+ }else if(d.num){
+   const smallClass = String(d.num).length >= 2 ? ' small-num' : '';
+   main.innerHTML='<div class="circle beige'+smallClass+'">'+d.num+'</div>';
+ }else{
+   main.innerHTML='';
+ }
+
+ memo.textContent=formatMemo(d.memo||'');
+
+}
+
+function formatMemo(t){
+
+ const lines=t.split('\n');
+
+ if(lines.length>=2){
+   return lines[0].slice(0,5)+'\n'+lines[1].slice(0,5);
+ }
+
+ if(t.length<=5) return t;
+
+ return t.slice(0,5)+'\n'+t.slice(5,10);
+
+}
+
+async function saveImage(){
+
+ const canvas=await html2canvas(document.getElementById('capture'),{
+   scale:3,
+   backgroundColor:'#f4f0ea'
+ });
+
+ const a=document.createElement('a');
+ a.href=canvas.toDataURL();
+ a.download='calendar.png';
+ a.click();
+
+}
+
+document.getElementById('start').value='2026-05-15';
+document.getElementById('end').value='2026-06-30';
+
+document.getElementById('start').addEventListener('change',e=>{
+ startDate=new Date(e.target.value);
 });
 
-const MONTHS=[5,6,7,8,9,10,11,12];
-const IMG={5:'images/2026-05.png',6:'images/2026-06.png',7:'images/2026-07.png',8:'images/2026-08.png',9:'images/2026-09.png',10:'images/2026-10.png',11:'images/2026-11.png',12:'images/2026-12.png'};
-const DAYS={5:31,6:30,7:31,8:31,9:30,10:31,11:30,12:31};
-const START={5:5,6:1,7:3,8:6,9:2,10:4,11:0,12:2}; // 0=Sun
-const GRID={x:56,y:444,w:968,h:762,cols:7,rows:6};
-let current=5, selectedDay=null;
-let data=JSON.parse(localStorage.getItem('yogaCalendarMarks2026')||'{}');
-let customImgs=JSON.parse(localStorage.getItem('yogaCalendarBaseImages2026')||'{}');
-const stage=document.getElementById('stage'), baseImg=document.getElementById('baseImg');
-function key(m,d){return `${m}-${d}`}
-function save(){localStorage.setItem('yogaCalendarMarks2026',JSON.stringify(data))}
-function saveImgs(){localStorage.setItem('yogaCalendarBaseImages2026',JSON.stringify(customImgs))}
-function cellRectByDay(month,day){const idx=START[month]+day-1;const col=idx%7,row=Math.floor(idx/7);return {x:GRID.x+col*GRID.w/7,y:GRID.y+row*GRID.h/6,w:GRID.w/7,h:GRID.h/6,col,row}}
-function pct(v,base){return (v/base*100)+'%'}
-function renderMonths(){const box=document.getElementById('months');box.innerHTML='';MONTHS.forEach(m=>{const b=document.createElement('button');b.textContent=m+'月';b.className=m===current?'active':'';b.onclick=()=>{current=m;render()};box.appendChild(b)})}
-function render(){renderMonths();baseImg.src=customImgs[current]||IMG[current];stage.querySelectorAll('.dayHit,.mark').forEach(e=>e.remove());for(let d=1;d<=DAYS[current];d++){const r=cellRectByDay(current,d);const hit=document.createElement('button');hit.className='dayHit';hit.style.left=pct(r.x,1080);hit.style.top=pct(r.y,1350);hit.style.width=pct(r.w,1080);hit.style.height=pct(r.h,1350);hit.setAttribute('aria-label',`${current}月${d}日`);hit.onclick=()=>openModal(d);stage.appendChild(hit);const v=data[key(current,d)];if(v){stage.appendChild(markEl(current,d,v));}}}
-function displayText(v){
-  const t=String(v.text||'');
-  if(v.type!=='text') return t;
-  if(t.includes('\n')) return t;
-  if(t.length<=4) return t;
-  if(t.endsWith('レッスン')) return t.replace('レッスン','\nレッスン');
-  const cut=Math.ceil(t.length/2);
-  return t.slice(0,cut)+'\n'+t.slice(cut);
-}
-function textFontSize(t){
-  const raw=String(t||'').replace(/\n/g,'');
-  if(raw.length<=3) return 24;
-  if(raw.length<=4) return 26;
-  return 18;
-}
-function drawMultiLine(ctx,text,cx,cy,lineHeight){
-  const lines=String(text||'').split('\n');
-  const start=cy-(lines.length-1)*lineHeight/2;
-  lines.forEach((line,i)=>ctx.fillText(line,cx,start+i*lineHeight));
-}
-function markEl(m,d,v){const r=cellRectByDay(m,d);const el=document.createElement('div');let cls='text';if(v.type==='num')cls='num';if(v.type==='full')cls='full';if(v.type==='rest')cls='rest';el.className='mark '+cls;el.textContent=displayText(v);el.style.left=pct(r.x+r.w*0.51,1080);el.style.top=pct(r.y+r.h*0.54,1350);return el}
-function openModal(d){selectedDay=d;document.getElementById('modalTitle').textContent=`${current}月${d}日`;document.getElementById('customText').value=(data[key(current,d)]?.type==='text')?data[key(current,d)].text:'';document.getElementById('modalBg').style.display='flex'}
-function closeModal(){document.getElementById('modalBg').style.display='none'}
-function setVal(type,text){data[key(current,selectedDay)]={type,text};save();closeModal();render()}
-function initQuick(){const q=document.getElementById('quickBtns');q.innerHTML='';['1','2','3','4','5','6','7','8','9'].forEach(n=>{const b=document.createElement('button');b.textContent=n;b.onclick=()=>setVal('num',n);q.appendChild(b)});[{t:'満',c:'full',type:'full'},{t:'休み',c:'rest',type:'rest'}].forEach(o=>{const b=document.createElement('button');b.textContent=o.t;b.className=o.c;b.onclick=()=>setVal(o.type,o.t);q.appendChild(b)})}
-async function imageLoaded(img){if(img.complete) return; await new Promise(res=>img.onload=res)}
-async function makeCanvas(month){const img=new Image();img.crossOrigin='anonymous';img.src=customImgs[month]||IMG[month];await imageLoaded(img);const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1350;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,1080,1350);for(let d=1;d<=DAYS[month];d++){const v=data[key(month,d)];if(!v)continue;const r=cellRectByDay(month,d), cx=r.x+r.w*.51, cy=r.y+r.h*.54;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#746d62';ctx.font='700 34px "Zen Maru Gothic", sans-serif';if(v.type==='num'||v.type==='full'){ctx.beginPath();ctx.arc(cx,cy,33,0,Math.PI*2);ctx.fillStyle=v.type==='full'?'rgba(244,209,207,.92)':'rgba(226,217,209,.9)';ctx.fill();ctx.fillStyle=v.type==='full'?'#a84d4d':'#746d62';ctx.font='700 34px "Zen Maru Gothic", sans-serif';ctx.fillText(v.text,cx,cy+1)}else{
-ctx.fillStyle='#222';
-const shown=displayText(v);
-const fs=textFontSize(shown);
-ctx.font=`700 ${fs}px "Zen Maru Gothic", sans-serif`;
-drawMultiLine(ctx,shown,cx,cy+1,fs*1.05);
-}}return canvas}
-function downloadCanvas(canvas,filename){const a=document.createElement('a');a.download=filename;a.href=canvas.toDataURL('image/png');a.click()}
-document.getElementById('savePng').onclick=async()=>downloadCanvas(await makeCanvas(current),`yoga-calendar-2026-${String(current).padStart(2,'0')}.png`);
-document.getElementById('copyPng').onclick=async()=>{try{const canvas=await makeCanvas(current);canvas.toBlob(async blob=>{await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);alert('画像をコピーしました');});}catch(e){alert('この端末ではコピーできません。画像保存を使ってください。')}};
-document.getElementById('downloadAll').onclick=async()=>{for(const m of MONTHS){downloadCanvas(await makeCanvas(m),`yoga-calendar-2026-${String(m).padStart(2,'0')}.png`);await new Promise(r=>setTimeout(r,300));}};
-document.getElementById('clearMonth').onclick=()=>{if(confirm(`${current}月の入力を全部消しますか？`)){for(let d=1;d<=DAYS[current];d++)delete data[key(current,d)];save();render();}};
-document.getElementById('clearDay').onclick=()=>{delete data[key(current,selectedDay)];save();closeModal();render()};
-document.getElementById('closeModal').onclick=closeModal;document.getElementById('modalBg').onclick=e=>{if(e.target.id==='modalBg')closeModal()};
-document.getElementById('customSet').onclick=()=>{const t=document.getElementById('customText').value.trim();if(t)setVal('text',t)};
-document.getElementById('fileInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=ev=>{customImgs[current]=ev.target.result;saveImgs();render();};reader.readAsDataURL(f);};
-initQuick();render();
+document.getElementById('end').addEventListener('change',e=>{
+ endDate=new Date(e.target.value);
+});
+
+build();
+
 </script>
+
 </body>
 </html>
