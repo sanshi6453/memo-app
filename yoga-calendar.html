@@ -20,12 +20,17 @@
   --red:#d64b4b;
 }
 
+html{
+  scroll-behavior:auto;
+}
+
 body{
   margin:0;
-  padding:10px;
+  padding:0 10px 10px;
   background:var(--bg);
   font-family:'Zen Maru Gothic', sans-serif;
   color:var(--text);
+  overflow-anchor:none;
 }
 
 .wrap{
@@ -34,20 +39,103 @@ body{
 }
 
 .page-title{
-  margin:6px 0 14px;
+  margin:0 0 10px;
+  padding:12px 4px 0;
   text-align:center;
   font-size:28px;
   font-weight:900;
   color:#2a424c;
   letter-spacing:.03em;
+  line-height:1.25;
   text-shadow:0 1px 2px rgba(255,255,255,.7);
+}
+
+.page-desc{
+  margin:0 0 12px;
+  text-align:center;
+  font-size:14px;
+  line-height:1.7;
+  color:#5b6a70;
+  background:rgba(255,255,255,.62);
+  padding:10px 14px;
+  border-radius:14px;
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+}
+
+.lesson-control{
+  margin-top:8px;
+}
+
+.lesson-control label{
+  display:block;
+  font-size:13px;
+  font-weight:900;
+  margin-bottom:5px;
+}
+
+.lesson-control textarea{
+  min-height:86px;
+  line-height:1.45;
+  resize:vertical;
+}
+
+.calendar-head{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:10px;
+  align-items:start;
+  margin-bottom:8px;
+}
+
+.calendar-title-left{
+  text-align:left;
+  color:var(--text);
+  text-shadow:0 1px 2px rgba(255,255,255,.9);
+}
+
+.lesson-display{
+  justify-self:end;
+  max-width:560px;
+  text-align:left;
+  white-space:pre-line;
+  font-size:15px;
+  line-height:1.45;
+  font-weight:700;
+  color:#2a424c;
+  background:rgba(255,255,255,.52);
+  border-radius:13px;
+  padding:9px 12px;
+  backdrop-filter:blur(1.5px);
+  -webkit-backdrop-filter:blur(1.5px);
 }
 
 @media(max-width:600px){
   .page-title{
     font-size:20px;
     line-height:1.35;
-    margin-bottom:12px;
+    margin:0 0 8px;
+    padding-top:10px;
+  }
+
+  .page-desc{
+    font-size:12px;
+    line-height:1.55;
+    padding:8px 10px;
+    margin-bottom:10px;
+  }
+
+  .calendar-head{
+    grid-template-columns:1fr;
+    gap:6px;
+  }
+
+  .lesson-display{
+    justify-self:stretch;
+    max-width:none;
+    font-size:11px;
+    line-height:1.35;
+    padding:7px 9px;
   }
 }
 
@@ -341,6 +429,10 @@ td{
 
 <h1 class="page-title">Yoga flower予約状況カレンダー作成ツール</h1>
 
+<p class="page-desc">
+開始日と終了日を選んで「カレンダー作成」。各日付をタップして予約数・空/満・夜・メモを入力できます。入力後は「反映する」を押してください。最後に「画像保存」でLINE等に使えます。
+</p>
+
 <div class="top">
 
 <div class="row">
@@ -353,13 +445,24 @@ td{
 <button type="button" onclick="saveImage()">画像保存</button>
 </div>
 
+<div class="lesson-control">
+<label for="lessonText">右上に表示するレッスン時間</label>
+<textarea id="lessonText">毎週月曜日19:30〜20:45
+(オンラインと対面どちらも可能)
+毎週水曜日9:30〜10:45
+毎週金曜日9:30〜10:45</textarea>
+</div>
+
 </div>
 
 <div class="calendar-wrap" id="capture">
 
-<div class="head">
-<span class="year" id="year"></span>
-<span class="month" id="month"></span>
+<div class="calendar-head">
+  <div class="calendar-title-left">
+    <span class="year" id="year"></span>
+    <span class="month" id="month"></span>
+  </div>
+  <div class="lesson-display" id="lessonDisplay"></div>
 </div>
 
 <table>
@@ -506,7 +609,20 @@ function build(){
  }
 
  updateTitle();
+ updateLessonDisplay();
  renderAll();
+
+}
+
+function updateLessonDisplay(){
+
+ const input=document.getElementById('lessonText');
+ const display=document.getElementById('lessonDisplay');
+
+ if(input && display){
+   display.textContent=input.value;
+   localStorage.setItem('yogaLessonText', input.value);
+ }
 
 }
 
@@ -704,6 +820,15 @@ function fallbackDownload(canvas,fileName){
 document.getElementById('start').value='2026-05-15';
 document.getElementById('end').value='2026-06-30';
 
+const savedLessonText = localStorage.getItem('yogaLessonText');
+if(savedLessonText !== null){
+ document.getElementById('lessonText').value = savedLessonText;
+}
+
+document.getElementById('lessonText').addEventListener('input',()=>{
+ updateLessonDisplay();
+});
+
 document.getElementById('start').addEventListener('change',e=>{
  startDate=new Date(e.target.value);
 });
@@ -713,6 +838,14 @@ document.getElementById('end').addEventListener('change',e=>{
 });
 
 build();
+
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    window.scrollTo(0,0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, 50);
+});
 
 </script>
 
