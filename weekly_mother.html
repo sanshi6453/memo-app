@@ -189,6 +189,7 @@ select,input,textarea{
   line-height:1.5;
   font-size:15px;
   width:160px;
+  z-index:5;
 }
 
 .exercise label{
@@ -214,6 +215,7 @@ select,input,textarea{
   font-weight:700;
   color:#888;
   line-height:1.4;
+  z-index:8;
 }
 
 .water-row{
@@ -233,6 +235,9 @@ select,input,textarea{
   display:flex;
   align-items:flex-start;
   gap:6px;
+  position:relative;
+  z-index:30;
+  max-width:250px;
 }
 
 .schedule.gray{
@@ -262,16 +267,21 @@ select,input,textarea{
 
 .delete-btn{
   border:none;
-  background:none;
-  color:#999;
-  font-size:14px;
+  background:#fff;
+  color:#d00000;
+  font-size:15px;
+  font-weight:700;
   cursor:pointer;
   padding:0 4px;
-  line-height:1;
+  line-height:1.2;
+  min-width:22px;
+  position:relative;
+  z-index:999;
+  border-radius:4px;
 }
 
 .delete-btn:hover{
-  color:red;
+  background:#ffecec;
 }
 
 .input-area{
@@ -395,6 +405,10 @@ textarea{
     width:560px !important;
     height:1122px !important;
     background:#fff !important;
+  }
+
+  .schedule{
+    max-width:300px;
   }
 
   @page{
@@ -564,7 +578,7 @@ textarea{
 
 <script>
 
-const STORAGE_KEY = 'weekly_schedule_data_v9';
+const STORAGE_KEY = 'weekly_schedule_data_v10';
 
 const jpDays = ['月','火','水','木','金','土','日'];
 
@@ -918,7 +932,7 @@ function renderSchedules(){
 
         <button
           class="delete-btn"
-          onclick="deleteSchedule(${i},${index})"
+          onclick="event.stopPropagation(); deleteSchedule(${i},${index})"
           type="button">
 
           ✕
