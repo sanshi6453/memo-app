@@ -200,12 +200,12 @@ table{
   width:100%;
   border-collapse:collapse;
   table-layout:fixed;
-  border:1.5px solid rgba(64,76,80,.45);
+  border:2px solid var(--line);
   background:rgba(255,255,255,.05);
 }
 
 th,td{
-  border:1.5px solid var(--line);
+  border:2px solid var(--line);
 }
 
 th{
@@ -219,9 +219,6 @@ td{
   vertical-align:top;
 
   background:rgba(255,255,255,.28);
-
-  border-right:1.2px solid rgba(64,76,80,.45);
-  border-bottom:1.2px solid rgba(64,76,80,.45);
 
   backdrop-filter:blur(.8px);
   -webkit-backdrop-filter:blur(.8px);
@@ -257,6 +254,7 @@ td{
 
 .night i{
   font-size:11px;
+  color:#C9A227;
 }
 
 .circle{
@@ -272,7 +270,7 @@ td{
   align-items:center;
   justify-content:center;
   font-size:34px;
-  font-weight:900;
+  font-weight:400;
   line-height:1;
   padding-bottom:3px;
 }
@@ -437,7 +435,7 @@ td{
 <h1 class="page-title">Yoga flower予約状況カレンダー作成ツール</h1>
 
 <p class="page-desc">
-開始日と終了日を選んで「カレンダー作成」。各日付をタップして予約数・空/満・夜・メモを入力できます。入力後は「反映する」を押してください。最後に「画像保存」でLINE等に使えます。
+開始日と終了日を選んで「カレンダー作成」。<br>各日付をタップして予約数・空/満・夜・メモを入力できます。<br>入力後は「反映する」を押してください。<br>最後に「画像保存」でLINE等に使えます。
 </p>
 
 <div class="top">
