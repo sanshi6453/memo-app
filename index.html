@@ -803,7 +803,7 @@ button.action{
 
 <div class="topbar">
   <div class="header-card" id="headerCard">
-    <h1>出勤・退勤LINE用(自分用)</h1>
+    <h1>出勤・退勤LINE用(自分用) REV62</h1>
     <p class="sub">出勤・退勤LINE送信用の自分用簡易コピペツール。入力内容はそれぞれ自動保存。</p>
 
     <div class="menu" id="homeMenu">
@@ -2442,9 +2442,9 @@ function normalizeClosing(value){
 }
 
 function formatClosingDisplay(value){
-  const normalized = normalizeClosing(value);
-  if(!normalized) return "";
-  return normalized.replace(/-/g,"/");
+  const d = otDateObj(value);
+  if(!d) return "";
+  return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
 }
 
 function getAllClosingDates(){
