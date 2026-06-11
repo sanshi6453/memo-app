@@ -2275,14 +2275,29 @@ async function loadOvertimeData(){
   }
 }
 
-async function postOvertimeData(payload){
-  await fetch(OVERTIME_GAS_URL, {
+async async function postOvertimeData(payload){
+  const res = await fetch(OVERTIME_GAS_URL, {
     method: "POST",
-        headers: {
+    headers: {
       "Content-Type": "text/plain;charset=utf-8"
     },
     body: JSON.stringify(payload)
   });
+
+  const text = await res.text();
+
+  let result;
+  try{
+    result = JSON.parse(text);
+  }catch(e){
+    throw new Error("GASの返答を読み取れません: " + text);
+  }
+
+  if(!result.success){
+    throw new Error(result.error || "保存に失敗しました");
+  }
+
+  return result;
 }
 
 function renderOvertime(){
@@ -2315,7 +2330,7 @@ function renderFurikae(){
 
   el.innerHTML = data.map(v => {
     const closing = v.closing || calcClosingDate(v.workDate);
-    return `振出：${jpDate(v.workDate)}<br><span class="ot-note-red">振休：${v.restDate ? jpDate(v.restDate) : "未登録"}</span>${!v.restDate ? `<br><button type="button" onclick="toggleRestEditor('${v.workDate}', this)" style="margin-top:8px;padding:8px 12px;border:none;border-radius:8px;background:#d93025;color:#fff;font-weight:bold;cursor:pointer;">振休登録</button><div class="rest-editor"></div>` : ""}<br><span style="font-size:13px;color:#6b7280;">締め日：${formatClosingDisplay(closing)}</span>`;
+    return `振出：${jpDate(v.workDate)}<br><span class="ot-note-red">振休：${v.restDate ? jpDate(v.restDate) : "未登録"}</span>${!v.restDate ? `<br><button type="button" onclick="openRestDayEditor('${normalizeClosing(v.workDate)}', this)" style="margin-top:8px;padding:8px 12px;border:none;border-radius:8px;background:#d93025;color:#fff;font-weight:bold;cursor:pointer;">振休登録</button><div class="rest-editor"></div>` : ""}<br><span style="font-size:13px;color:#6b7280;">締め日：${formatClosingDisplay(closing)}</span>`;
   }).join("<br><br>");
 }
 
@@ -2539,47 +2554,50 @@ function clearFurikae(){
 }
 
 
-
-function toggleRestEditor(workDate, btn){
+async function openRestDayEditor(workDate, btn){
   const box = btn.nextElementSibling;
+
   if(box.innerHTML.trim()){
     box.innerHTML = "";
     return;
   }
 
+  const safeId = "rest_" + String(workDate).replace(/[^0-9A-Za-z_-]/g, "_");
+
   box.innerHTML = `
-    <div style="margin-top:8px;padding:10px;border:1px solid #ddd;border-radius:8px;background:#fff;">
+    <div style="margin-top:8px;padding:10px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#2a424c;">
       <div style="margin-bottom:6px;font-weight:bold;">振休日</div>
-      <input type="date" id="rest_${workDate}" style="padding:8px;">
-      <button type="button" onclick="saveRestDay('${workDate}')" style="margin-left:8px;padding:8px 12px;background:#2a424c;color:#fff;border:none;border-radius:8px;">保存</button>
+      <input type="date" id="${safeId}" style="padding:8px;border:1px solid #ccc;border-radius:8px;">
+      <button type="button" onclick="saveRestDay('${workDate}', '${safeId}')" style="margin-left:8px;padding:8px 12px;background:#2a424c;color:#fff;border:none;border-radius:8px;font-weight:bold;">保存</button>
     </div>
   `;
 }
 
-async function saveRestDay(workDate){
-  const el = document.getElementById('rest_' + workDate);
-  const restDate = el ? el.value : '';
+async function saveRestDay(workDate, inputId){
+  const el = document.getElementById(inputId);
+  const restDate = el ? el.value : "";
 
   if(!restDate){
-    alert('振休日を選択してください');
+    alert("振休日を選択してください");
     return;
   }
 
   try{
     await postOvertimeData({
-      type:'updateFurikae',
-      workDate:workDate,
-      restDate:restDate
+      type: "updateFurikae",
+      workDate: workDate,
+      restDate: restDate
     });
 
-    otSetStatus('振休日を登録しました。');
-    loadOvertimeData();
+    otSetStatus("振休日を登録しました。");
+    await loadOvertimeData();
 
   }catch(err){
-    otSetStatus('振休日の登録に失敗しました。', true);
+    otSetStatus("振休日の登録に失敗しました: " + err.message, true);
+    alert("振休日の登録に失敗しました。
+" + err.message);
   }
 }
-
 
 setTimeout(()=>{
   loadOvertimeData();
