@@ -2327,7 +2327,7 @@ function makeSummaryBlock(title, closing, className){
 
   return `
     <div class="ot-block ${className}">
-      <div class="ot-block-title">${title}（${closing}締）</div>
+      <div class="ot-block-title">${title}（${formatClosingDisplay(closing)}締）</div>
       <div class="ot-line"><strong>残業</strong></div>
       ${overtimeHtml}
       <div class="ot-total">合計：${otMinuteLabel(total)}</div>
@@ -2345,6 +2345,18 @@ function renderApplySummary(){
   el.innerHTML =
     makeSummaryBlock("今月申請対象", current, "current") +
     makeSummaryBlock("次回申請対象", next, "next");
+}
+
+
+function formatClosingDisplay(value){
+  const d = new Date(value);
+  if(!isNaN(d.getTime())){
+    const y=d.getFullYear();
+    const m=String(d.getMonth()+1).padStart(2,'0');
+    const day=String(d.getDate()).padStart(2,'0');
+    return `${y}/${m}/${day}`;
+  }
+  return String(value).replace(/-/g,'/');
 }
 
 function getAllClosingDates(){
@@ -2366,7 +2378,7 @@ function renderHistoryMonthOptions(){
     return;
   }
 
-  select.innerHTML = closings.map(c => `<option value="${c}">${c}締</option>`).join("");
+  select.innerHTML = closings.map(c => `<option value="${c}">${formatClosingDisplay(c)}締</option>`).join("");
   if(currentValue && closings.includes(currentValue)) select.value = currentValue;
 }
 
