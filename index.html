@@ -777,6 +777,25 @@ button.action{
   font-weight:bold;
 }
 
+.ot-warning-box{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid #f3b7b7;
+  background:#fff1f1;
+  color:#d93025;
+  font-weight:bold;
+  line-height:1.8;
+}
+.ot-warning-title{
+  font-size:15px;
+  margin-bottom:4px;
+}
+.ot-warning-line{
+  font-size:14px;
+}
+
+
 </style>
 <link rel="icon" href="https://img.icons8.com/?size=100&id=fpAVFn3MN108&format=png&color=000000">
 </head>
@@ -2231,7 +2250,7 @@ function normalizeFurikaeRows(raw){
   return raw.slice(1).filter(row => row && row.length >= 4 && row[1]).map(row => ({
     registeredAt: row[0],
     workDate: row[1],
-    restDate: row[2],
+    restDate: row[2] || "",
     closing: normalizeClosing(row[3])
   }));
 }
@@ -2296,7 +2315,7 @@ function renderFurikae(){
 
   el.innerHTML = data.map(v => {
     const closing = v.closing || calcClosingDate(v.workDate);
-    return `振出：${jpDate(v.workDate)}<br><span class="ot-note-red">振休：${jpDate(v.restDate)}</span><br><span style="font-size:13px;color:#6b7280;">締め日：${formatClosingDisplay(closing)}</span>`;
+    return `振出：${jpDate(v.workDate)}<br><span class="ot-note-red">振休：${v.restDate ? jpDate(v.restDate) : "未登録"}</span><br><span style="font-size:13px;color:#6b7280;">締め日：${formatClosingDisplay(closing)}</span>`;
   }).join("<br><br>");
 }
 
@@ -2314,6 +2333,31 @@ function furikaeLinesByClosing(closing){
     .sort((a,b)=> otDateObj(a.workDate) - otDateObj(b.workDate));
 }
 
+
+function unregisteredFurikaeLinesByClosing(closing){
+  const target = normalizeClosing(closing);
+  return furikaeRows
+    .filter(v => normalizeClosing(v.closing || calcClosingDate(v.workDate)) === target)
+    .filter(v => !v.restDate)
+    .sort((a,b)=> otDateObj(a.workDate) - otDateObj(b.workDate));
+}
+
+function makeUnregisteredFurikaeWarning(closing){
+  const rows = unregisteredFurikaeLinesByClosing(closing);
+  if(!rows.length) return "";
+
+  const lines = rows.map(v => {
+    return `<div class="ot-warning-line">・振出：${jpDate(v.workDate)}</div>`;
+  }).join("");
+
+  return `
+      <div class="ot-warning-box">
+        <div class="ot-warning-title">⚠ 振休未登録：${rows.length}件</div>
+        ${lines}
+      </div>
+  `;
+}
+
 function makeSummaryBlock(title, closing, className){
   const overtime = overtimeLinesByClosing(closing);
   const furikae = furikaeLinesByClosing(closing);
@@ -2324,7 +2368,7 @@ function makeSummaryBlock(title, closing, className){
     : `<div class="ot-line">残業なし</div>`;
 
   const furikaeHtml = furikae.length
-    ? furikae.map(v => `<div class="ot-line">・${otShortMd(otDateObj(v.workDate))} → ${otShortMd(otDateObj(v.restDate))}</div>`).join("")
+    ? furikae.map(v => `<div class="ot-line">・${otShortMd(otDateObj(v.workDate))} → ${v.restDate ? otShortMd(otDateObj(v.restDate)) : "<span class=\"ot-note-red\">未登録</span>"}</div>`).join("")
     : `<div class="ot-line">振出・振休なし</div>`;
 
   return `
@@ -2335,6 +2379,7 @@ function makeSummaryBlock(title, closing, className){
       <div class="ot-total">合計：${otMinuteLabel(total)}</div>
       <div class="ot-line" style="margin-top:10px;"><strong>振出・振休</strong></div>
       ${furikaeHtml}
+      ${makeUnregisteredFurikaeWarning(closing)}
     </div>
   `;
 }
@@ -2455,8 +2500,8 @@ async function addFurikae(){
   const work = document.getElementById("furi_work").value;
   const rest = document.getElementById("furi_rest").value;
 
-  if(!work || !rest){
-    otSetStatus("振出日と振休日を入力してください。", true);
+  if(!work){
+    otSetStatus("振出日を入力してください。", true);
     return;
   }
 
