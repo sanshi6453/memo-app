@@ -2038,6 +2038,7 @@ function deliveryAddManual(){
 
   setDeliveryManualData(data);
   renderDeliveryManualList();
+  todoLoad();
   renderDeliveryResult({status:"in", store, municipality, area, zip});
 }
 
