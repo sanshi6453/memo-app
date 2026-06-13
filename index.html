@@ -803,7 +803,7 @@ button.action{
 
 <div class="topbar">
   <div class="header-card" id="headerCard">
-    <h1>出勤・退勤LINE用(自分用) REV62</h1>
+    <h1>出勤・退勤LINE用(自分用)</h1>
     <p class="sub">出勤・退勤LINE送信用の自分用簡易コピペツール。入力内容はそれぞれ自動保存。</p>
 
     <div class="menu" id="homeMenu">
@@ -1706,6 +1706,181 @@ function resetDocSheet(sheetName, resultId){
   const result = document.getElementById(resultId);
   result.className = "doccheck-result";
   result.textContent = "";
+}
+
+
+/* To Do */
+const TODO_STORAGE_KEY = "watashi_todo_v1";
+let todoItems = [];
+let todoDragFromIndex = null;
+
+function todoById(id){ return document.getElementById(id); }
+
+function todoSetStatus(msg){
+  const el = todoById("todo_status");
+  if(el) el.textContent = msg;
+}
+
+function todoSave(){
+  localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(todoItems));
+}
+
+function todoLoad(){
+  try{
+    const data = JSON.parse(localStorage.getItem(TODO_STORAGE_KEY) || "[]");
+    todoItems = Array.isArray(data) ? data : [];
+  }catch(e){
+    todoItems = [];
+  }
+  todoRender();
+}
+
+function todoRender(){
+  const box = todoById("todo_output");
+  if(!box) return;
+
+  box.innerHTML = "";
+
+  if(todoItems.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "todo-empty";
+    empty.textContent = "ここにTo Doが表示されます。";
+    box.appendChild(empty);
+    return;
+  }
+
+  todoItems.forEach((item, index) => {
+    const row = document.createElement("div");
+    row.className = "todo-item" + (item.done ? " done" : "");
+    row.draggable = true;
+    row.dataset.index = String(index);
+
+    row.addEventListener("dragstart", (e) => {
+      todoDragFromIndex = index;
+      row.classList.add("dragging");
+      if(e.dataTransfer){
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", String(index));
+      }
+    });
+
+    row.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      row.classList.add("drag-over");
+      if(e.dataTransfer) e.dataTransfer.dropEffect = "move";
+    });
+
+    row.addEventListener("dragleave", () => {
+      row.classList.remove("drag-over");
+    });
+
+    row.addEventListener("drop", (e) => {
+      e.preventDefault();
+      row.classList.remove("drag-over");
+
+      const fromIndex = todoDragFromIndex;
+      const toIndex = index;
+
+      if(fromIndex === null || fromIndex === toIndex) return;
+
+      const moved = todoItems.splice(fromIndex, 1)[0];
+      todoItems.splice(toIndex, 0, moved);
+
+      todoDragFromIndex = null;
+      todoSave();
+      todoRender();
+      todoSetStatus("順番を変更しました。");
+    });
+
+    row.addEventListener("dragend", () => {
+      todoDragFromIndex = null;
+      document.querySelectorAll(".todo-item").forEach(el => {
+        el.classList.remove("dragging");
+        el.classList.remove("drag-over");
+      });
+    });
+
+    const handle = document.createElement("span");
+    handle.className = "todo-drag-handle";
+    handle.textContent = "☰";
+    handle.title = "ドラッグで並べ替え";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = !!item.done;
+    checkbox.addEventListener("change", () => {
+      todoItems[index].done = checkbox.checked;
+      todoSave();
+      todoRender();
+    });
+
+    const text = document.createElement("span");
+    text.className = "todo-text";
+    text.textContent = item.text || "";
+
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "todo-delete-btn";
+    del.textContent = "削除";
+    del.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      todoItems.splice(index, 1);
+      todoSave();
+      todoRender();
+      todoSetStatus("削除しました。");
+    });
+
+    row.appendChild(handle);
+    row.appendChild(checkbox);
+    row.appendChild(text);
+    row.appendChild(del);
+    box.appendChild(row);
+  });
+}
+
+function todoAdd(){
+  const input = todoById("todo_text");
+  if(!input) return;
+
+  const lines = input.value.split(/\r?\n/).map(v => v.trim()).filter(Boolean);
+
+  if(lines.length === 0){
+    todoSetStatus("入力してください。");
+    return;
+  }
+
+  lines.forEach(line => {
+    todoItems.push({
+      text: line,
+      done: false
+    });
+  });
+
+  input.value = "";
+  todoSave();
+  todoRender();
+  todoSetStatus("追加しました。");
+}
+
+function todoClearDone(){
+  const before = todoItems.length;
+  todoItems = todoItems.filter(item => !item.done);
+  todoSave();
+  todoRender();
+  todoSetStatus(before === todoItems.length ? "チェック済みの項目はありません。" : "チェック済みを削除しました。");
+}
+
+function todoClearAll(){
+  if(todoItems.length === 0){
+    todoSetStatus("削除する項目はありません。");
+    return;
+  }
+
+  todoItems = [];
+  localStorage.removeItem(TODO_STORAGE_KEY);
+  todoRender();
+  todoSetStatus("すべて削除しました。");
 }
 
 
