@@ -893,7 +893,8 @@ function renderSchedules(){
 
   for(let i=0;i<7;i++){
 
-    document.getElementById(`am-${i}`).innerHTML = '';
+    document.getElementById(`am-${i}`).innerHTML =
+      '<div class="schedule"><div class="schedule-text">□💊 朝の薬を飲む</div></div>';
 
     document.getElementById(`pm-${i}`).innerHTML = '';
 
