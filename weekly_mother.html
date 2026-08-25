@@ -164,8 +164,8 @@ button{
 
 .paper-check{
   display:inline-block;
-  width:10px;
-  height:10px;
+  width:13px;
+  height:13px;
   border:1.5px solid #59686e;
   background:#fff;
 }
@@ -455,7 +455,7 @@ button{
 }
 
 .daily-water{
-  height:17px;
+  height:19px;
   padding:2px 7px 1px;
   border-top:1px solid var(--soft-line);
   display:flex;
@@ -472,13 +472,13 @@ button{
 
 .daily-water .water-checks{
   margin:0;
-  gap:2px;
+  gap:1px;
 }
 
 .daily-water .paper-check{
-  width:9px;
-  height:9px;
-  border-width:1px;
+  width:13px;
+  height:13px;
+  border-width:1.5px;
 }
 
 .editor{
@@ -858,7 +858,7 @@ button{
 const STORAGE_KEY = 'weekly_schedule_data_v10';
 const jpDays = ['月','火','水','木','金','土','日'];
 const templates = [
-  {key:'rieko-work',label:'リエコはバイト',icon:'fa-solid fa-briefcase',color:'work',kind:'work'},
+  {key:'rieko-work',label:'リエコバイト',icon:'fa-solid fa-briefcase',color:'work',kind:'work'},
   {key:'rieko-dentist',label:'リエコ歯医者',icon:'fa-solid fa-hospital',color:'gray'},
   {key:'rieko-diabetes',label:'リエコ糖尿病',icon:'fa-solid fa-hospital',color:'gray'},
   {key:'karaoke',label:'カラオケ',icon:'fa-solid fa-microphone',color:'black'},
@@ -1234,7 +1234,7 @@ function renderSchedules(){
       scheduleColumn.classList.add('has-work');
       const badge = document.createElement('div');
       badge.className = 'work-badge';
-      badge.innerHTML = '<i class="fa-solid fa-briefcase"></i><span>リエコはバイト</span>';
+      badge.innerHTML = '<i class="fa-solid fa-briefcase"></i><span>リエコバイト</span>';
       badge.addEventListener('click',function(){
         editSchedule(day,workIndex);
       });
