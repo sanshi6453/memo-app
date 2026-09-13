@@ -190,7 +190,7 @@ button{
 
 .day-row{
   width:744px;
-  height:150px;
+  height:149px;
   display:grid;
   grid-template-columns:90px 652px;
   border-right:1px solid var(--line);
@@ -364,12 +364,14 @@ button{
 }
 
 .routine-column{
+  position:relative;
   min-width:0;
   overflow:hidden;
   background:#fff;
 }
 
 .medicine-group{
+  position:relative;
   padding:3px 7px 2px;
   background:var(--medicine);
 }
@@ -382,6 +384,37 @@ button{
   color:#5d4930;
   font-size:11.5px;
   font-weight:700;
+}
+
+.routine-date{
+  position:absolute;
+  z-index:5;
+  top:2px;
+  right:6px;
+  padding:0 !important;
+  border:none !important;
+  border-radius:0 !important;
+  outline:none !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  color:#26363d;
+  font-size:11px;
+  font-weight:700;
+  line-height:1.05;
+  text-align:center;
+  white-space:nowrap;
+}
+
+.routine-date span{
+  display:block;
+}
+
+.routine-date.sat{
+  color:#245d83;
+}
+
+.routine-date.sun{
+  color:#a22b3a;
 }
 
 .medicine-line{
@@ -1055,7 +1088,7 @@ function generateWeek(){
       '<div class="period pm"><span class="period-label">午後</span><div id="pm-' + i + '"></div></div>';
 
     dayBody.appendChild(scheduleColumn);
-    dayBody.appendChild(createRoutineColumn());
+    dayBody.appendChild(createRoutineColumn(date,i));
     row.appendChild(dateCol);
     row.appendChild(dayBody);
     week.appendChild(row);
@@ -1064,12 +1097,14 @@ function generateWeek(){
   renderSchedules();
 }
 
-function createRoutineColumn(){
+function createRoutineColumn(date,dayIndex){
   const routine = document.createElement('div');
   routine.className = 'routine-column';
+  const dateClass = dayIndex === 5 ? ' sat' : (dayIndex === 6 ? ' sun' : '');
   routine.innerHTML =
     '<div class="medicine-group">' +
       '<div class="routine-title"><i class="fa-solid fa-kit-medical"></i>お薬</div>' +
+      '<div class="routine-date' + dateClass + '"><span>' + formatDate(date) + '</span><span>(' + jpDays[dayIndex] + ')</span></div>' +
       '<label class="medicine-line"><input type="checkbox"><i class="fa-solid fa-leaf herbal"></i><span>朝の漢方薬（食前）</span></label>' +
       '<label class="medicine-line"><input type="checkbox"><i class="fa-solid fa-pills regular"></i><span>朝の薬（食後）</span></label>' +
       '<label class="medicine-line"><input type="checkbox"><i class="fa-solid fa-leaf herbal"></i><span>昼の漢方薬（食前）</span></label>' +
