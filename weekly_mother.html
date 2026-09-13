@@ -579,7 +579,7 @@ button{
   font-weight:700;
 }
 
-.time-input,
+.time-part-input,
 .manual-text{
   width:100%;
   border:2px solid #b7c4c9;
@@ -588,12 +588,27 @@ button{
   color:var(--ink);
 }
 
-.time-input{
+.time-parts{
+  display:grid;
+  grid-template-columns:92px 18px 92px;
+  align-items:center;
+  gap:5px;
+}
+
+.time-part-input{
   height:48px;
   padding:8px 12px;
+  text-align:center;
   font-size:20px;
   font-weight:700;
   font-variant-numeric:tabular-nums;
+}
+
+.time-separator{
+  color:var(--deep);
+  font-size:25px;
+  font-weight:700;
+  text-align:center;
 }
 
 .manual-text{
@@ -824,9 +839,15 @@ button{
 
   <div class="form-section entry-grid">
     <div>
-      <label class="field-label" for="timeInput">時間（手入力）</label>
-      <input class="time-input" id="timeInput" type="text" inputmode="numeric" autocomplete="off" placeholder="例：9:30">
-      <div class="field-help">時間が決まっていない予定は空欄で構いません。</div>
+      <div class="field-label">時間</div>
+      <div class="time-parts">
+        <input class="time-part-input" id="hourInput" type="text" inputmode="numeric" autocomplete="off" maxlength="2" list="hourOptions" placeholder="時" aria-label="時">
+        <span class="time-separator">：</span>
+        <input class="time-part-input" id="minuteInput" type="text" inputmode="numeric" autocomplete="off" maxlength="2" list="minuteOptions" placeholder="分" aria-label="分">
+      </div>
+      <datalist id="hourOptions"></datalist>
+      <datalist id="minuteOptions"></datalist>
+      <div class="field-help">候補から選ぶか、時・分に数字だけを入力します。時間なしは両方空欄にします。</div>
 
       <div class="form-section" style="margin-top:16px;margin-bottom:0;">
         <div class="field-label">表示する時間帯</div>
@@ -890,6 +911,25 @@ function fillWaterChecks(){
   });
 }
 
+function buildTimeLists(){
+  const hourList = document.getElementById('hourOptions');
+  const minuteList = document.getElementById('minuteOptions');
+  hourList.innerHTML = '';
+  minuteList.innerHTML = '';
+
+  for(let hour=0;hour<=23;hour++){
+    const option = document.createElement('option');
+    option.value = String(hour).padStart(2,'0');
+    hourList.appendChild(option);
+  }
+
+  for(let minute=0;minute<=55;minute+=5){
+    const option = document.createElement('option');
+    option.value = String(minute).padStart(2,'0');
+    minuteList.appendChild(option);
+  }
+}
+
 function renderTemplateButtons(){
   const grid = document.getElementById('templateGrid');
   grid.innerHTML = '';
@@ -916,10 +956,12 @@ function selectTemplate(key,forceSelect){
   });
   const selected = getTemplate(selectedTemplateKey);
   const isWork = selected && selected.kind === 'work';
-  document.getElementById('timeInput').disabled = Boolean(isWork);
+  document.getElementById('hourInput').disabled = Boolean(isWork);
+  document.getElementById('minuteInput').disabled = Boolean(isWork);
   document.getElementById('important').disabled = Boolean(isWork);
   if(isWork){
-    document.getElementById('timeInput').value = '';
+    document.getElementById('hourInput').value = '';
+    document.getElementById('minuteInput').value = '';
     document.getElementById('important').checked = false;
   }
 }
@@ -1077,6 +1119,43 @@ function normalizeTime(value){
   return String(hour).padStart(2,'0') + ':' + String(minute).padStart(2,'0');
 }
 
+function getEnteredTime(){
+  let hour = normalizeDigits(document.getElementById('hourInput').value.trim());
+  let minute = normalizeDigits(document.getElementById('minuteInput').value.trim());
+
+  if(!hour && !minute){
+    return '';
+  }
+  if(!hour || !/^\d{1,2}$/.test(hour)){
+    return null;
+  }
+  if(!minute){
+    minute = '0';
+  }
+  if(!/^\d{1,2}$/.test(minute)){
+    return null;
+  }
+
+  const hourNumber = Number(hour);
+  const minuteNumber = Number(minute);
+  if(hourNumber < 0 || hourNumber > 23 || minuteNumber < 0 || minuteNumber > 59){
+    return null;
+  }
+  return String(hourNumber).padStart(2,'0') + ':' + String(minuteNumber).padStart(2,'0');
+}
+
+function setTimeInputs(time){
+  const normalized = normalizeTime(time || '');
+  if(!normalized){
+    document.getElementById('hourInput').value = '';
+    document.getElementById('minuteInput').value = '';
+    return;
+  }
+  const parts = normalized.split(':');
+  document.getElementById('hourInput').value = parts[0];
+  document.getElementById('minuteInput').value = parts[1];
+}
+
 function timeToMinutes(time){
   const normalized = normalizeTime(time || '');
   if(!normalized){
@@ -1119,11 +1198,11 @@ function saveSchedule(){
   const day = getSelectedDay();
   const template = getTemplate(selectedTemplateKey);
   const manualText = document.getElementById('manualText').value.trim();
-  const time = normalizeTime(document.getElementById('timeInput').value);
+  const time = getEnteredTime();
 
   if(time === null){
-    showError('時間は「9:30」のように入力してください。時間なしの場合は空欄にします。');
-    document.getElementById('timeInput').focus();
+    showError('「時」は0～23、「分」は0～59の数字で入力してください。');
+    document.getElementById('hourInput').focus();
     return;
   }
   if(!template && !manualText){
@@ -1314,7 +1393,7 @@ function editSchedule(day,index){
   editingIndex = index;
   setSelectedDay(day);
   setSelectedPeriod(getItemPeriod(item));
-  document.getElementById('timeInput').value = item.time || '';
+  setTimeInputs(item.time || '');
   document.getElementById('manualText').value =
     item.freeText !== undefined
       ? item.freeText
@@ -1336,8 +1415,10 @@ function resetForm(){
   editingIndex = null;
   selectedTemplateKey = '';
   document.getElementById('manualText').value = '';
-  document.getElementById('timeInput').value = '';
-  document.getElementById('timeInput').disabled = false;
+  document.getElementById('hourInput').value = '';
+  document.getElementById('minuteInput').value = '';
+  document.getElementById('hourInput').disabled = false;
+  document.getElementById('minuteInput').disabled = false;
   document.getElementById('important').checked = false;
   document.getElementById('important').disabled = false;
   document.getElementById('editingNotice').style.display = 'none';
@@ -1371,14 +1452,22 @@ function clearSchedules(){
   resetForm();
 }
 
-document.getElementById('timeInput').addEventListener('blur',function(){
-  const normalized = normalizeTime(this.value);
-  if(normalized){
-    this.value = normalized;
-    setSelectedPeriod(Number(normalized.split(':')[0]) < 12 ? 'am' : 'pm');
+document.getElementById('hourInput').addEventListener('blur',function(){
+  const value = normalizeDigits(this.value.trim());
+  if(/^\d{1,2}$/.test(value) && Number(value) <= 23){
+    this.value = String(Number(value)).padStart(2,'0');
+    setSelectedPeriod(Number(value) < 12 ? 'am' : 'pm');
   }
 });
 
+document.getElementById('minuteInput').addEventListener('blur',function(){
+  const value = normalizeDigits(this.value.trim());
+  if(/^\d{1,2}$/.test(value) && Number(value) <= 59){
+    this.value = String(Number(value)).padStart(2,'0');
+  }
+});
+
+buildTimeLists();
 renderTemplateButtons();
 loadSchedules();
 sortAllSchedules();
