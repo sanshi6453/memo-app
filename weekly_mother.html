@@ -190,7 +190,7 @@ button{
 
 .day-row{
   width:744px;
-  height:149px;
+  height:144px;
   display:grid;
   grid-template-columns:90px 652px;
   border-right:1px solid var(--line);
@@ -377,7 +377,7 @@ button{
 }
 
 .routine-title{
-  height:13px;
+  height:12px;
   display:flex;
   align-items:center;
   gap:5px;
@@ -398,7 +398,7 @@ button{
   background:transparent !important;
   box-shadow:none !important;
   color:#26363d;
-  font-size:11px;
+  font-size:14px;
   font-weight:700;
   line-height:1.05;
   text-align:center;
@@ -407,6 +407,10 @@ button{
 
 .routine-date span{
   display:block;
+}
+
+.routine-date span:first-child{
+  font-size:15px;
 }
 
 .routine-date.sat{
@@ -418,7 +422,7 @@ button{
 }
 
 .medicine-line{
-  height:15.5px;
+  height:15px;
   display:grid;
   grid-template-columns:15px 16px 1fr;
   align-items:center;
@@ -467,7 +471,7 @@ button{
 }
 
 .exercise-line{
-  height:15px;
+  height:14.5px;
   display:grid;
   grid-template-columns:15px 14px 1fr;
   align-items:center;
@@ -488,7 +492,7 @@ button{
 }
 
 .daily-water{
-  height:19px;
+  height:18px;
   padding:2px 7px 1px;
   border-top:1px solid var(--soft-line);
   display:flex;
@@ -795,6 +799,18 @@ button{
   .sheet{
     width:744px !important;
     height:1122px !important;
+  }
+
+  .sheet-header{
+    height:19mm !important;
+  }
+
+  .week{
+    height:266mm !important;
+  }
+
+  .day-row{
+    height:38mm !important;
   }
 
   .schedule-entry{
