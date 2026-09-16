@@ -795,6 +795,77 @@ button.action{
   font-size:14px;
 }
 
+/* 自動車使用距離（15日締め） */
+.car-current{
+  margin-top:12px;
+  padding:16px;
+  border-radius:14px;
+  background:#eef7ff;
+  border:2px solid #9dc7e8;
+}
+.car-current-label{
+  color:#4b6475;
+  font-size:14px;
+  font-weight:bold;
+}
+.car-current-odo{
+  margin-top:4px;
+  color:#16384f;
+  font-size:30px;
+  line-height:1.25;
+  font-weight:800;
+}
+.car-current-odo small{
+  font-size:16px;
+}
+.car-period-total{
+  margin-top:10px;
+  font-size:17px;
+  font-weight:bold;
+  color:#2a424c;
+}
+.car-period-range{
+  margin-top:4px;
+  color:#6b7280;
+  font-size:13px;
+}
+.car-actual-row{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid #c8dce9;
+  font-size:15px;
+  line-height:1.7;
+}
+.car-difference.ok{
+  color:#176b3a;
+  font-weight:bold;
+}
+.car-difference.over{
+  color:#d93025;
+  font-weight:bold;
+}
+.car-entry{
+  padding:10px 0;
+  border-bottom:1px solid #e5e7eb;
+  line-height:1.7;
+}
+.car-entry:last-child{
+  border-bottom:0;
+}
+.car-entry-odo{
+  color:#4b6475;
+  font-size:13px;
+}
+.car-initial-note{
+  margin:0 0 12px;
+  padding:10px 12px;
+  border-radius:10px;
+  background:#fff8d6;
+  color:#5d4a00;
+  font-size:13px;
+  line-height:1.6;
+}
+
 
 </style>
 <link rel="icon" href="https://img.icons8.com/?size=100&id=fpAVFn3MN108&format=png&color=000000">
@@ -803,7 +874,7 @@ button.action{
 
 <div class="topbar">
   <div class="header-card" id="headerCard">
-    <h1>出勤・退勤LINE用(自分用)</h1>
+    <h1>出勤・退勤LINE用(自分用) REV62</h1>
     <p class="sub">出勤・退勤LINE送信用の自分用簡易コピペツール。入力内容はそれぞれ自動保存。</p>
 
     <div class="menu" id="homeMenu">
@@ -853,6 +924,14 @@ button.action{
     <div class="delivery-title">残業・振休出メモ</div>
     <p class="delivery-sub">残業メモと振出・振休メモを別々に保存できます。</p>
     <button class="delivery-open-btn" type="button" onclick="showPage('overtimePage')" style="background:#2a424c;color:#fff;">残業・振休出メモ</button>
+  </div>
+</div>
+
+<div class="shell" id="carDistanceShell">
+  <div class="delivery-card">
+    <div class="delivery-title">自動車使用距離</div>
+    <p class="delivery-sub">申請した距離をODDメーターへ加算し、15日締めの合計を確認できます。</p>
+    <button class="delivery-open-btn" type="button" onclick="showPage('carDistancePage'); loadCarData();" style="background:#356b8c;color:#fff;">自動車使用距離を開く</button>
   </div>
 </div>
 
@@ -1257,6 +1336,64 @@ button.action{
   </div>
 </div>
 
+<div class="page-card page" id="carDistancePage">
+  <div class="back-row">
+    <button class="back-btn" type="button" onclick="showHome()">← トップに戻る</button>
+  </div>
+
+  <h2 class="page-title">自動車使用距離</h2>
+
+  <div class="ot-summary-card">
+    <div class="ot-summary-title">現在の集計</div>
+    <div class="ot-summary-sub">毎月16日から翌月15日までを1期間として自動集計します。</div>
+    <div id="car_summary">読み込み中です。</div>
+    <div class="delivery-grid" style="margin-top:16px;">
+      <label class="delivery-label">現在の実数ODD</label>
+      <input type="number" inputmode="decimal" min="0" step="0.1" class="delivery-input" id="car_actual_odo" placeholder="メーターの実数値">
+    </div>
+    <div class="buttons">
+      <button class="action primary" type="button" id="car_actual_save_btn" onclick="saveCarActualOdo()">実数ODDを更新</button>
+      <button class="action secondary" type="button" onclick="loadCarData()">再読込</button>
+    </div>
+    <div id="car_status" class="ot-status"></div>
+  </div>
+
+  <div class="card">
+    <h3>距離を追加</h3>
+    <div id="car_initial_box">
+      <p class="car-initial-note">最初の1回だけ、現在の実数ODDを入力してください。以後は申請距離を自動で加算します。</p>
+      <div class="delivery-grid">
+        <label class="delivery-label">最初の実数ODD</label>
+        <input type="number" inputmode="decimal" min="0" step="0.1" class="delivery-input" id="car_initial_odo" placeholder="例：23540">
+      </div>
+    </div>
+
+    <div class="delivery-grid">
+      <label class="delivery-label">申請日</label>
+      <input type="date" class="delivery-input" id="car_date">
+
+      <label class="delivery-label">申請距離（調整分込み）</label>
+      <input type="number" inputmode="decimal" min="0.1" step="0.1" class="delivery-input" id="car_distance" placeholder="例：18.5">
+    </div>
+
+    <div class="buttons">
+      <button class="action primary" type="button" id="car_save_btn" onclick="addCarDistance()">距離を保存して加算</button>
+      <button class="action ghost" type="button" onclick="clearCarInput()">入力をクリア</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px;">
+    <h3>今回の申請明細</h3>
+    <div id="car_current_list" class="output" style="min-height:100px;"></div>
+  </div>
+
+  <div class="card" style="margin-top:20px;">
+    <h3>15日締め履歴</h3>
+    <select id="car_history_month" class="ot-history-select" onchange="renderCarHistory()"></select>
+    <div id="car_history_output" class="output" style="min-height:120px;"></div>
+  </div>
+</div>
+
 
 <script>
 /* トップ切り替え */
@@ -1286,6 +1423,9 @@ function showPage(pageId){
 
   const overtimeShell = document.getElementById("overtimeShell");
   if (overtimeShell) overtimeShell.style.display = "none";
+
+  const carDistanceShell = document.getElementById("carDistanceShell");
+  if (carDistanceShell) carDistanceShell.style.display = "none";
 
   const header = document.getElementById("headerCard");
   if (header) header.style.display = "none";
@@ -1323,6 +1463,9 @@ function showHome(){
 
   const overtimeShell = document.getElementById("overtimeShell");
   if (overtimeShell) overtimeShell.style.display = "";
+
+  const carDistanceShell = document.getElementById("carDistanceShell");
+  if (carDistanceShell) carDistanceShell.style.display = "";
 
   const header = document.getElementById("headerCard");
   if (header) header.style.display = "";
@@ -1706,181 +1849,6 @@ function resetDocSheet(sheetName, resultId){
   const result = document.getElementById(resultId);
   result.className = "doccheck-result";
   result.textContent = "";
-}
-
-
-/* To Do */
-const TODO_STORAGE_KEY = "watashi_todo_v1";
-let todoItems = [];
-let todoDragFromIndex = null;
-
-function todoById(id){ return document.getElementById(id); }
-
-function todoSetStatus(msg){
-  const el = todoById("todo_status");
-  if(el) el.textContent = msg;
-}
-
-function todoSave(){
-  localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(todoItems));
-}
-
-function todoLoad(){
-  try{
-    const data = JSON.parse(localStorage.getItem(TODO_STORAGE_KEY) || "[]");
-    todoItems = Array.isArray(data) ? data : [];
-  }catch(e){
-    todoItems = [];
-  }
-  todoRender();
-}
-
-function todoRender(){
-  const box = todoById("todo_output");
-  if(!box) return;
-
-  box.innerHTML = "";
-
-  if(todoItems.length === 0){
-    const empty = document.createElement("div");
-    empty.className = "todo-empty";
-    empty.textContent = "ここにTo Doが表示されます。";
-    box.appendChild(empty);
-    return;
-  }
-
-  todoItems.forEach((item, index) => {
-    const row = document.createElement("div");
-    row.className = "todo-item" + (item.done ? " done" : "");
-    row.draggable = true;
-    row.dataset.index = String(index);
-
-    row.addEventListener("dragstart", (e) => {
-      todoDragFromIndex = index;
-      row.classList.add("dragging");
-      if(e.dataTransfer){
-        e.dataTransfer.effectAllowed = "move";
-        e.dataTransfer.setData("text/plain", String(index));
-      }
-    });
-
-    row.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      row.classList.add("drag-over");
-      if(e.dataTransfer) e.dataTransfer.dropEffect = "move";
-    });
-
-    row.addEventListener("dragleave", () => {
-      row.classList.remove("drag-over");
-    });
-
-    row.addEventListener("drop", (e) => {
-      e.preventDefault();
-      row.classList.remove("drag-over");
-
-      const fromIndex = todoDragFromIndex;
-      const toIndex = index;
-
-      if(fromIndex === null || fromIndex === toIndex) return;
-
-      const moved = todoItems.splice(fromIndex, 1)[0];
-      todoItems.splice(toIndex, 0, moved);
-
-      todoDragFromIndex = null;
-      todoSave();
-      todoRender();
-      todoSetStatus("順番を変更しました。");
-    });
-
-    row.addEventListener("dragend", () => {
-      todoDragFromIndex = null;
-      document.querySelectorAll(".todo-item").forEach(el => {
-        el.classList.remove("dragging");
-        el.classList.remove("drag-over");
-      });
-    });
-
-    const handle = document.createElement("span");
-    handle.className = "todo-drag-handle";
-    handle.textContent = "☰";
-    handle.title = "ドラッグで並べ替え";
-
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = !!item.done;
-    checkbox.addEventListener("change", () => {
-      todoItems[index].done = checkbox.checked;
-      todoSave();
-      todoRender();
-    });
-
-    const text = document.createElement("span");
-    text.className = "todo-text";
-    text.textContent = item.text || "";
-
-    const del = document.createElement("button");
-    del.type = "button";
-    del.className = "todo-delete-btn";
-    del.textContent = "削除";
-    del.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      todoItems.splice(index, 1);
-      todoSave();
-      todoRender();
-      todoSetStatus("削除しました。");
-    });
-
-    row.appendChild(handle);
-    row.appendChild(checkbox);
-    row.appendChild(text);
-    row.appendChild(del);
-    box.appendChild(row);
-  });
-}
-
-function todoAdd(){
-  const input = todoById("todo_text");
-  if(!input) return;
-
-  const lines = input.value.split(/\r?\n/).map(v => v.trim()).filter(Boolean);
-
-  if(lines.length === 0){
-    todoSetStatus("入力してください。");
-    return;
-  }
-
-  lines.forEach(line => {
-    todoItems.push({
-      text: line,
-      done: false
-    });
-  });
-
-  input.value = "";
-  todoSave();
-  todoRender();
-  todoSetStatus("追加しました。");
-}
-
-function todoClearDone(){
-  const before = todoItems.length;
-  todoItems = todoItems.filter(item => !item.done);
-  todoSave();
-  todoRender();
-  todoSetStatus(before === todoItems.length ? "チェック済みの項目はありません。" : "チェック済みを削除しました。");
-}
-
-function todoClearAll(){
-  if(todoItems.length === 0){
-    todoSetStatus("削除する項目はありません。");
-    return;
-  }
-
-  todoItems = [];
-  localStorage.removeItem(TODO_STORAGE_KEY);
-  todoRender();
-  todoSetStatus("すべて削除しました。");
 }
 
 
@@ -2334,6 +2302,8 @@ window.addEventListener("DOMContentLoaded",renderBenefit);
 const OVERTIME_GAS_URL = "https://script.google.com/macros/s/AKfycbz9KpCnxAHmglJ1LDybIZkcIQM_ey9cJ-ih5BVBYUTBuEm_LHjwie1FBPvrJwkTg95Q/exec";
 let overtimeRows = [];
 let furikaeRows = [];
+let carRows = [];
+let carActualOdoRows = [];
 
 function otSetStatus(message, isError=false){
   const el = document.getElementById("ot_status");
@@ -2773,6 +2743,254 @@ async function saveRestDay(workDate, inputId){
     alert("振休日の登録に失敗しました。\n" + err.message);
   }
 }
+
+/* 自動車使用距離 */
+function carSetStatus(message, isError=false){
+  const el = document.getElementById("car_status");
+  if(!el) return;
+  el.textContent = message || "";
+  el.className = isError ? "ot-status error" : "ot-status";
+}
+
+function carNumber(value){
+  const num = Number(value);
+  if(!Number.isFinite(num)) return 0;
+  return Math.round(num * 10) / 10;
+}
+
+function carNumberLabel(value){
+  return carNumber(value).toLocaleString("ja-JP", {maximumFractionDigits:1});
+}
+
+function calcCarClosingDate(dateStr){
+  const d = otDateObj(dateStr);
+  if(!d) return "";
+  const close = d.getDate() <= 15
+    ? new Date(d.getFullYear(), d.getMonth(), 15)
+    : new Date(d.getFullYear(), d.getMonth()+1, 15);
+  return normalizeClosing(close);
+}
+
+function currentCarClosingDate(){
+  return calcCarClosingDate(otYmd(new Date()));
+}
+
+function carPeriodStart(closing){
+  const close = otDateObj(closing);
+  if(!close) return null;
+  return new Date(close.getFullYear(), close.getMonth()-1, 16);
+}
+
+function normalizeCarRows(raw){
+  if(!Array.isArray(raw)) return [];
+  return raw.slice(1).filter(row => row && row.length >= 5 && row[1]).map(row => ({
+    registeredAt: row[0],
+    date: normalizeClosing(row[1]),
+    distance: carNumber(row[2]),
+    odo: carNumber(row[3]),
+    closing: normalizeClosing(row[4] || calcCarClosingDate(row[1]))
+  }));
+}
+
+function normalizeCarActualOdoRows(raw){
+  if(!Array.isArray(raw)) return [];
+  return raw.slice(1).filter(row => row && row.length >= 2 && row[1] !== "").map(row => ({
+    registeredAt: row[0],
+    odo: carNumber(row[1])
+  }));
+}
+
+function carRowsByClosing(closing){
+  const target = normalizeClosing(closing);
+  return carRows
+    .filter(v => normalizeClosing(v.closing || calcCarClosingDate(v.date)) === target)
+    .sort((a,b)=> otDateObj(a.date) - otDateObj(b.date));
+}
+
+function latestCarOdo(){
+  return carRows.length ? carRows[carRows.length-1].odo : null;
+}
+
+function latestActualCarOdo(){
+  return carActualOdoRows.length ? carActualOdoRows[carActualOdoRows.length-1].odo : null;
+}
+
+function makeCarEntries(rows){
+  if(!rows.length) return "まだ申請距離はありません。";
+  return rows.map(v => `
+    <div class="car-entry">
+      <strong>${jpDate(v.date)}</strong>　${carNumberLabel(v.distance)} km
+      <div class="car-entry-odo">加算後ODD：${carNumberLabel(v.odo)} km</div>
+    </div>
+  `).join("");
+}
+
+function renderCarSummary(){
+  const summary = document.getElementById("car_summary");
+  const list = document.getElementById("car_current_list");
+  const initialBox = document.getElementById("car_initial_box");
+  if(!summary || !list || !initialBox) return;
+
+  const closing = currentCarClosingDate();
+  const start = carPeriodStart(closing);
+  const rows = carRowsByClosing(closing);
+  const periodTotal = rows.reduce((sum,v)=> sum + v.distance, 0);
+  const odo = latestCarOdo();
+  const actualOdo = latestActualCarOdo();
+
+  initialBox.style.display = carRows.length ? "none" : "";
+
+  if(odo === null){
+    summary.innerHTML = `
+      <div class="car-initial-note">まだ登録がありません。最初のODDメーターと、最初の申請距離を入力してください。</div>
+      <div class="car-period-total">今回の申請距離合計：0 km</div>
+      <div class="car-period-range">${formatClosingDisplay(start)}〜${formatClosingDisplay(closing)}（${formatClosingDisplay(closing)}締）</div>
+    `;
+  }else{
+    const difference = actualOdo === null ? null : carNumber(actualOdo - odo);
+    const actualHtml = actualOdo === null
+      ? `<div class="car-actual-row">実数ODDはまだ更新されていません。</div>`
+      : `<div class="car-actual-row">
+          最新の実数ODD：<strong>${carNumberLabel(actualOdo)} km</strong><br>
+          実数との差：<span class="car-difference ${difference >= 0 ? "ok" : "over"}">${difference >= 0 ? "+" : ""}${carNumberLabel(difference)} km</span>
+          ${difference < 0 ? `<br><span class="car-difference over">申請距離の累計が実数ODDを超えています。</span>` : ""}
+        </div>`;
+    summary.innerHTML = `
+      <div class="car-current">
+        <div class="car-current-label">現在の計算上ODDメーター</div>
+        <div class="car-current-odo">${carNumberLabel(odo)} <small>km</small></div>
+        <div class="car-period-total">今回の申請距離合計：${carNumberLabel(periodTotal)} km</div>
+        <div class="car-period-range">${formatClosingDisplay(start)}〜${formatClosingDisplay(closing)}（${formatClosingDisplay(closing)}締）</div>
+        ${actualHtml}
+      </div>
+    `;
+  }
+
+  list.innerHTML = makeCarEntries(rows);
+  renderCarHistoryOptions();
+  renderCarHistory();
+}
+
+function renderCarHistoryOptions(){
+  const select = document.getElementById("car_history_month");
+  if(!select) return;
+  const oldValue = select.value;
+  const closings = [...new Set(carRows.map(v => normalizeClosing(v.closing || calcCarClosingDate(v.date))))]
+    .filter(Boolean)
+    .sort((a,b)=> otDateObj(b) - otDateObj(a));
+
+  if(!closings.length){
+    select.innerHTML = `<option value="">履歴なし</option>`;
+    return;
+  }
+
+  select.innerHTML = closings.map(c => `<option value="${c}">${formatClosingDisplay(c)}締</option>`).join("");
+  if(oldValue && closings.includes(oldValue)) select.value = oldValue;
+}
+
+function renderCarHistory(){
+  const select = document.getElementById("car_history_month");
+  const output = document.getElementById("car_history_output");
+  if(!select || !output) return;
+  if(!select.value){
+    output.textContent = "履歴はまだありません。";
+    return;
+  }
+  const rows = carRowsByClosing(select.value);
+  const total = rows.reduce((sum,v)=> sum + v.distance, 0);
+  output.innerHTML = `<div class="ot-total" style="margin-bottom:8px;">合計：${carNumberLabel(total)} km</div>${makeCarEntries(rows)}`;
+}
+
+async function loadCarData(){
+  carSetStatus("スプレッドシートから読み込み中です。");
+  try{
+    const res = await fetch(OVERTIME_GAS_URL + "?mode=getData&ts=" + Date.now());
+    const data = await res.json();
+    if(data.success === false) throw new Error(data.error || "読み込みに失敗しました");
+    carRows = normalizeCarRows(data.car);
+    carActualOdoRows = normalizeCarActualOdoRows(data.carActualOdo);
+    renderCarSummary();
+    carSetStatus("読み込みました。");
+  }catch(err){
+    carSetStatus("読み込みできませんでした。GASの更新と公開設定を確認してください。", true);
+  }
+}
+
+async function saveCarActualOdo(){
+  const input = document.getElementById("car_actual_odo");
+  const saveBtn = document.getElementById("car_actual_save_btn");
+  const actualOdo = Number(input.value);
+
+  if(!Number.isFinite(actualOdo) || actualOdo < 0){
+    carSetStatus("現在の実数ODDを入力してください。", true);
+    return;
+  }
+
+  saveBtn.disabled = true;
+  carSetStatus("実数ODDを更新中です。");
+  try{
+    await postOvertimeData({type:"carActualOdo", actualOdo:actualOdo});
+    input.value = "";
+    await loadCarData();
+    carSetStatus("実数ODDを更新しました。");
+  }catch(err){
+    carSetStatus("実数ODDを更新できませんでした。" + (err.message ? " " + err.message : ""), true);
+  }finally{
+    saveBtn.disabled = false;
+  }
+}
+
+async function addCarDistance(){
+  const date = document.getElementById("car_date").value;
+  const distance = Number(document.getElementById("car_distance").value);
+  const initialOdo = Number(document.getElementById("car_initial_odo").value);
+  const saveBtn = document.getElementById("car_save_btn");
+
+  if(!date){
+    carSetStatus("申請日を入力してください。", true);
+    return;
+  }
+  if(!Number.isFinite(distance) || distance <= 0){
+    carSetStatus("申請距離を入力してください。", true);
+    return;
+  }
+  if(!carRows.length && (!Number.isFinite(initialOdo) || initialOdo < 0)){
+    carSetStatus("最初のODDメーターを入力してください。", true);
+    return;
+  }
+
+  saveBtn.disabled = true;
+  carSetStatus("保存してODDメーターへ加算中です。");
+  try{
+    await postOvertimeData({
+      type: "carDistance",
+      date: date,
+      distance: distance,
+      initialOdo: initialOdo
+    });
+    document.getElementById("car_distance").value = "";
+    document.getElementById("car_initial_odo").value = "";
+    await loadCarData();
+    carSetStatus("保存し、ODDメーターへ加算しました。");
+  }catch(err){
+    carSetStatus("保存できませんでした。" + (err.message ? " " + err.message : ""), true);
+  }finally{
+    saveBtn.disabled = false;
+  }
+}
+
+function clearCarInput(){
+  const date = document.getElementById("car_date");
+  const distance = document.getElementById("car_distance");
+  const initial = document.getElementById("car_initial_odo");
+  if(date) date.value = otYmd(new Date()).replace(/\//g, "-");
+  if(distance) distance.value = "";
+  if(initial) initial.value = "";
+  carSetStatus("入力をクリアしました。");
+}
+
+const carDateInput = document.getElementById("car_date");
+if(carDateInput) carDateInput.value = otYmd(new Date()).replace(/\//g, "-");
 
 setTimeout(()=>{
   loadOvertimeData();
