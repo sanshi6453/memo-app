@@ -889,11 +889,17 @@ button.action{
   width:100%;
   box-sizing:border-box;
 }
-#car_closing_date{
-  width:auto !important;
+.car-date-field{
+  width:100%;
+  min-width:0;
+  padding-right:14px;
+  box-sizing:border-box;
+}
+#carDistancePage .car-date-field .delivery-input{
+  display:block;
+  width:100% !important;
   min-width:0 !important;
-  max-width:none !important;
-  justify-self:stretch;
+  max-width:100% !important;
   box-sizing:border-box !important;
 }
 .car-list-output{
@@ -1411,7 +1417,9 @@ button.action{
     <div class="car-closing-box">
       <div class="delivery-grid">
         <label class="delivery-label">今回の締め日</label>
-        <input type="date" class="delivery-input" id="car_closing_date">
+        <div class="car-date-field">
+          <input type="date" class="delivery-input" id="car_closing_date">
+        </div>
       </div>
       <div class="buttons">
         <button class="action secondary" type="button" id="car_closing_save_btn" onclick="saveCarClosingDate()">締め日を変更</button>
@@ -1440,7 +1448,9 @@ button.action{
 
     <div class="delivery-grid">
       <label class="delivery-label">申請日</label>
-      <input type="date" class="delivery-input" id="car_date">
+      <div class="car-date-field">
+        <input type="date" class="delivery-input" id="car_date">
+      </div>
 
       <label class="delivery-label">申請距離（調整分込み）</label>
       <input type="number" inputmode="decimal" min="0.1" step="0.1" class="delivery-input" id="car_distance" placeholder="例：18.5">
