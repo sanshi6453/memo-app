@@ -2916,7 +2916,9 @@ function renderCarSummary(){
       ? `<div class="car-actual-row">実数ODDはまだ更新されていません。</div>`
       : `<div class="car-actual-row">
           最新の実数ODD：<strong>${carNumberLabel(actualOdo)} km</strong><br>
-          実数との差：<span class="car-difference ${difference >= 0 ? "ok" : "over"}">${difference >= 0 ? "+" : ""}${carNumberLabel(difference)} km</span>
+          ${difference >= 0
+            ? `あと申請できる距離：<span class="car-difference ok">${carNumberLabel(difference)} km</span>`
+            : `申請距離の超過：<span class="car-difference over">${carNumberLabel(Math.abs(difference))} km</span>`}
           ${difference < 0 ? `<br><span class="car-difference over">申請距離の累計が実数ODDを超えています。</span>` : ""}
         </div>`;
     summary.innerHTML = `
