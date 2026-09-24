@@ -795,7 +795,7 @@ button.action{
   font-size:14px;
 }
 
-/* 自動車使用距離（15日締め） */
+/* 自動車使用距離（基本15日締め・変更可） */
 .car-current{
   margin-top:12px;
   padding:16px;
@@ -855,6 +855,32 @@ button.action{
 .car-entry-odo{
   color:#4b6475;
   font-size:13px;
+}
+.car-entry-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.car-delete-btn{
+  flex:0 0 auto;
+  border:1px solid #d93025;
+  border-radius:9px;
+  background:#fff;
+  color:#d93025;
+  padding:6px 10px;
+  font-size:13px;
+  font-weight:bold;
+}
+.car-closing-box{
+  margin-top:14px;
+  padding:12px;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid #c8dce9;
+}
+.car-closing-box .delivery-grid{
+  margin:0;
 }
 .car-initial-note{
   margin:0 0 12px;
@@ -930,7 +956,7 @@ button.action{
 <div class="shell" id="carDistanceShell">
   <div class="delivery-card">
     <div class="delivery-title">自動車使用距離</div>
-    <p class="delivery-sub">申請した距離をODDメーターへ加算し、15日締めの合計を確認できます。</p>
+    <p class="delivery-sub">申請した距離をODDメーターへ加算し、基本15日締めで合計できます。締め日は月ごとに変更できます。</p>
     <button class="delivery-open-btn" type="button" onclick="showPage('carDistancePage'); loadCarData();" style="background:#356b8c;color:#fff;">自動車使用距離を開く</button>
   </div>
 </div>
@@ -1345,8 +1371,17 @@ button.action{
 
   <div class="ot-summary-card">
     <div class="ot-summary-title">現在の集計</div>
-    <div class="ot-summary-sub">毎月16日から翌月15日までを1期間として自動集計します。</div>
+    <div class="ot-summary-sub">基本は15日締めです。16日などへ変更した月は、保存済みの記録も自動でまとめ直します。</div>
     <div id="car_summary">読み込み中です。</div>
+    <div class="car-closing-box">
+      <div class="delivery-grid">
+        <label class="delivery-label">今回の締め日</label>
+        <input type="date" class="delivery-input" id="car_closing_date">
+      </div>
+      <div class="buttons">
+        <button class="action secondary" type="button" id="car_closing_save_btn" onclick="saveCarClosingDate()">締め日を変更</button>
+      </div>
+    </div>
     <div class="delivery-grid" style="margin-top:16px;">
       <label class="delivery-label">現在の実数ODD</label>
       <input type="number" inputmode="decimal" min="0" step="0.1" class="delivery-input" id="car_actual_odo" placeholder="メーターの実数値">
@@ -1388,7 +1423,7 @@ button.action{
   </div>
 
   <div class="card" style="margin-top:20px;">
-    <h3>15日締め履歴</h3>
+    <h3>締め日別履歴</h3>
     <select id="car_history_month" class="ot-history-select" onchange="renderCarHistory()"></select>
     <div id="car_history_output" class="output" style="min-height:120px;"></div>
   </div>
@@ -2304,6 +2339,7 @@ let overtimeRows = [];
 let furikaeRows = [];
 let carRows = [];
 let carActualOdoRows = [];
+let carClosingSettings = {};
 
 function otSetStatus(message, isError=false){
   const el = document.getElementById("ot_status");
@@ -2765,20 +2801,30 @@ function carNumberLabel(value){
 function calcCarClosingDate(dateStr){
   const d = otDateObj(dateStr);
   if(!d) return "";
-  const close = d.getDate() <= 15
-    ? new Date(d.getFullYear(), d.getMonth(), 15)
-    : new Date(d.getFullYear(), d.getMonth()+1, 15);
-  return normalizeClosing(close);
+  const dateText = normalizeClosing(d);
+  const current = carClosingForMonth(d.getFullYear(), d.getMonth());
+  const next = carClosingForMonth(d.getFullYear(), d.getMonth()+1);
+  return dateText <= current ? current : next;
 }
 
 function currentCarClosingDate(){
   return calcCarClosingDate(otYmd(new Date()));
 }
 
+function carClosingForMonth(year, monthIndex){
+  const first = new Date(year, monthIndex, 1);
+  const y = first.getFullYear();
+  const m = String(first.getMonth()+1).padStart(2, "0");
+  const key = `${y}-${m}`;
+  return carClosingSettings[key] || `${key}-15`;
+}
+
 function carPeriodStart(closing){
   const close = otDateObj(closing);
   if(!close) return null;
-  return new Date(close.getFullYear(), close.getMonth()-1, 16);
+  const previousClosing = otDateObj(carClosingForMonth(close.getFullYear(), close.getMonth()-1));
+  previousClosing.setDate(previousClosing.getDate()+1);
+  return previousClosing;
 }
 
 function normalizeCarRows(raw){
@@ -2788,7 +2834,8 @@ function normalizeCarRows(raw){
     date: normalizeClosing(row[1]),
     distance: carNumber(row[2]),
     odo: carNumber(row[3]),
-    closing: normalizeClosing(row[4] || calcCarClosingDate(row[1]))
+    closing: normalizeClosing(row[4] || calcCarClosingDate(row[1])),
+    recordId: String(row[5] || "")
   }));
 }
 
@@ -2800,6 +2847,17 @@ function normalizeCarActualOdoRows(raw){
   }));
 }
 
+function normalizeCarClosingSettings(raw){
+  const settings = {};
+  if(!Array.isArray(raw)) return settings;
+  raw.slice(1).forEach(row => {
+    const closing = normalizeClosing(row && row[1]);
+    const monthKey = closing ? closing.substring(0,7) : String(row && row[0] || "").trim();
+    if(/^\d{4}-\d{2}$/.test(monthKey) && closing) settings[monthKey] = closing;
+  });
+  return settings;
+}
+
 function carRowsByClosing(closing){
   const target = normalizeClosing(closing);
   return carRows
@@ -2808,7 +2866,8 @@ function carRowsByClosing(closing){
 }
 
 function latestCarOdo(){
-  return carRows.length ? carRows[carRows.length-1].odo : null;
+  if(carRows.length) return carRows[carRows.length-1].odo;
+  return carActualOdoRows.length ? carActualOdoRows[0].odo : null;
 }
 
 function latestActualCarOdo(){
@@ -2819,7 +2878,10 @@ function makeCarEntries(rows){
   if(!rows.length) return "まだ申請距離はありません。";
   return rows.map(v => `
     <div class="car-entry">
-      <strong>${jpDate(v.date)}</strong>　${carNumberLabel(v.distance)} km
+      <div class="car-entry-head">
+        <div><strong>${jpDate(v.date)}</strong>　${carNumberLabel(v.distance)} km</div>
+        <button class="car-delete-btn" type="button" onclick="deleteCarDistance('${v.recordId}')">削除</button>
+      </div>
       <div class="car-entry-odo">加算後ODD：${carNumberLabel(v.odo)} km</div>
     </div>
   `).join("");
@@ -2837,8 +2899,10 @@ function renderCarSummary(){
   const periodTotal = rows.reduce((sum,v)=> sum + v.distance, 0);
   const odo = latestCarOdo();
   const actualOdo = latestActualCarOdo();
+  const closingInput = document.getElementById("car_closing_date");
 
-  initialBox.style.display = carRows.length ? "none" : "";
+  initialBox.style.display = (carRows.length || carActualOdoRows.length) ? "none" : "";
+  if(closingInput && document.activeElement !== closingInput) closingInput.value = closing;
 
   if(odo === null){
     summary.innerHTML = `
@@ -2907,12 +2971,49 @@ async function loadCarData(){
     const res = await fetch(OVERTIME_GAS_URL + "?mode=getData&ts=" + Date.now());
     const data = await res.json();
     if(data.success === false) throw new Error(data.error || "読み込みに失敗しました");
+    carClosingSettings = normalizeCarClosingSettings(data.carClosingSettings);
     carRows = normalizeCarRows(data.car);
     carActualOdoRows = normalizeCarActualOdoRows(data.carActualOdo);
     renderCarSummary();
     carSetStatus("読み込みました。");
   }catch(err){
     carSetStatus("読み込みできませんでした。GASの更新と公開設定を確認してください。", true);
+  }
+}
+
+async function saveCarClosingDate(){
+  const input = document.getElementById("car_closing_date");
+  const saveBtn = document.getElementById("car_closing_save_btn");
+  const closingDate = input.value;
+
+  if(!closingDate){
+    carSetStatus("締め日を入力してください。", true);
+    return;
+  }
+
+  saveBtn.disabled = true;
+  carSetStatus("締め日を変更中です。");
+  try{
+    await postOvertimeData({type:"carClosingDate", closingDate:closingDate});
+    await loadCarData();
+    carSetStatus(`締め日を${formatClosingDisplay(closingDate)}に変更しました。`);
+  }catch(err){
+    carSetStatus("締め日を変更できませんでした。" + (err.message ? " " + err.message : ""), true);
+  }finally{
+    saveBtn.disabled = false;
+  }
+}
+
+async function deleteCarDistance(recordId){
+  if(!confirm("この申請距離を削除しますか？")) return;
+
+  carSetStatus("削除中です。");
+  try{
+    await postOvertimeData({type:"deleteCarDistance", recordId:recordId});
+    await loadCarData();
+    carSetStatus("削除しました。以降の計算上ODDも再計算しました。");
+  }catch(err){
+    carSetStatus("削除できませんでした。" + (err.message ? " " + err.message : ""), true);
   }
 }
 
@@ -2954,7 +3055,7 @@ async function addCarDistance(){
     carSetStatus("申請距離を入力してください。", true);
     return;
   }
-  if(!carRows.length && (!Number.isFinite(initialOdo) || initialOdo < 0)){
+  if(!carRows.length && !carActualOdoRows.length && (!Number.isFinite(initialOdo) || initialOdo < 0)){
     carSetStatus("最初のODDメーターを入力してください。", true);
     return;
   }
