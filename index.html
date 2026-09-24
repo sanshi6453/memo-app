@@ -845,22 +845,24 @@ button.action{
   font-weight:bold;
 }
 .car-entry{
-  padding:10px 0;
+  padding:12px 0;
   border-bottom:1px solid #e5e7eb;
-  line-height:1.7;
+  line-height:1.45;
 }
 .car-entry:last-child{
   border-bottom:0;
 }
 .car-entry-odo{
+  margin-top:5px;
   color:#4b6475;
-  font-size:13px;
+  font-size:16px;
 }
 .car-entry-head{
   display:flex;
   align-items:flex-start;
   justify-content:space-between;
   gap:10px;
+  font-size:18px;
 }
 .car-delete-btn{
   flex:0 0 auto;
@@ -868,19 +870,43 @@ button.action{
   border-radius:9px;
   background:#fff;
   color:#d93025;
-  padding:6px 10px;
-  font-size:13px;
+  padding:7px 11px;
+  font-size:14px;
   font-weight:bold;
 }
 .car-closing-box{
   margin-top:14px;
   padding:12px;
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
   border-radius:12px;
   background:#fff;
   border:1px solid #c8dce9;
 }
 .car-closing-box .delivery-grid{
   margin:0;
+}
+.car-list-output{
+  min-height:0 !important;
+  padding:10px 14px;
+  white-space:normal;
+  line-height:1.45;
+}
+#carDistancePage .delivery-grid,
+#carDistancePage .delivery-input,
+#carDistancePage .delivery-select{
+  min-width:0;
+  max-width:100%;
+}
+#carDistancePage .delivery-input,
+#carDistancePage .delivery-select{
+  display:block;
+}
+@media(max-width:800px){
+  #carDistancePage .delivery-grid{
+    grid-template-columns:minmax(0,1fr);
+  }
 }
 .car-initial-note{
   margin:0 0 12px;
@@ -1419,13 +1445,13 @@ button.action{
 
   <div class="card" style="margin-top:20px;">
     <h3>今回の申請明細</h3>
-    <div id="car_current_list" class="output" style="min-height:100px;"></div>
+    <div id="car_current_list" class="output car-list-output"></div>
   </div>
 
   <div class="card" style="margin-top:20px;">
     <h3>締め日別履歴</h3>
     <select id="car_history_month" class="ot-history-select" onchange="renderCarHistory()"></select>
-    <div id="car_history_output" class="output" style="min-height:120px;"></div>
+    <div id="car_history_output" class="output car-list-output"></div>
   </div>
 </div>
 
